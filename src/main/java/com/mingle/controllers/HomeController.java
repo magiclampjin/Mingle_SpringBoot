@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Controller
 @RestController
 public class HomeController {
-	@GetMapping("/mingle/**")
+	@GetMapping("/**")
 	public String home() {
 		return "forward:/index.html";
 	}
