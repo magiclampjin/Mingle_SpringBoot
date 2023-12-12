@@ -35,16 +35,14 @@ public class MemberController {
 			String username = authentication.getName();
 			System.out.println("username:"+username);
 			// 세션에 아이디 저장
-	        session.setAttribute("loginID", username);
+	        // session.setAttribute("loginID", username);
 	        // 세션에 닉네임 저장
 	        String userNick = mServ.selectUserNickName(username);
-	        session.setAttribute("loginNick", userNick);
+	        // session.setAttribute("loginNick", userNick);
 	        //아이디랑 닉네임 맵으로 생성
 	        
 	        userInfo.put("loginID", username);
 	        userInfo.put("loginNick", userNick);
-		}else {
-			userInfo=null;
 		}
 		
         return ResponseEntity.ok(userInfo);
