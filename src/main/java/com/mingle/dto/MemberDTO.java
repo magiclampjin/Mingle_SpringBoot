@@ -20,7 +20,7 @@ public class MemberDTO {
 	private String nickname;
 	private String phone;
 	private String email;
-	private Timestamp birth;
+	private Instant birth;
 	private String member_recommeder_id;
 	private String social_type_id;
 	private Timestamp signup_date;
