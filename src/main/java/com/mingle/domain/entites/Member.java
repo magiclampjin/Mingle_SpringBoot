@@ -18,10 +18,10 @@ public class Member {
 	@Column(name="id")
 	private String id;
 	
-	@Column(name="password")
+	@Column(name="password", nullable = false)
 	private String password;
 	
-	@Column(name="name")
+	@Column(name="name", nullable = false)
 	private String name;
 	
 	// 리스트로 가져와야함
