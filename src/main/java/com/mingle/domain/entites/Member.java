@@ -25,8 +25,8 @@ public class Member {
 	private String name;
 	
 	// 리스트로 가져와야함
-	@Column(name="role")
-	private String role;
+	@Column(name="role_id")
+	private String role_id;
 
 	@Column(name="enabled")
 	private boolean enabled;
