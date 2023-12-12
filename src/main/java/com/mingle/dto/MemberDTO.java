@@ -1,6 +1,7 @@
 package com.mingle.dto;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,7 +21,7 @@ public class MemberDTO {
 	private String nickname;
 	private String phone;
 	private String email;
-	private Timestamp birth;
+	private Instant birth;
 	private String member_recommeder_id;
 	private String social_type_id;
 	private Timestamp signup_date;
