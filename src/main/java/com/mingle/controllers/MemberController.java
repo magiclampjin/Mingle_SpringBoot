@@ -13,15 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mingle.services.MemberService;
 
-import jakarta.servlet.http.HttpSession;
-
 @Controller
 @RestController
 @RequestMapping("/api/member")
 public class MemberController {
-	@Autowired
-	private HttpSession session;
-	
 	@Autowired
 	private MemberService mServ;
 	
@@ -33,18 +28,10 @@ public class MemberController {
 		// 사용자 아이디 가져오기
 		if(authentication!=null) {
 			String username = authentication.getName();
-			System.out.println("username:"+username);
-		// 세션에 아이디 저장
-	        // session.setAttribute("loginID", username);
-	        // 세션에 닉네임 저장
 	        String userNick = mServ.selectUserNickName(username);
-	        // session.setAttribute("loginNick", userNick);
 	        //아이디랑 닉네임 맵으로 생성
-	        
 	        userInfo.put("loginID", username);
 	        userInfo.put("loginNick", userNick);
-		}else {
-			userInfo=null;
 		}
 		
         return ResponseEntity.ok(userInfo);
