@@ -32,12 +32,12 @@ public class Post {
 	@Column(name = "id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
+	
 	@Column(name = "title", nullable = false)
 	private String title;
-	
-	@Column(name = "contents", nullable = false)
-	private String contents;
+
+	@Column(name = "content", nullable = false)
+	private String content;
 	
 	@Column(name = "write_date", nullable = false)
 	@CreationTimestamp
@@ -56,35 +56,21 @@ public class Post {
 	private Long reviewGrade;
 	
 	@ManyToOne
-	@JoinColumn(name = "member_id", referencedColumnName = "id", nullable = false)
+	@JoinColumn(name = "member_id", referencedColumnName = "id")
 	private Member member;
 	
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "parentPost", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name="post_Id", referencedColumnName = "id")
 	private Set<Reply> replies;
 	
 	
 	@Builder
-	public Post(Long id, String title, String contents, Timestamp writeDate, Long viewCount, Boolean isNotice,
-			Boolean isFix, Member member, Set<Reply> replies) {
-		super();
-		this.id = id;
-		this.title = title;
-		this.contents = contents;
-		this.writeDate = writeDate;
-		this.viewCount = viewCount;
-		this.isNotice = isNotice;
-		this.isFix = isFix;
-		this.member = member;
-		this.replies = replies;
-	}
-	
-	@Builder
-	public Post(Long id, String title, String contents, Timestamp writeDate, Long viewCount, Boolean isNotice,
+	public Post(Long id, String title, String content, Timestamp writeDate, Long viewCount, Boolean isNotice,
 			Boolean isFix, Long reviewGrade, Member member, Set<Reply> replies) {
 		super();
 		this.id = id;
 		this.title = title;
-		this.contents = contents;
+		this.content = content;
 		this.writeDate = writeDate;
 		this.viewCount = viewCount;
 		this.isNotice = isNotice;
@@ -93,6 +79,8 @@ public class Post {
 		this.member = member;
 		this.replies = replies;
 	}
+	
+	
 	
 
 }

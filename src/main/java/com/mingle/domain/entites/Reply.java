@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -36,38 +38,32 @@ public class Reply {
 	@CreationTimestamp
 	private Timestamp writeDate;
 	
+	@Column(name = "post_id", nullable = false)
+	private Long postId;
+	
 	@ManyToOne
 	@JoinColumn(name = "member_id", referencedColumnName = "id", nullable = false)
-	private Member writerInfo;
-
-	@ManyToOne
-	@JoinColumn(name = "post_id", referencedColumnName = "id", nullable = false)
-	private Post parentPost;
+	private Member member;
 	
-	@OneToMany(mappedBy = "parentReply")
-	private List<Reply> childReplies;
+	@Column(name = "reply_parent_id", nullable = true)
+	private Long replyParentId;
 	
-	@ManyToOne
-	@JoinColumn(name = "reply_parent_id",referencedColumnName = "id", nullable = true)
-	private Reply parentReply;
-	
-	@ManyToOne
-	@JoinColumn(name = "reply_adoptive_parent_id",referencedColumnName = "id", nullable = true)
-	private Reply adoptiveParentReply;
+	@Column(name = "reply_adoptive_parent_id", nullable = true)
+	private Long replyAdoptiveParentId;
 	
 	@Builder
-	public Reply(Long id, String content, Timestamp writeDate, Member writerInfo, Post parentPost,
-			List<Reply> childReplies, Reply parentReply, Reply adoptiveParentReply) {
+	public Reply(Long id, String content, Timestamp writeDate, Long postId, Member member, Long replyParentId,
+			Long replyAdoptiveParentId) {
 		super();
 		this.id = id;
 		this.content = content;
 		this.writeDate = writeDate;
-		this.writerInfo = writerInfo;
-		this.parentPost = parentPost;
-		this.childReplies = childReplies;
-		this.parentReply = parentReply;
-		this.adoptiveParentReply = adoptiveParentReply;
+		this.postId = postId;
+		this.member = member;
+		this.replyParentId = replyParentId;
+		this.replyAdoptiveParentId = replyAdoptiveParentId;
 	}
+	
 	
 	
 

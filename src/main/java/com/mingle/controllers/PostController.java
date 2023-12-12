@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mingle.dto.PostDTO;
 import com.mingle.services.PostService;
 
 @RestController
@@ -21,6 +22,11 @@ public class PostController {
 	@GetMapping("/freeTop10")
 	public ResponseEntity<List<Map<String,Object>>> getLastestFreePosts(){
 		return ResponseEntity.ok(pServ.selectByNoticeFalseTop10());
+	}
+	
+	@GetMapping("/test")
+	public ResponseEntity<List<PostDTO>> getTest(){
+		return ResponseEntity.ok(pServ.selectAll());
 	}
 	
 	@GetMapping("/noticeTop10")

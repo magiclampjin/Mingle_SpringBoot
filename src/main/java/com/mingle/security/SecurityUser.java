@@ -7,6 +7,6 @@ import com.mingle.domain.entites.Member;
 
 public class SecurityUser extends User{
 	public SecurityUser(Member m) {
-		super(m.getId(), m.getPassword() , m.isEnabled(), true, true, true, AuthorityUtils.createAuthorityList(m.getRole()));
+		super(m.getId(), m.getPassword() , m.isEnabled(), true, true, true, AuthorityUtils.createAuthorityList(m.getRole_id()));
 	}
 }
