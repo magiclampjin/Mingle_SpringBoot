@@ -1,6 +1,7 @@
 package com.mingle.dto;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
