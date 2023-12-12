@@ -1,5 +1,7 @@
 package com.mingle.domain.entites;
 
+import java.sql.Timestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -24,10 +26,31 @@ public class Member {
 	@Column(name="name")
 	private String name;
 	
-	// 리스트로 가져와야함
-	@Column(name="role_id")
-	private String role_id;
+	@Column(name="nickname")
+	private String nickname;
+	
+	@Column(name="phone")
+	private String phone;
+	
+	@Column(name="email")
+	private String email;
+	
+	@Column(name="birth")
+	private Timestamp birth;
+	
+	@Column(name="member_recommeder_id")
+	private String member_recommeder_id;
+	
+	@Column(name="social_type_id")
+	private String social_type_id;
+	
+	@Column(name="signup_date")
+	private Timestamp signup_date;
 
 	@Column(name="enabled")
 	private boolean enabled;
+	
+	@Column(name="role_id")
+	private String role_id;
+
 }
