@@ -31,7 +31,16 @@ public class PartyController {
 	@GetMapping("/getService/{id}")
 	public ResponseEntity<List<ServiceDTO>> selectServiceByCategoryId(@PathVariable String id) {
 		List<ServiceDTO> list = pServ.selectServiceByCategoryId(id);
-		System.out.println(list);
 		return ResponseEntity.ok(list);
 	}
+	
+	// 특정 서비스 정보 불러오기
+	@GetMapping("/getServiceById/{id}")
+	public ResponseEntity<ServiceDTO> selectServiceByServiceId(@PathVariable Long id) {
+		ServiceDTO dto = pServ.selectServiceByServiceId(id);
+		System.out.println(dto);
+		return ResponseEntity.ok(dto);
+	}
+	
+	
 }

@@ -3,7 +3,10 @@ package com.mingle.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import com.mingle.domain.repositories.ServiceCategoryRepository;
 import com.mingle.domain.repositories.ServiceRepository;
@@ -37,5 +40,12 @@ public class PartyService {
 		}else {
 			return sMap.toDtoList(sRepo.findByServiceCategoryId(id));
 		}
+	}
+	
+	// 특정 서비스 정보 불러오기
+	public ServiceDTO selectServiceByServiceId(Long id) {
+		ServiceDTO dto = sMap.toDto(sRepo.findById(id).get());
+		System.out.println(dto);
+		return dto;
 	}
 }
