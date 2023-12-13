@@ -87,6 +87,12 @@
 		    <artifactId>mapstruct</artifactId>
 		    <version>1.5.5.Final</version>
 		</dependency>
+		<!-- Google APIS -->
+		<dependency>
+			<groupId>com.google.apis</groupId>
+			<artifactId>google-api-services-youtube</artifactId>
+			<version>v3-rev222-1.25.0</version>
+		</dependency>
 		
 	</dependencies>
 
