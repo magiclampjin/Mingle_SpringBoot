@@ -20,10 +20,10 @@ public class Member {
 	@Column(name="id")
 	private String id;
 	
-	@Column(name="password")
+	@Column(name="password", nullable = false)
 	private String password;
 	
-	@Column(name="name")
+	@Column(name="name", nullable = false)
 	private String name;
 	
 	@Column(name="nickname")
@@ -39,18 +39,18 @@ public class Member {
 	private Timestamp birth;
 	
 	@Column(name="member_recommeder_id")
-	private String member_recommeder_id;
+	private String memberRecommederId;
 	
 	@Column(name="social_type_id")
-	private String social_type_id;
+	private String socialTypeId;
 	
 	@Column(name="signup_date")
-	private Timestamp signup_date;
+	private Timestamp signupDate;
 
 	@Column(name="enabled")
 	private boolean enabled;
 	
 	@Column(name="role_id")
-	private String role_id;
+	private String roleId;
 
 }
