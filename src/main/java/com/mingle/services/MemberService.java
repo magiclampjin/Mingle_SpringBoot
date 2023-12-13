@@ -14,9 +14,14 @@ public class MemberService {
 	@Autowired
 	private MemberRepository mReop;
 	
+	// 로그인한 사용자 nickName 불러오기
 	public String selectUserNickName(String id) {
-		String nick = mReop.selectUserNickName(id);
-		// String nick = mReop.findByNicknameIs(id);
-		return nick;
+		return mReop.selectUserNickName(id);
+	}
+	
+	// 아이디 중복검사
+	public boolean idDuplicateCheck(String id) {
+		boolean result = mReop.idDuplicateCheck(id);
+		return result;
 	}
 }
