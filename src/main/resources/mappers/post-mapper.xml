@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Post">
+
+	<resultMap id="PostWithRownumResultMap"
+		type="java.util.HashMap">
+		<result column="rownum" property="rownum" />
+		<result column="id" property="id" />
+		<result column="member_id" property="memberId" />
+		<result column="member_nickname" property="memberNickname" />
+		<result column="title" property="title" />
+		<result column="content" property="content" />
+		<result column="write_date" property="writeDate" />
+		<result column="view_count" property="viewCount" />
+		<result column="is_notice" property="isNotice" />
+		<result column="is_fix" property="isFix" />
+		<result column="review_grade" property="reviewGrade" />
+	</resultMap>
+
+
+	<!-- is_notice가 true인 게시물을 조회하는 쿼리 -->
+	<select id="selectByNoticeTrue"
+		resultMap="PostWithRownumResultMap">
+		SELECT *
+		FROM postswithrownum
+		WHERE is_notice = 1
+		ORDER BY id desc
+	</select>
+
+	<select id="selectByNoticeTrueTop10"
+		resultMap="PostWithRownumResultMap">
+		SELECT *
+		FROM postswithrownum
+		WHERE is_notice = 1
+		ORDER BY id desc
+		LIMIT 10
+	</select>
+
+	<!-- is_notice가 false인 게시물을 조회하는 쿼리 -->
+	<select id="selectByNoticeFalse"
+		resultMap="PostWithRownumResultMap">
+		SELECT *
+		FROM postswithrownum
+		WHERE is_notice = 0
+		ORDER BY id desc
+	</select>
+
+	<select id="selectByNoticeFalseTop10"
+		resultMap="PostWithRownumResultMap">
+		SELECT *
+		FROM postswithrownum
+		WHERE is_notice = 0
+		ORDER BY id desc
+		LIMIT 10
+	</select>
+
+</mapper>
