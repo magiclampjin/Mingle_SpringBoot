@@ -14,6 +14,7 @@ import lombok.ToString;
 public class ServiceDTO {
 	private Long id;
 	private String name;
+	private String englishName;
 	private Long price;
 	private Long maxPeopleCount;
 	private Long commission;
