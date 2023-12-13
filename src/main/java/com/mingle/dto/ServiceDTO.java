@@ -16,7 +16,8 @@ public class ServiceDTO {
 	private String name;
 	private String englishName;
 	private Long price;
-	private Long maxPeopleCount;
 	private Long commission;
+	private String plan;
+	private Long maxPeopleCount;
 	private String serviceCategoryId;
 }
