@@ -1,5 +1,7 @@
 package com.mingle.dto;
 
+import java.time.Instant;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,14 +13,10 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class ServiceDTO {
+public class ReportDTO {
 	private Long id;
-	private String name;
-	private String englishName;
-	private Long price;
-	private Long commission;
-	private String plan;
-	private Long maxPeopleCount;
-	private String url;
-	private String serviceCategoryId;
+	private String memberReporterId;
+	private String content;
+	private Instant reportDate;
+	private boolean isProcess;
 }
