@@ -24,8 +24,8 @@ public class AdminController {
 	
 	// 미처리 신고 리스트 (전체)
 	@GetMapping("/reportList")
-	public ResponseEntity<List<ReportDTO>> selectAllByIsProcessFalseOrderByReportDateDesc() {
-		List<ReportDTO> list = rServ.selectAllByIsProcessFalseOrderByReportDateDesc();
+	public ResponseEntity<List<ReportDTO>> findTop10ByIsProcessFalseOrderByReportDateDesc() {
+		List<ReportDTO> list = rServ.findTop10ByIsProcessFalseOrderByReportDateDesc();
 		return ResponseEntity.ok(list);
 	}
 	
@@ -45,8 +45,8 @@ public class AdminController {
 	
 	// 미처리 파티 신고 리스트 (전체)
 	@GetMapping("/reportPartyList")
-	public ResponseEntity<List<ReportDTO>> selectAllByReportParty() {
-		List<ReportDTO> list = rServ.selectAllByReportParty();
+	public ResponseEntity<List<ReportDTO>> selectTop10ByReportParty() {
+		List<ReportDTO> list = rServ.selectTop10ByReportParty();
 		return ResponseEntity.ok(list);
 	}
 	

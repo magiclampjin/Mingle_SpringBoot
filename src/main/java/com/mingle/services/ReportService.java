@@ -3,6 +3,7 @@ package com.mingle.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.mingle.domain.repositories.ReportPartyRepository;
@@ -46,8 +47,8 @@ public class ReportService {
 	private ReportPartyMapper rptMapper;
 	
 	// 미처리 신고 리스트
-	public List<ReportDTO> selectAllByIsProcessFalseOrderByReportDateDesc() {
-		return rMapper.toDtoList(rRepo.selectAllByIsProcessFalseOrderByReportDateDesc());
+	public List<ReportDTO> findTop10ByIsProcessFalseOrderByReportDateDesc() {
+		return rMapper.toDtoList(rRepo.findTop10ByIsProcessFalseOrderByReportDateDesc());
 	}
 	
 	// 미처리 게시물 신고 리스트
@@ -61,8 +62,8 @@ public class ReportService {
 	}
 	
 	// 미처리 파티 신고 리스트
-	public List<ReportDTO> selectAllByReportParty() {
-		return rMapper.toDtoList(rRepo.selectAllByReportParty());
+	public List<ReportDTO> selectTop10ByReportParty() {
+		return rMapper.toDtoList(rRepo.selectTop10ByReportParty(PageRequest.of(0, 10)));
 	}
 	
 	// 미처리 파티 카테고리 리스트 (계정/댓글/미납)
