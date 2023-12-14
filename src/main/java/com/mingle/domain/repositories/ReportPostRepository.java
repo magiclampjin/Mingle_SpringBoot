@@ -10,5 +10,5 @@ public interface ReportPostRepository extends JpaRepository<ReportPost, Long> {
 	
 	// 게시물 신고 상세 정보
 	@Query("select rp from ReportPost rp join fetch rp.report join fetch rp.post where rp.reportId = :id")
-	ReportPost selectPostByIdEquals(@Param("id") Long id);
+	ReportPost selectPostById(@Param("id") Long id);
 }

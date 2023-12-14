@@ -5,36 +5,45 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.mingle.domain.repositories.ReportPartyRepository;
 import com.mingle.domain.repositories.ReportPostRepository;
 import com.mingle.domain.repositories.ReportReplyRepository;
 import com.mingle.domain.repositories.ReportRepository;
 import com.mingle.dto.ReportDTO;
+import com.mingle.dto.ReportPartyDTO;
 import com.mingle.dto.ReportPostDTO;
 import com.mingle.dto.ReportReplyDTO;
 import com.mingle.mappers.ReportMapper;
+import com.mingle.mappers.ReportPartyMapper;
 import com.mingle.mappers.ReportPostMapper;
 import com.mingle.mappers.ReportReplyMapper;
 
 @Service
 public class ReportService {
 
+	// 신고
 	@Autowired
 	private ReportRepository rRepo;
-	
-	@Autowired
-	private ReportPostRepository rpRepo;
-	
-	@Autowired
-	private ReportReplyRepository rrRepo;
-	
 	@Autowired
 	private ReportMapper rMapper;
 	
+	// 게시글 신고
+	@Autowired
+	private ReportPostRepository rpRepo;
 	@Autowired
 	private ReportPostMapper rpMapper;
 	
+	// 댓글 신고
+	@Autowired
+	private ReportReplyRepository rrRepo;
 	@Autowired
 	private ReportReplyMapper rrMapper;
+	
+	// 파티 신고
+	@Autowired
+	private ReportPartyRepository rptRepo;
+	@Autowired
+	private ReportPartyMapper rptMapper;
 	
 	// 미처리 신고 리스트
 	public List<ReportDTO> selectAllByIsProcessFalseOrderByReportDateDesc() {
@@ -62,12 +71,17 @@ public class ReportService {
 	}
 	
 	// 게시글 신고 상세 정보
-	public ReportPostDTO selectPostByIdEquals(Long id) {
-		return rpMapper.toDto(rpRepo.selectPostByIdEquals(id));
+	public ReportPostDTO selectPostById(Long id) {
+		return rpMapper.toDto(rpRepo.selectPostById(id));
 	}
 	
 	// 댓글 신고 상세 정보
-	public ReportReplyDTO selectReplyByIdEquals(Long id) {
-		return rrMapper.toDto(rrRepo.selectReplyByIdEquals(id));
+	public ReportReplyDTO selectReplyById(Long id) {
+		return rrMapper.toDto(rrRepo.selectReplyById(id));
+	}
+	
+	// 파티 신고 상세 정보
+	public ReportPartyDTO selectPartyById(Long id) {
+		return rptMapper.toDto(rptRepo.selectPartyById(id));
 	}
 }

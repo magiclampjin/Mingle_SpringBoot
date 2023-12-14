@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mingle.dto.ReportDTO;
+import com.mingle.dto.ReportPartyDTO;
 import com.mingle.dto.ReportPostDTO;
 import com.mingle.dto.ReportReplyDTO;
 import com.mingle.services.ReportService;
@@ -49,7 +50,7 @@ public class AdminController {
 		return ResponseEntity.ok(list);
 	}
 	
-	// 미처리 파티 카테고리 리스트 (계정/댓글/미납)
+	// 미처리 파티 카테고리 리스트 (계정/댓글/미납/채팅)
 	@GetMapping("/reportPartyCategoryList/{category}")
 	public ResponseEntity<List<ReportDTO>> selectAllByReportPartyCategoryList(@PathVariable String category) {
 		List<ReportDTO> list = rServ.selectAllByReportPartyCategoryList(category);
@@ -58,15 +59,22 @@ public class AdminController {
 	
 	// 게시물 신고 상세 정보
 	@GetMapping("/reportPostDetailInfo/{id}")
-	public ResponseEntity<ReportPostDTO> selectPostByIdEquals(@PathVariable Long id) {
-		ReportPostDTO dto = rServ.selectPostByIdEquals(id);
+	public ResponseEntity<ReportPostDTO> selectPostById(@PathVariable Long id) {
+		ReportPostDTO dto = rServ.selectPostById(id);
 		return ResponseEntity.ok(dto);
 	}
 	
 	// 댓글 신고 상세 정보
 	@GetMapping("/reportReplyDetailInfo/{id}")
-	public ResponseEntity<ReportReplyDTO> selectReplyByIdEquals(@PathVariable Long id) {
-		ReportReplyDTO dto = rServ.selectReplyByIdEquals(id);
+	public ResponseEntity<ReportReplyDTO> selectReplyById(@PathVariable Long id) {
+		ReportReplyDTO dto = rServ.selectReplyById(id);
+		return ResponseEntity.ok(dto);
+	}
+	
+	// 파티 신고 상세 정보
+	@GetMapping("/reportPartyDetailInfo/{id}")
+	public ResponseEntity<ReportPartyDTO> selectPartyById(@PathVariable Long id) {
+		ReportPartyDTO dto = rServ.selectPartyById(id);
 		return ResponseEntity.ok(dto);
 	}
 }

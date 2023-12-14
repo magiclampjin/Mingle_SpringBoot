@@ -1,10 +1,10 @@
 package com.mingle.domain.entites;
 
-import java.sql.Timestamp;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,8 +24,12 @@ public class ReportParty {
 	Long partyRegistratinoId;
 	
 	@Column(name="member_id")
-	Long memberId;
+	String memberId;
 	
 	@Column(name="party_report_category_id")
 	String partyReportCategoryId;
+	
+	@OneToOne
+	@JoinColumn(name = "report_id", referencedColumnName = "id", insertable = false, updatable = false)
+	private Report report;
 }
