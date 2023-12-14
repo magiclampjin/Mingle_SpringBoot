@@ -19,5 +19,6 @@ public class ServiceDTO {
 	private Long commission;
 	private String plan;
 	private Long maxPeopleCount;
+	private String url;
 	private String serviceCategoryId;
 }
