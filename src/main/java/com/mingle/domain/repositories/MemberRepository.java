@@ -34,4 +34,13 @@ public interface MemberRepository extends JpaRepository<Member, String> {
 	default boolean phoneDuplicateCheck(String phone) {
 		return countByPhone(phone) > 0;
 	}
+	
+	// 닉네임 중복 검사
+	@Query("select count(*) from Member m where m.nickname=:nickname")
+	Long countByNickname(@Param("nickname")String nickname);
+	
+	default boolean nickDuplicateCheck(String nickname) {
+		return countByNickname(nickname) > 0;
+	}
+
 }
