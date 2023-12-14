@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
 import com.mingle.dto.NewVideoDTO;
-import com.mingle.services.NewVideoAPIService;
+import com.mingle.services.NewVideoService;
 
 
 //각종 외부 api요청을 보내고 되돌아 온 값을 사이트로 보내주는 컨트롤러
@@ -23,11 +23,11 @@ import com.mingle.services.NewVideoAPIService;
 public class ApiController {
 	
 	@Autowired
-	private NewVideoAPIService nvServ;
+	private NewVideoService nvServ;
 
-	@GetMapping("youtube/netflix")
-	public ResponseEntity<List<NewVideoDTO>> getNetflixKoreaTrailers() throws IOException {
-	        return ResponseEntity.ok(nvServ.getLatestVideosFromNetflixKorea());
+	@GetMapping("youtube/latestvideo")
+	public ResponseEntity<List<NewVideoDTO>> getLatestLikestVideos() throws IOException {
+	        return ResponseEntity.ok(nvServ.selectLikestVideosDuringLatestOneMonth());
 	}
 	
     @ExceptionHandler(Exception.class)

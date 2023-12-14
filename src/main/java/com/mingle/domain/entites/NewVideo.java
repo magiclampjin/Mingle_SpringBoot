@@ -42,13 +42,16 @@ public class NewVideo {
 	@Column(name = "view_count", nullable = false)
 	private Long viewCount;
 	
-	@Column(name = "recoded_date", nullable = false)
+	@Column(name = "recorded_date", nullable = false)
 	@CreationTimestamp
 	private Timestamp recordedDate;
 	
+	@Column(name = "ott", nullable = false)
+	private String ott;
+	
 	@Builder
 	public NewVideo(String id, String title, String description, String url, String thumbnail, Long likeCount,
-			Long viewCount, Timestamp recordedDate) {
+			Long viewCount, Timestamp recordedDate, String ott) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -58,6 +61,7 @@ public class NewVideo {
 		this.likeCount = likeCount;
 		this.viewCount = viewCount;
 		this.recordedDate = recordedDate;
+		this.ott = ott;
 	}
 	
 }
