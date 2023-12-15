@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import com.mingle.domain.entites.Report;
+import com.mingle.domain.entites.Warning;
 import com.mingle.domain.repositories.ReportPartyRepository;
 import com.mingle.domain.repositories.ReportPostRepository;
 import com.mingle.domain.repositories.ReportReplyRepository;
@@ -91,8 +93,20 @@ public class ReportService {
 		return rptMapper.toDto(rptRepo.selectPartyById(id));
 	}
 	
+	// 회원 경고
+	public void insertWarningByMemberId(Warning warning) {
+		wRepo.save(warning);
+	}
+	
 	// 회원 경고 횟수
 	public Long selectWarningCountByMemberId(String memberId) {
 		return wRepo.selectWarningCountByMemberId(memberId);
+	}
+	
+	// 신고 처리
+	public void updateReportProcess(Long id) {
+		Report report = rRepo.findAllById(id); // 해당하는 report 가져옴
+		report.setProcess(true);
+		rRepo.save(report);
 	}
 }

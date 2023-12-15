@@ -29,4 +29,7 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
 	// 미처리 파티 카테고리 리스트 (계정/댓글/미납)
 	@Query("select r from Report r join ReportParty rp on r.id = rp.reportId where rp.partyReportCategoryId = :category and r.isProcess = false order by reportDate desc")
 	List<Report> selectAllByReportPartyCategoryList(@Param("category") String category);
+	
+	// 아이디에 해당하는 신고
+	Report findAllById(@Param("id") Long id);
 }
