@@ -77,4 +77,12 @@ public class AdminController {
 		ReportPartyDTO dto = rServ.selectPartyById(id);
 		return ResponseEntity.ok(dto);
 	}
+	
+	// 회원 경고 횟수
+	@GetMapping("/memberWarningCount/{memberId}")
+	public ResponseEntity<Long> selectWarningCountByMemberId(@PathVariable String memberId) {
+		Long warningCount = rServ.selectWarningCountByMemberId(memberId);
+		System.out.println("경고 횟수: " + warningCount);
+		return ResponseEntity.ok(warningCount);
+	}
 }

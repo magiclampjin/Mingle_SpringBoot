@@ -10,6 +10,7 @@ import com.mingle.domain.repositories.ReportPartyRepository;
 import com.mingle.domain.repositories.ReportPostRepository;
 import com.mingle.domain.repositories.ReportReplyRepository;
 import com.mingle.domain.repositories.ReportRepository;
+import com.mingle.domain.repositories.WarningRepository;
 import com.mingle.dto.ReportDTO;
 import com.mingle.dto.ReportPartyDTO;
 import com.mingle.dto.ReportPostDTO;
@@ -45,6 +46,10 @@ public class ReportService {
 	private ReportPartyRepository rptRepo;
 	@Autowired
 	private ReportPartyMapper rptMapper;
+	
+	// 경고
+	@Autowired
+	private WarningRepository wRepo;
 	
 	// 미처리 신고 리스트
 	public List<ReportDTO> findTop10ByIsProcessFalseOrderByReportDateDesc() {
@@ -84,5 +89,10 @@ public class ReportService {
 	// 파티 신고 상세 정보
 	public ReportPartyDTO selectPartyById(Long id) {
 		return rptMapper.toDto(rptRepo.selectPartyById(id));
+	}
+	
+	// 회원 경고 횟수
+	public Long selectWarningCountByMemberId(String memberId) {
+		return wRepo.selectWarningCountByMemberId(memberId);
 	}
 }
