@@ -38,8 +38,8 @@ public class Member {
 	@Column(name="birth")
 	private Timestamp birth;
 	
-	@Column(name="member_recommeder_id")
-	private String memberRecommederId;
+	@Column(name="member_recommender_id")
+	private String memberRecommenderId;
 	
 	@Column(name="social_type_id")
 	private String socialTypeId;

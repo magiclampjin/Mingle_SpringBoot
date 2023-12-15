@@ -22,7 +22,7 @@ public class MemberDTO {
 	private String phone;
 	private String email;
 	private Instant birth;
-	private String memberRecommederId;
+	private String memberRecommenderId;
 	private String socialTypeId;
 	private Timestamp signupDate;
 	private boolean enabled;

@@ -1,6 +1,6 @@
 package com.mingle.dto;
 
-import java.time.Instant;
+import com.mingle.domain.entites.Report;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,4 +18,5 @@ public class ReportPartyDTO {
 	private Long partyRegistrationId;
 	private String memberId;
 	private String partyReportCategoryId;
+	private Report report;
 }
