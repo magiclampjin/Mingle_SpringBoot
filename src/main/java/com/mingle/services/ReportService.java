@@ -107,6 +107,6 @@ public class ReportService {
 	public void updateReportProcess(Long id) {
 		Report report = rRepo.findAllById(id); // 해당하는 report 가져옴
 		report.setProcess(true);
-		rRepo.save(report);
+		rRepo.save(report); 
 	}
 }
