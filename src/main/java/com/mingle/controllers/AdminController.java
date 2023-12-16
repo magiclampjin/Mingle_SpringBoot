@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mingle.domain.entites.Warning;
+import com.mingle.dto.PostDTO;
 import com.mingle.dto.ReportDTO;
 import com.mingle.dto.ReportPartyDTO;
 import com.mingle.dto.ReportPostDTO;
 import com.mingle.dto.ReportReplyDTO;
+import com.mingle.services.PostService;
 import com.mingle.services.ReportService;
 
 @RestController
@@ -25,6 +27,9 @@ public class AdminController {
 
 	@Autowired
 	private ReportService rServ;
+	
+	@Autowired
+	private PostService pServ;
 	
 	// 미처리 신고 리스트 (전체)
 	@GetMapping("/reportList")
@@ -102,5 +107,14 @@ public class AdminController {
 	public ResponseEntity<Void> updateReportProcess(@PathVariable Long id) {
 		rServ.updateReportProcess(id);
 		return ResponseEntity.ok().build();
+	}
+	
+	
+	
+	// 공지 게시판 리스트
+	@GetMapping("/noticeBoardList")
+	public ResponseEntity<List<PostDTO>> selectNoticePosts() {
+		List<PostDTO> list = pServ.selectNoticePosts();
+		return ResponseEntity.ok(list);
 	}
 }
