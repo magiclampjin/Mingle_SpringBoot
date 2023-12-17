@@ -4,11 +4,15 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mingle.dto.PartyInformationDTO;
 import com.mingle.dto.ServiceCategoryDTO;
 import com.mingle.dto.ServiceDTO;
 import com.mingle.services.PartyService;
@@ -38,9 +42,14 @@ public class PartyController {
 	@GetMapping("/getServiceById/{id}")
 	public ResponseEntity<ServiceDTO> selectServiceByServiceId(@PathVariable Long id) {
 		ServiceDTO dto = pServ.selectServiceByServiceId(id);
-		System.out.println(dto);
 		return ResponseEntity.ok(dto);
 	}
 	
+	// 파티 정보 저장, 파티 등록, 파티장 등록
+	@PostMapping
+	public ResponseEntity<Void> inertParty(@RequestBody PartyInformationDTO partyData, Authentication authentication){
+		pServ.inertParty(partyData, authentication.getName());
+		return ResponseEntity.ok().build();
+	}
 	
 }
