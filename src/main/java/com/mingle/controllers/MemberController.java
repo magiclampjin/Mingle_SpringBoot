@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mingle.domain.entites.Member;
+import com.mingle.dto.MemberDTO;
 import com.mingle.services.MemberService;
 
 @Controller
@@ -50,7 +51,7 @@ public class MemberController {
 
 	// 이메일 중복검사
 	@PostMapping("/emailDuplicateCheck")
-	public ResponseEntity<Boolean> emailDuplicateCheck(@RequestBody String email) {
+	public ResponseEntity<Boolean> emailDuplicateCheck(String email) {
 		boolean result = mServ.emailDuplicateCheck(email);
 		return ResponseEntity.ok(result);
 	}
@@ -66,6 +67,15 @@ public class MemberController {
 	@GetMapping("/createNickName")
 	public ResponseEntity<String> createNickName(){
 		String result = mServ.createNickName();
+		return ResponseEntity.ok(result);
+	}
+	
+	// 회원가입
+	@PostMapping("/insertMember")
+	public ResponseEntity<Integer> insertMember(@RequestBody MemberDTO dto){
+		System.out.println(dto.getBirth());
+		Member insertResult = mServ.insertMember(dto);
+		int result = insertResult!=null?1:0;
 		return ResponseEntity.ok(result);
 	}
 }

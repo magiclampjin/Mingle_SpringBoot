@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.mingle.domain.entites.Member;
+import com.mingle.dto.MemberDTO;
 
 public interface MemberRepository extends JpaRepository<Member, String> {
 	// 로그인한 사용자 nickName 불러오기
@@ -42,5 +43,5 @@ public interface MemberRepository extends JpaRepository<Member, String> {
 	default boolean nickDuplicateCheck(String nickname) {
 		return countByNickname(nickname) > 0;
 	}
-
+	
 }
