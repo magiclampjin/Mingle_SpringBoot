@@ -52,4 +52,13 @@ public class PartyController {
 		return ResponseEntity.ok().build();
 	}
 	
+	
+	// 로그인 여부 -> 추후에 멤버로 이동
+	@GetMapping("/isAuthenticated")
+	public ResponseEntity<Boolean> isAuthenticated(Authentication authentication){
+		if(authentication != null)
+			return ResponseEntity.ok(true);
+		else
+			return ResponseEntity.ok(false);
+	}
 }
