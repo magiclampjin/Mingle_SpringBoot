@@ -41,6 +41,9 @@ public class Service {
 	@Column(name="max_people_count")
 	private Long maxPeopleCount;
 	
+	@Column(name="url")
+	private String url;
+	
 	@Column(name="service_category_id")
 	private String serviceCategoryId;
 }
