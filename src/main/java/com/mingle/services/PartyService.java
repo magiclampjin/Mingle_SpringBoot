@@ -81,4 +81,10 @@ public class PartyService {
 		PartyMember pme = new PartyMember(0L, id, member_id, true);
 		pmRepo.save(pme);
 	}
+	
+	
+	// 등록된 파티 정보 불러오기
+	public List<PartyInformationDTO> selectPartyList(Long id){
+		return piMap.toDtoList(piRepo.findPartyInformationByServiceIdAndCount(id));
+	}
 }

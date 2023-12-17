@@ -61,4 +61,19 @@ public class PartyController {
 		else
 			return ResponseEntity.ok(false);
 	}
+	
+//	// 가입한 파티 목록 불러오기
+//	@GetMapping("/getMyPartyList")
+//	public ResponseEntity<List<PartyInformationDTO>> getMypartyList(Authentication authentication){
+//		List<PartyInformationDTO> list = pServ.getMypartyList(authentication.getName());
+//		return ResponseEntity.ok(list);
+//	}
+	
+	// 생성된 파티 목록 불러오기
+	@GetMapping("/getPartyList/{id}")
+	public ResponseEntity<List<PartyInformationDTO>> getPartyList(@PathVariable Long id){
+		System.out.println(id);
+		List<PartyInformationDTO> list = pServ.selectPartyList(id);
+		return ResponseEntity.ok(list);
+	}
 }

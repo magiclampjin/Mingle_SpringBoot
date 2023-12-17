@@ -18,5 +18,5 @@ import lombok.ToString;
 public class PartyRegistration {
 	@Id
 	@Column(name="id")
-	private long id;
+	private long id;	
 }
