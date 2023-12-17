@@ -115,8 +115,9 @@ public class MemberService {
         
 		Member user = mMapper.toEntity(dto);
 		user.setPassword(pwEncoding);
-		user.setRoleId("default");
+		user.setRoleId("ROLE_MEMBER");
 		user.setSignupDate(Timestamp.valueOf(koreaTime));
+		user.setEnabled(true);
 		return mRepo.save(user);
 	}
 }
