@@ -19,8 +19,12 @@ public class SecurityService implements UserDetailsService{
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		System.out.println("loginID : "+username);
 		Member m = mRepo.findById(username).get();
-		SecurityUser user = new SecurityUser(m);
-		System.out.println(user.toString());
-		return user;
+		if(m!=null) {
+			SecurityUser user = new SecurityUser(m);
+			System.out.println(user.toString());
+			return user;
+		}else {
+			return null;
+		}
 	}
 }
