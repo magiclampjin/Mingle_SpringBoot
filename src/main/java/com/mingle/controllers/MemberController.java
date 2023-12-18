@@ -166,4 +166,13 @@ public class MemberController {
 		return ResponseEntity.ok().build();
 	}
 	
+	// 로그인 여부 (파티 생성 시 사용함 - 로그인한 사용자만 생성 가능하도록)
+	@GetMapping("/isAuthenticated")
+	public ResponseEntity<Boolean> isAuthenticated(Authentication authentication){
+		if(authentication != null)
+			return ResponseEntity.ok(true);
+		else
+			return ResponseEntity.ok(false);
+	}
+	
 }
