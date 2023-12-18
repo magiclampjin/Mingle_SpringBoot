@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import com.mingle.domain.entites.Bank;
 import com.mingle.domain.entites.Member;
 
 public interface MemberRepository extends JpaRepository<Member, String> {
@@ -34,4 +35,12 @@ public interface MemberRepository extends JpaRepository<Member, String> {
 	default boolean phoneDuplicateCheck(String phone) {
 		return countByPhone(phone) > 0;
 	}
+	
+	// 멤버 이메일, 휴대폰 가져오기
+	@Query("select m from Member m where m.id =:id")
+	Member selectMypageInfo(@Param("id") String id);
+	
+	// 닉네임으로 엔티티 가져오기
+	Member findAllById(String username);
+	
 }
