@@ -6,10 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mingle.domain.entites.Warning;
 import com.mingle.dto.ReportDTO;
+import com.mingle.dto.ReportPartyDTO;
 import com.mingle.dto.ReportPostDTO;
 import com.mingle.dto.ReportReplyDTO;
 import com.mingle.services.ReportService;
@@ -23,8 +28,8 @@ public class AdminController {
 	
 	// 미처리 신고 리스트 (전체)
 	@GetMapping("/reportList")
-	public ResponseEntity<List<ReportDTO>> selectAllByIsProcessFalseOrderByReportDateDesc() {
-		List<ReportDTO> list = rServ.selectAllByIsProcessFalseOrderByReportDateDesc();
+	public ResponseEntity<List<ReportDTO>> findTop10ByIsProcessFalseOrderByReportDateDesc() {
+		List<ReportDTO> list = rServ.findTop10ByIsProcessFalseOrderByReportDateDesc();
 		return ResponseEntity.ok(list);
 	}
 	
@@ -44,12 +49,12 @@ public class AdminController {
 	
 	// 미처리 파티 신고 리스트 (전체)
 	@GetMapping("/reportPartyList")
-	public ResponseEntity<List<ReportDTO>> selectAllByReportParty() {
-		List<ReportDTO> list = rServ.selectAllByReportParty();
+	public ResponseEntity<List<ReportDTO>> selectTop10ByReportParty() {
+		List<ReportDTO> list = rServ.selectTop10ByReportParty();
 		return ResponseEntity.ok(list);
 	}
 	
-	// 미처리 파티 카테고리 리스트 (계정/댓글/미납)
+	// 미처리 파티 카테고리 리스트 (계정/댓글/미납/채팅)
 	@GetMapping("/reportPartyCategoryList/{category}")
 	public ResponseEntity<List<ReportDTO>> selectAllByReportPartyCategoryList(@PathVariable String category) {
 		List<ReportDTO> list = rServ.selectAllByReportPartyCategoryList(category);
@@ -58,15 +63,44 @@ public class AdminController {
 	
 	// 게시물 신고 상세 정보
 	@GetMapping("/reportPostDetailInfo/{id}")
-	public ResponseEntity<ReportPostDTO> selectPostByIdEquals(@PathVariable Long id) {
-		ReportPostDTO dto = rServ.selectPostByIdEquals(id);
+	public ResponseEntity<ReportPostDTO> selectPostById(@PathVariable Long id) {
+		ReportPostDTO dto = rServ.selectPostById(id);
 		return ResponseEntity.ok(dto);
 	}
 	
 	// 댓글 신고 상세 정보
 	@GetMapping("/reportReplyDetailInfo/{id}")
-	public ResponseEntity<ReportReplyDTO> selectReplyByIdEquals(@PathVariable Long id) {
-		ReportReplyDTO dto = rServ.selectReplyByIdEquals(id);
+	public ResponseEntity<ReportReplyDTO> selectReplyById(@PathVariable Long id) {
+		ReportReplyDTO dto = rServ.selectReplyById(id);
 		return ResponseEntity.ok(dto);
+	}
+	
+	// 파티 신고 상세 정보
+	@GetMapping("/reportPartyDetailInfo/{id}")
+	public ResponseEntity<ReportPartyDTO> selectPartyById(@PathVariable Long id) {
+		ReportPartyDTO dto = rServ.selectPartyById(id);
+		return ResponseEntity.ok(dto);
+	}
+	
+	// 회원 경고
+	@PostMapping("/giveWarning")
+	public ResponseEntity<Void> insertWarningByMemberId(@RequestBody Warning warning) {
+		rServ.insertWarningByMemberId(warning);
+		return ResponseEntity.ok().build();
+	}
+	
+	// 회원 경고 횟수
+	@GetMapping("/memberWarningCount/{memberId}")
+	public ResponseEntity<Long> selectWarningCountByMemberId(@PathVariable String memberId) {
+		Long warningCount = rServ.selectWarningCountByMemberId(memberId);
+		System.out.println("warningCount: " + warningCount);
+		return ResponseEntity.ok(warningCount);
+	}
+	
+	// 신고 처리
+	@PutMapping("/reportProcess/{id}")
+	public ResponseEntity<Void> updateReportProcess(@PathVariable Long id) {
+		rServ.updateReportProcess(id);
+		return ResponseEntity.ok().build();
 	}
 }

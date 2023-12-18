@@ -13,11 +13,13 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class PartyInfomationDTO {
+public class PartyInformationDTO {
 	private long id;
 	private long serviceId;
 	private long peopleCount;
 	private Instant startDate;
 	private long MonthCount;
 	private String content;
+	private String loginId;
+	private String loginPw;
 }
