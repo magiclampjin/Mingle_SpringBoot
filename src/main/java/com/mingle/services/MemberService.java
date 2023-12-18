@@ -129,18 +129,10 @@ public class MemberService {
 
 	// 회원가입
 	public Member insertMember(MemberDTO dto) {
-		System.out.println(dto.toString());
 		// 비밀번호 인코딩
 		String pwEncoding = passwordEncoder.encode(dto.getPassword());
-		System.out.println(pwEncoding);
-
-		// 생년월일 매핑
-		String birthString = dto.getBirth().toString();
-		System.out.println(birthString);
-
 		// 현재 시각을 얻어옴
 		LocalDateTime now = LocalDateTime.now();
-
 		// 시간대 변환 (UTC에서 Asia/Seoul로)
 		LocalDateTime koreaTime = now.atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Asia/Seoul"))
 				.toLocalDateTime();
@@ -259,7 +251,7 @@ public class MemberService {
 				} else {// 비밀번호 변경
 					body += "<h1>" + session.getAttribute("pwVerificationCode") + "<h1>";
 				}
-				
+
 				body += "<h3>" + "감사합니다." + "<h3>";
 				message.setText(body, "UTF-8", "html");
 			} catch (MessagingException e) {
@@ -277,5 +269,15 @@ public class MemberService {
 	public MemberDTO findUserId(MemberDTO dto) {
 		Member m = mRepo.findByNameAndEmail(dto.getName(), dto.getEmail());
 		return mMapper.toDto(m);
+	}
+
+	// 비밀번호 변경하기
+	public boolean updateUserPw(MemberDTO dto) {
+		// 비밀번호 인코딩
+		String pwEncoding = passwordEncoder.encode(dto.getPassword());
+
+		Member m = mRepo.findAllById(dto.getId());
+		m.setPassword(pwEncoding);
+		return mRepo.save(m) != null;
 	}
 }

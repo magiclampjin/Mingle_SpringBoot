@@ -54,7 +54,7 @@ public class MemberController {
 
 	// 아이디 중복검사
 	@PostMapping("/idDuplicateCheck")
-	public ResponseEntity<Boolean> idDuplicateCheck(@RequestBody String id) {
+	public ResponseEntity<Boolean> idDuplicateCheck(String id) {
 		boolean result = mServ.idDuplicateCheck(id);
 		return ResponseEntity.ok(result);
 	}
@@ -68,8 +68,10 @@ public class MemberController {
 
 	// 전화번호 중복검사
 	@PostMapping("/phoneDuplicateCheck")
-	public ResponseEntity<Boolean> phoneDuplicateCheck(@RequestBody String phone) {
+	public ResponseEntity<Boolean> phoneDuplicateCheck(String phone) {
+		System.out.println(phone);
 		boolean result = mServ.phoneDuplicateCheck(phone);
+		System.out.println(result);
 		return ResponseEntity.ok(result);
 	}
 
@@ -155,7 +157,6 @@ public class MemberController {
 	// 아이디 찾기 본인 인증 메일 보내기
 	@PostMapping("/verificationEmail")
 	public ResponseEntity<Boolean> findId(@RequestBody MemberDTO dto) {
-		System.out.println(dto.getId());
 		boolean result = mServ.findId(dto);
 		return ResponseEntity.ok(result);
 	}
@@ -163,8 +164,6 @@ public class MemberController {
 	// 아이디 찾기 본인 인증 코드 확인하기
 	@PostMapping("/certification/id")
 	public ResponseEntity<Boolean> certification(Integer code) {
-		System.out.println(session.getAttribute("idVerificationCode"));
-		System.out.println(code);
 		boolean result = (code.equals(session.getAttribute("idVerificationCode")));
 		session.invalidate();
 		return ResponseEntity.ok(result);
@@ -184,10 +183,15 @@ public class MemberController {
 	// 비밀번호 찾기 본인 인증 코드 확인하기
 	@PostMapping("/certification/pw")
 	public ResponseEntity<Boolean> pwFindcertification(Integer code) {
-		System.out.println(session.getAttribute("pwVerificationCode"));
-		System.out.println(code);
 		boolean result = (code.equals(session.getAttribute("pwVerificationCode")));
 		session.invalidate();
+		return ResponseEntity.ok(result);
+	}
+	
+	// 비밀번호 변경하기
+	@PostMapping("/updatePw")
+	public ResponseEntity<Boolean> updatePw(@RequestBody MemberDTO dto){
+		boolean result = mServ.updateUserPw(dto);
 		return ResponseEntity.ok(result);
 	}
 }

@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.mingle.services.SecurityService;
@@ -44,6 +45,7 @@ public class SecurityConfig {
 		.failureHandler((request, response, exception) -> { 
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		});
+
 		
 	
 		// 인증이 되어있지 않을 때 발생하는 예외 처리
