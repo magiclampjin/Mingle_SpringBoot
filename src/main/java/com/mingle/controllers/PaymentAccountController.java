@@ -63,10 +63,6 @@ public class PaymentAccountController {
 	// 등록된 계좌 수정하기
 	@PutMapping("/accountUpdate")
 	public ResponseEntity<Void> updateById(Authentication authentication, @RequestBody PaymentAccountDTO dto){
-		System.out.println(authentication.getName());
-		System.out.println(dto.getBankId());
-		System.out.println(dto.getAccountNumber());
-		
 		paServ.updateById(authentication.getName(),dto);
 		
 		return ResponseEntity.ok().build();
