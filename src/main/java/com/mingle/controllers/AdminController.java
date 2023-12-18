@@ -1,6 +1,7 @@
 package com.mingle.controllers;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import com.mingle.dto.ReportDTO;
 import com.mingle.dto.ReportPartyDTO;
 import com.mingle.dto.ReportPostDTO;
 import com.mingle.dto.ReportReplyDTO;
+import com.mingle.services.PartyService;
 import com.mingle.services.PostService;
 import com.mingle.services.ReportService;
 
@@ -30,6 +32,9 @@ public class AdminController {
 	
 	@Autowired
 	private PostService pServ;
+	
+	@Autowired
+	private PartyService ptServ;
 	
 	// 미처리 신고 리스트 (전체)
 	@GetMapping("/reportList")
@@ -107,9 +112,9 @@ public class AdminController {
 	public ResponseEntity<Void> updateReportProcess(@PathVariable Long id) {
 		rServ.updateReportProcess(id);
 		return ResponseEntity.ok().build();
-	}
+	}	
 	
-	
+// ----------------------------------------------------------------
 	
 	// 공지 게시판 리스트
 	@GetMapping("/noticeBoardList")
@@ -146,4 +151,12 @@ public class AdminController {
 		return ResponseEntity.ok().build();
 	}
 	
+// ----------------------------------------------------------------
+	
+	// 서비스별 파티 이용자수
+	@GetMapping("/serviceUserCount")
+	public ResponseEntity<List<Map<String,Object>>> selectCountUserByService() {
+		List<Map<String,Object>> list = ptServ.selectCountUserByService();
+		return ResponseEntity.ok(list);
+	}
 }
