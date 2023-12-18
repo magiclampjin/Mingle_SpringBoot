@@ -155,14 +155,18 @@ public class MemberController {
 	// 아이디 찾기 본인 인증 메일 보내기
 	@PostMapping("/verificationEmail")
 	public ResponseEntity<Boolean> findId(@RequestBody MemberDTO dto) {
+		System.out.println(dto.getId());
 		boolean result = mServ.findId(dto);
 		return ResponseEntity.ok(result);
 	}
 
 	// 아이디 찾기 본인 인증 코드 확인하기
-	@PostMapping("/certification")
+	@PostMapping("/certification/id")
 	public ResponseEntity<Boolean> certification(Integer code) {
-		boolean result = (code.equals(session.getAttribute("emailCode")));
+		System.out.println(session.getAttribute("idVerificationCode"));
+		System.out.println(code);
+		boolean result = (code.equals(session.getAttribute("idVerificationCode")));
+		session.invalidate();
 		return ResponseEntity.ok(result);
 	}
 	
@@ -175,5 +179,15 @@ public class MemberController {
         int length = id.length();
         String securityId = id.substring(0, length - 2) + "**";
 		return ResponseEntity.ok(securityId);
+	}
+	
+	// 비밀번호 찾기 본인 인증 코드 확인하기
+	@PostMapping("/certification/pw")
+	public ResponseEntity<Boolean> pwFindcertification(Integer code) {
+		System.out.println(session.getAttribute("pwVerificationCode"));
+		System.out.println(code);
+		boolean result = (code.equals(session.getAttribute("pwVerificationCode")));
+		session.invalidate();
+		return ResponseEntity.ok(result);
 	}
 }

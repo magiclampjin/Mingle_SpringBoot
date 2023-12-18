@@ -59,20 +59,20 @@ public class MemberService {
 	// 닉네임 명사 뷰
 	@Autowired
 	private NounViewRepository nvRepo;
-	
+
 	// 비밀번호 인코딩
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-	
+
 	@Autowired
 	private BankRepository bRepo;
-	
+
 	@Autowired
 	private BankMapper bMapper;
-	
+
 	@Autowired
 	private HttpSession session;
-	
+
 	@Autowired
 	private JavaMailSender javaMailSender;
 	private static final String senderEmail = "mingle@gmail.com";
@@ -133,17 +133,18 @@ public class MemberService {
 		// 비밀번호 인코딩
 		String pwEncoding = passwordEncoder.encode(dto.getPassword());
 		System.out.println(pwEncoding);
-		
+
 		// 생년월일 매핑
 		String birthString = dto.getBirth().toString();
 		System.out.println(birthString);
-		
-		// 현재 시각을 얻어옴
-        LocalDateTime now = LocalDateTime.now();
 
-        // 시간대 변환 (UTC에서 Asia/Seoul로)
-        LocalDateTime koreaTime = now.atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Asia/Seoul")).toLocalDateTime();
-        
+		// 현재 시각을 얻어옴
+		LocalDateTime now = LocalDateTime.now();
+
+		// 시간대 변환 (UTC에서 Asia/Seoul로)
+		LocalDateTime koreaTime = now.atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Asia/Seoul"))
+				.toLocalDateTime();
+
 		Member user = mMapper.toEntity(dto);
 		user.setPassword(pwEncoding);
 		user.setRoleId("ROLE_MEMBER");
@@ -151,97 +152,130 @@ public class MemberService {
 		user.setEnabled(true);
 		return mRepo.save(user);
 	}
-	
+
 	// 멤버 이메일, 휴대폰 가져오기
 	public MemberDTO selectMypageInfo(String id) {
 		return mMapper.toDto(mRepo.selectMypageInfo(id));
 	}
-	
+
 	// 이메일 인증
 	// 이메일 관련 코드
 	public void createNumber() {
-		number = (int)(Math.random()*(90000)) + 10000;
-		
+		number = (int) (Math.random() * (90000)) + 10000;
+
 		session.setAttribute("emailCode", number);
 	}
-	
+
 	// 이메일 인증 생성
 	public MimeMessage CreateMail(String email) {
-		
+
 		createNumber();
-		
+
 		MimeMessage message = javaMailSender.createMimeMessage();
-		
+
 		try {
-			message.setFrom(senderEmail); 
+			message.setFrom(senderEmail);
 			message.setRecipients(MimeMessage.RecipientType.TO, email);
 			message.setSubject("Mingle 이메일 인증");
 			String body = "";
-			body += "<h3>"+"요청하신 인증 번호입니다."+"<h3>";
-			body += "<h1>"+session.getAttribute("emailCode")+"<h1>";
-			body += "<h3>"+"감사합니다."+"<h3>";
-			message.setText(body,"UTF-8","html");
-		}catch(MessagingException e) {
+			body += "<h3>" + "요청하신 인증 번호입니다." + "<h3>";
+			body += "<h1>" + session.getAttribute("emailCode") + "<h1>";
+			body += "<h3>" + "감사합니다." + "<h3>";
+			message.setText(body, "UTF-8", "html");
+		} catch (MessagingException e) {
 			e.printStackTrace();
 		}
 		return message;
 	}
-	
+
 	// 이메일 보냄
 	public int sendMail(String email) {
 		MimeMessage message = CreateMail(email);
 		javaMailSender.send(message);
-		
+
 		return number;
 	}
-	
+
 	// 이메일 변경
 	public void updateUserEmail(String email, String username) {
-		
+
 		// 멤버 엔티티불러오기
 		Member m = mRepo.findAllById(username);
 		m.setEmail(email);
 		mRepo.save(m);
 	}
-	
-	//은행 목록 불러오기
-	public List<BankDTO> selectBank(){
-		
+
+	// 은행 목록 불러오기
+	public List<BankDTO> selectBank() {
+
 		return bMapper.toDtoList(bRepo.findAll());
 	}
-	
-	// 아이디 찾기 본인 인증 메일 보내기
+
+	// 이메일 인증코드 생성 - 아이디 찾기
+	public void idVerificationCode() {
+		int number = (int) (Math.random() * (90000)) + 10000;
+		session.setAttribute("idVerificationCode", number);
+	}
+
+	// 이메일 인증코드 생성 - 비밀번호 찾기
+	public void pwVerificationCode() {
+		int number = (int) (Math.random() * (90000)) + 10000;
+		session.setAttribute("pwVerificationCode", number);
+	}
+
+	// 아이디 찾기, 비밀번호 변경 본인 인증 메일 보내기
 	public boolean findId(MemberDTO dto) {
 		// 이름과 메일 정보가 일치하는 사용자가 있는지 검증
-		boolean verification = mRepo.userVerification(dto);
-		if(verification) {
-			// 이메일 인증코드 생성
-			createNumber();
+		boolean verification = false;
+		if (dto.getId() == null) {// 아이디 찾기
+			verification = mRepo.userVerification(dto);
+		} else {// 비밀번호 변경
+			verification = mRepo.userPWVerification(dto);
+		}
+
+		if (verification) {
+
+			if (dto.getId() == null) {// 아이디 찾기
+				idVerificationCode();// 이메일 인증코드 생성 - 아이디 찾기
+			} else {// 비밀번호 변경
+				pwVerificationCode();// 이메일 인증코드 생성 - 비밀번호 찾기
+			}
+
 			// 메일 전송 객체 생성
 			MimeMessage message = javaMailSender.createMimeMessage();
 			try {
 				message.setFrom(senderEmail);// 보내는 사람 설정
 				message.setRecipients(MimeMessage.RecipientType.TO, dto.getEmail());// 받는사람 설정
-				message.setSubject("Mingle - [아이디 찾기] 이메일 본인 인증");// 제목 설정
+				if (dto.getId() == null) {// 아이디 찾기
+					message.setSubject("Mingle - [아이디 찾기] 이메일 본인 인증");// 제목 설정
+				} else {// 비밀번호 변경
+					message.setSubject("Mingle - [비밀번호 변경] 이메일 본인 인증");// 제목 설정
+				}
+
 				String body = "";// 메일 본문 설정
-				body += "<h3>"+"본인인증을 위해 요청하신 인증 번호입니다."+"<h3>";
-				body += "<h1>"+session.getAttribute("emailCode")+"<h1>";
-				body += "<h3>"+"감사합니다."+"<h3>";
-				message.setText(body,"UTF-8","html");
-			}catch(MessagingException e) {
+				body += "<h3>" + "본인인증을 위해 요청하신 인증 번호입니다." + "<h3>";
+				if (dto.getId() == null) {// 아이디 찾기
+					body += "<h1>" + session.getAttribute("idVerificationCode") + "<h1>";
+				} else {// 비밀번호 변경
+					body += "<h1>" + session.getAttribute("pwVerificationCode") + "<h1>";
+				}
+				
+				body += "<h3>" + "감사합니다." + "<h3>";
+				message.setText(body, "UTF-8", "html");
+			} catch (MessagingException e) {
 				e.printStackTrace();
 			}
-			
+
 			javaMailSender.send(message);
 			return true;
-		}else {
+		} else {
 			return false;
 		}
 	}
-	
+
 	// 아이디 찾기
 	public MemberDTO findUserId(MemberDTO dto) {
-		Member m =mRepo.findByNameAndEmail(dto.getName(),dto.getEmail());
+		Member m = mRepo.findByNameAndEmail(dto.getName(), dto.getEmail());
 		return mMapper.toDto(m);
 	}
 }
