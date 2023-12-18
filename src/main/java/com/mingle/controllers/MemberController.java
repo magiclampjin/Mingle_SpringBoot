@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -151,4 +152,13 @@ public class MemberController {
 		return ResponseEntity.ok(dto);
 		
 	}
+	
+	// 사용자 휴대폰번호 변경
+	@PutMapping("/mypagePhoneUpdate")
+	public ResponseEntity<Void> updatePhone(Authentication authentication, @RequestBody MemberDTO dto){
+		System.out.println(dto.getPhone());
+		mServ.updateUserPhone(authentication.getName(),dto.getPhone());
+		return ResponseEntity.ok().build();
+	}
+	
 }
