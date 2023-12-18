@@ -1,6 +1,7 @@
 package com.mingle.controllers;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,10 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mingle.domain.entites.Warning;
+import com.mingle.dto.PostDTO;
 import com.mingle.dto.ReportDTO;
 import com.mingle.dto.ReportPartyDTO;
 import com.mingle.dto.ReportPostDTO;
 import com.mingle.dto.ReportReplyDTO;
+import com.mingle.services.PartyService;
+import com.mingle.services.PostService;
 import com.mingle.services.ReportService;
 
 @RestController
@@ -25,6 +29,12 @@ public class AdminController {
 
 	@Autowired
 	private ReportService rServ;
+	
+	@Autowired
+	private PostService pServ;
+	
+	@Autowired
+	private PartyService ptServ;
 	
 	// 미처리 신고 리스트 (전체)
 	@GetMapping("/reportList")
@@ -102,5 +112,51 @@ public class AdminController {
 	public ResponseEntity<Void> updateReportProcess(@PathVariable Long id) {
 		rServ.updateReportProcess(id);
 		return ResponseEntity.ok().build();
+	}	
+	
+// ----------------------------------------------------------------
+	
+	// 공지 게시판 리스트
+	@GetMapping("/noticeBoardList")
+	public ResponseEntity<List<PostDTO>> selectNoticePosts() {
+		List<PostDTO> list = pServ.selectNoticePosts();
+		return ResponseEntity.ok(list);
+	}
+	
+	// 고정 중인 공지글 리스트
+	@GetMapping("/fixedNoticeBoardList")
+	public ResponseEntity<List<PostDTO>> selectByFixedNotice() {
+		List<PostDTO> list = pServ.selectByFixedNotice();
+		return ResponseEntity.ok(list);
+	}
+	
+	// 고정 중이 아닌 공지글 리스트
+	@GetMapping("/unfixedMoticeBoardList")
+	public ResponseEntity<List<PostDTO>> selectByUnFixedNotice() {
+		List<PostDTO> list = pServ.selectByUnfixedNotice();
+		return ResponseEntity.ok(list);
+	}
+	
+	// 공지글 고정
+	@PutMapping("/fixNoticeBoard/{id}")
+	public ResponseEntity<Void> updateNoticeFixTrue(@PathVariable Long id) {
+		pServ.updateNoticeFixTrue(id);
+		return ResponseEntity.ok().build();
+	}
+	
+	// 공지글 고정 해제
+	@PutMapping("/unfixNoticeBoard/{id}")
+	public ResponseEntity<Void> updateNoticeFixFalse(@PathVariable Long id) {
+		pServ.updateNoticeFixFalse(id);
+		return ResponseEntity.ok().build();
+	}
+	
+// ----------------------------------------------------------------
+	
+	// 서비스별 파티 이용자수
+	@GetMapping("/serviceUserCount")
+	public ResponseEntity<List<Map<String,Object>>> selectCountUserByService() {
+		List<Map<String,Object>> list = ptServ.selectCountUserByService();
+		return ResponseEntity.ok(list);
 	}
 }

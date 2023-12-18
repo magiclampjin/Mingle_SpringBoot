@@ -2,10 +2,12 @@ package com.mingle.services;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.mingle.dao.PartyDAO;
 import com.mingle.domain.entites.PartyMember;
 import com.mingle.domain.entites.PartyRegistration;
 import com.mingle.domain.repositories.PartyInformationRepository;
@@ -34,12 +36,14 @@ public class PartyService {
 	private ServiceRepository sRepo;
 	@Autowired
 	private ServiceMapper sMap;
-	
+
 	// 파티 정보
 	@Autowired
 	private PartyInformationRepository piRepo;
 	@Autowired
 	private PartyInformationMapper piMap;
+	@Autowired
+	private PartyDAO pdao;
 	
 	// 파티 등록
 	@Autowired
@@ -69,6 +73,11 @@ public class PartyService {
 		return dto;
 	}
 	
+	// 서비스별 파티 이용자수
+	public List<Map<String, Object>> selectCountUserByService() {
+		return pdao.selectCountUserByService();
+	}
+
 	// 파티 정보 저장
 	public void inertParty(PartyInformationDTO partyData, String member_id){
 		// 파티 정보 저장
@@ -82,7 +91,6 @@ public class PartyService {
 		PartyMember pme = new PartyMember(0L, id, member_id, true);
 		pmRepo.save(pme);
 	}
-	
 	
 	// 등록된 파티 정보 불러오기
 	public List<PartyInformationDTO> selectPartyList(Long id){

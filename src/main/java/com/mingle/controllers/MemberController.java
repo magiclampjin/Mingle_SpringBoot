@@ -35,7 +35,7 @@ public class MemberController {
 	
 	String num = "";
 
-	// 사용자 기본정보 불러오기 - 아이디, 닉네임
+	// 사용자 기본정보 불러오기 - 아이디, 닉네임, 권한 
 	@GetMapping("/userBasicInfo")
 	public ResponseEntity<Map<String, String>> selectUserNickName(Authentication authentication) {
 		Map<String, String> userInfo = new HashMap<>();
@@ -44,10 +44,15 @@ public class MemberController {
 		if (authentication != null) {
 			String username = authentication.getName();
 			// 로그인한 사용자 nickName 불러오기
-			String userNick = mServ.selectUserNickName(username);
-			// 아이디랑 닉네임 맵으로 생성
+//			String userNick = mServ.selectUserNickName(username);
+			// 로그인한 사용자 정보 불러오기
+			MemberDTO dto = mServ.selectUserNickName(username);
+			// 아이디, 닉네임, 권한 맵으로 생성
 			userInfo.put("loginID", username);
-			userInfo.put("loginNick", userNick);
+			userInfo.put("loginNick", dto.getNickname());
+			userInfo.put("loginRole", dto.getRoleId());
+			
+			System.out.println("userInfo : " + userInfo);
 		}
 
 		return ResponseEntity.ok(userInfo);
