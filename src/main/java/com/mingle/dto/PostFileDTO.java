@@ -8,20 +8,23 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class PostReactionsDTO {
+public class PostFileDTO {
 	
 	private Long id;
+	private String oriName;
+	private String sysName;
 	private Long postId;
-	private String memberId;
-	private Long vote;
 	
 	@Builder
-	public PostReactionsDTO(Long id, Long postId, String memberId, Long vote) {
+	public PostFileDTO(Long id, String oriName, String sysName, Long postId) {
 		super();
 		this.id = id;
+		this.oriName = oriName;
+		this.sysName = sysName;
 		this.postId = postId;
-		this.memberId = memberId;
-		this.vote = vote;
 	}
 	
+	
+	
+
 }
