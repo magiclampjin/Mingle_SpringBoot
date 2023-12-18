@@ -209,4 +209,11 @@ public class MemberService {
 		
 		return bMapper.toDtoList(bRepo.findAll());
 	}
+	
+	// 사용자 휴대폰번호 변경
+	public void updateUserPhone(String id, String phone) {
+		Member m = mRepo.findAllById(id);
+		m.setPhone(phone);
+		mRepo.save(m);
+	}
 }
