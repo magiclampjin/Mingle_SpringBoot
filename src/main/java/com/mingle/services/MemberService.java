@@ -238,4 +238,10 @@ public class MemberService {
 			return false;
 		}
 	}
+	
+	// 아이디 찾기
+	public MemberDTO findUserId(MemberDTO dto) {
+		Member m =mRepo.findByNameAndEmail(dto.getName(),dto.getEmail());
+		return mMapper.toDto(m);
+	}
 }
