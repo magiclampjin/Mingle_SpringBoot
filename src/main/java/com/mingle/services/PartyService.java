@@ -1,5 +1,6 @@
 package com.mingle.services;
 
+import java.time.Instant;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,5 +87,10 @@ public class PartyService {
 	// 등록된 파티 정보 불러오기
 	public List<PartyInformationDTO> selectPartyList(Long id){
 		return piMap.toDtoList(piRepo.findPartyInformationByServiceIdAndCount(id));
+	}
+	
+	// 등록된 파티 정보 중 선택한 날짜에 해당하는 파티 정보 불러오기
+	public List<PartyInformationDTO> selectPartyListByStartDate(Long id, Instant start, Instant end){
+		return piMap.toDtoList(piRepo.findPartyInformationByServiceIdAndCountAndStartDate(id, start, end));
 	}
 }
