@@ -6,6 +6,6 @@ import com.mingle.domain.entites.PartyInformation;
 import com.mingle.dto.PartyInformationDTO;
 
 @Mapper(componentModel = "spring")
-public interface PartyInfomationMapper extends GenericMapper<PartyInformationDTO, PartyInformation> {
+public interface PartyInformationMapper  extends GenericMapper<PartyInformationDTO, PartyInformation>{
 
 }
