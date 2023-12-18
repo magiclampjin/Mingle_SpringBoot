@@ -54,10 +54,8 @@ public class SecurityConfig {
 		// 접근 권한이 없을 때 이동할 페이지
 		http.exceptionHandling().accessDeniedPage("/denied");
 		
-		// 로그아웃 1 - 기본 url 사용 
-		//http.logout().invalidateHttpSession(true).logoutSuccessUrl("/");
 		
-		// 로그아웃 2 - 특정 url 사용
+		// 로그아웃 - 특정 url 사용
 		http.logout().logoutUrl("/api/member/logout").invalidateHttpSession(true)
 		.logoutSuccessHandler((request, response, authentication) -> {
 			response.setStatus(HttpServletResponse.SC_OK);

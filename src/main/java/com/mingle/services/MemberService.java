@@ -1,5 +1,22 @@
 package com.mingle.services;
 
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
+
+import com.mingle.domain.entites.Member;
+import com.mingle.domain.repositories.BankRepository;
+import com.mingle.domain.repositories.MemberRepository;
+import com.mingle.dto.BankDTO;
+import com.mingle.dto.MemberDTO;
+import com.mingle.mappers.BankMapper;
+import com.mingle.mappers.MemberMapper;
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.servlet.http.HttpSession;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -46,6 +63,20 @@ public class MemberService {
 	// 비밀번호 인코딩
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	private BankRepository bRepo;
+	
+	@Autowired
+	private BankMapper bMapper;
+	
+	@Autowired
+	private HttpSession session;
+	
+	@Autowired
+	private JavaMailSender javaMailSender;
+	private static final String senderEmail = "mingle@gmail.com";
+	private int number;
 
 	// 로그인한 사용자 nickName 불러오기
 	public String selectUserNickName(String id) {
@@ -119,5 +150,92 @@ public class MemberService {
 		user.setSignupDate(Timestamp.valueOf(koreaTime));
 		user.setEnabled(true);
 		return mRepo.save(user);
+	}
+	
+	// 멤버 이메일, 휴대폰 가져오기
+	public MemberDTO selectMypageInfo(String id) {
+		return mMapper.toDto(mRepo.selectMypageInfo(id));
+	}
+	
+	// 이메일 인증
+	// 이메일 관련 코드
+	public void createNumber() {
+		number = (int)(Math.random()*(90000)) + 10000;
+		
+		session.setAttribute("emailCode", number);
+	}
+	
+	// 이메일 인증 생성
+	public MimeMessage CreateMail(String email) {
+		
+		createNumber();
+		
+		MimeMessage message = javaMailSender.createMimeMessage();
+		
+		try {
+			message.setFrom(senderEmail); 
+			message.setRecipients(MimeMessage.RecipientType.TO, email);
+			message.setSubject("Mingle 이메일 인증");
+			String body = "";
+			body += "<h3>"+"요청하신 인증 번호입니다."+"<h3>";
+			body += "<h1>"+session.getAttribute("emailCode")+"<h1>";
+			body += "<h3>"+"감사합니다."+"<h3>";
+			message.setText(body,"UTF-8","html");
+		}catch(MessagingException e) {
+			e.printStackTrace();
+		}
+		return message;
+	}
+	
+	// 이메일 보냄
+	public int sendMail(String email) {
+		MimeMessage message = CreateMail(email);
+		javaMailSender.send(message);
+		
+		return number;
+	}
+	
+	// 이메일 변경
+	public void updateUserEmail(String email, String username) {
+		
+		// 멤버 엔티티불러오기
+		Member m = mRepo.findAllById(username);
+		m.setEmail(email);
+		mRepo.save(m);
+	}
+	
+	//은행 목록 불러오기
+	public List<BankDTO> selectBank(){
+		
+		return bMapper.toDtoList(bRepo.findAll());
+	}
+	
+	// 아이디 찾기 본인 인증 메일 보내기
+	public boolean findId(MemberDTO dto) {
+		// 이름과 메일 정보가 일치하는 사용자가 있는지 검증
+		boolean verification = mRepo.userVerification(dto);
+		if(verification) {
+			// 이메일 인증코드 생성
+			createNumber();
+			// 메일 전송 객체 생성
+			MimeMessage message = javaMailSender.createMimeMessage();
+			try {
+				message.setFrom(senderEmail);// 보내는 사람 설정
+				message.setRecipients(MimeMessage.RecipientType.TO, dto.getEmail());// 받는사람 설정
+				message.setSubject("Mingle - [아이디 찾기] 이메일 본인 인증");// 제목 설정
+				String body = "";// 메일 본문 설정
+				body += "<h3>"+"본인인증을 위해 요청하신 인증 번호입니다."+"<h3>";
+				body += "<h1>"+session.getAttribute("emailCode")+"<h1>";
+				body += "<h3>"+"감사합니다."+"<h3>";
+				message.setText(body,"UTF-8","html");
+			}catch(MessagingException e) {
+				e.printStackTrace();
+			}
+			
+			javaMailSender.send(message);
+			return true;
+		}else {
+			return false;
+		}
 	}
 }

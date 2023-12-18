@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import com.mingle.domain.entites.Bank;
 import com.mingle.domain.entites.Member;
 import com.mingle.dto.MemberDTO;
 
@@ -43,5 +44,19 @@ public interface MemberRepository extends JpaRepository<Member, String> {
 	default boolean nickDuplicateCheck(String nickname) {
 		return countByNickname(nickname) > 0;
 	}
+
+	// 멤버 이메일, 휴대폰 가져오기
+	@Query("select m from Member m where m.id =:id")
+	Member selectMypageInfo(@Param("id") String id);
 	
+	// 닉네임으로 엔티티 가져오기
+	Member findAllById(String username);
+	
+	// 이름과 메일 정보가 일치하는 사용자가 있는지 검증
+	Member findByNameAndEmail(String name, String email);
+	
+	default boolean userVerification(MemberDTO dto) {
+		return findByNameAndEmail(dto.getName(), dto.getEmail())!=null?true:false;
+	}
+
 }
