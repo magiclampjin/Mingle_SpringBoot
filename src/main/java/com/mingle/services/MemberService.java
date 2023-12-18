@@ -42,8 +42,6 @@ public class MemberService {
 	private MemberMapper mMapper;
 
 	@Autowired
-	private MemberRepository mReop;
-	
 	private MemberRepository mRepo;
 
 	// 닉네임 형용사 관련
@@ -156,7 +154,7 @@ public class MemberService {
 	
 	// 멤버 이메일, 휴대폰 가져오기
 	public MemberDTO selectMypageInfo(String id) {
-		return mMapper.toDto(mReop.selectMypageInfo(id));
+		return mMapper.toDto(mRepo.selectMypageInfo(id));
 	}
 	
 	// 이메일 인증
@@ -201,9 +199,9 @@ public class MemberService {
 	public void updateUserEmail(String email, String username) {
 		
 		// 멤버 엔티티불러오기
-		Member m = mReop.findAllById(username);
+		Member m = mRepo.findAllById(username);
 		m.setEmail(email);
-		mReop.save(m);
+		mRepo.save(m);
 	}
 	
 	//은행 목록 불러오기

@@ -89,7 +89,7 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 
-//멤버 이메일, 휴대폰 가져오기
+	//멤버 이메일, 휴대폰 가져오기
 	@GetMapping("/mypageUserInfo")
 	public ResponseEntity<MemberDTO> selectMypageInfo(Authentication authentication){
 		MemberDTO dto = null;
