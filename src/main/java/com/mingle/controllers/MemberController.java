@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mingle.domain.entites.Member;
+import com.mingle.dto.MemberDTO;
 import com.mingle.services.MemberService;
 
 @Controller
@@ -44,15 +45,13 @@ public class MemberController {
 	// 아이디 중복검사
 	@PostMapping("/idDuplicateCheck")
 	public ResponseEntity<Boolean> idDuplicateCheck(@RequestBody String id) {
-		System.out.println(id);
 		boolean result = mServ.idDuplicateCheck(id);
 		return ResponseEntity.ok(result);
 	}
 
 	// 이메일 중복검사
 	@PostMapping("/emailDuplicateCheck")
-	public ResponseEntity<Boolean> emailDuplicateCheck(@RequestBody String email) {
-		System.out.println(email);
+	public ResponseEntity<Boolean> emailDuplicateCheck(String email) {
 		boolean result = mServ.emailDuplicateCheck(email);
 		return ResponseEntity.ok(result);
 	}
@@ -60,8 +59,23 @@ public class MemberController {
 	// 전화번호 중복검사
 	@PostMapping("/phoneDuplicateCheck")
 	public ResponseEntity<Boolean> phoneDuplicateCheck(@RequestBody String phone) {
-		System.out.println(phone);
 		boolean result = mServ.phoneDuplicateCheck(phone);
+		return ResponseEntity.ok(result);
+	}
+	
+	// 닉네임 랜덤 생성
+	@GetMapping("/createNickName")
+	public ResponseEntity<String> createNickName(){
+		String result = mServ.createNickName();
+		return ResponseEntity.ok(result);
+	}
+	
+	// 회원가입
+	@PostMapping("/insertMember")
+	public ResponseEntity<Integer> insertMember(@RequestBody MemberDTO dto){
+		System.out.println(dto.getBirth());
+		Member insertResult = mServ.insertMember(dto);
+		int result = insertResult!=null?1:0;
 		return ResponseEntity.ok(result);
 	}
 }

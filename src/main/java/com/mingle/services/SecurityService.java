@@ -20,6 +20,7 @@ public class SecurityService implements UserDetailsService{
 		System.out.println("loginID : "+username);
 		Member m = mRepo.findById(username).get();
 		SecurityUser user = new SecurityUser(m);
+		System.out.println(user.toString());
 		return user;
 	}
 }
