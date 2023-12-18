@@ -117,4 +117,33 @@ public class AdminController {
 		List<PostDTO> list = pServ.selectNoticePosts();
 		return ResponseEntity.ok(list);
 	}
+	
+	// 고정 중인 공지글 리스트
+	@GetMapping("/fixedNoticeBoardList")
+	public ResponseEntity<List<PostDTO>> selectByFixedNotice() {
+		List<PostDTO> list = pServ.selectByFixedNotice();
+		return ResponseEntity.ok(list);
+	}
+	
+	// 고정 중이 아닌 공지글 리스트
+	@GetMapping("/unfixedMoticeBoardList")
+	public ResponseEntity<List<PostDTO>> selectByUnFixedNotice() {
+		List<PostDTO> list = pServ.selectByUnfixedNotice();
+		return ResponseEntity.ok(list);
+	}
+	
+	// 공지글 고정
+	@PutMapping("/fixNoticeBoard/{id}")
+	public ResponseEntity<Void> updateNoticeFixTrue(@PathVariable Long id) {
+		pServ.updateNoticeFixTrue(id);
+		return ResponseEntity.ok().build();
+	}
+	
+	// 공지글 고정 해제
+	@PutMapping("/unfixNoticeBoard/{id}")
+	public ResponseEntity<Void> updateNoticeFixFalse(@PathVariable Long id) {
+		pServ.updateNoticeFixFalse(id);
+		return ResponseEntity.ok().build();
+	}
+	
 }
