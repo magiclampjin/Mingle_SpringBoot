@@ -1,8 +1,5 @@
 package com.mingle.domain.entites;
 
-import java.sql.Timestamp;
-import java.util.Set;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
