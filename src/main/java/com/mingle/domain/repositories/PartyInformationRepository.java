@@ -18,7 +18,7 @@ public interface PartyInformationRepository extends JpaRepository<PartyInformati
 //			+ "  GROUP BY pr.id HAVING COUNT(pm.party_registration_id) < pi.people_count)", nativeQuery = true)
 //	List<PartyInformation> findPartyInformationByServiceIdAndCount(@Param("serviceId") Long serviceId);
 	
-	@Query(value = "select * from current_party_info WHERE service_id = :serviceId ", nativeQuery = true)
+	@Query(value = "select * from current_party_info WHERE service_id = :serviceId order by start_date, id desc", nativeQuery = true)
 	List<PartyInformation> findPartyInformationByServiceIdAndCount(@Param("serviceId") Long serviceId);
 
 }
