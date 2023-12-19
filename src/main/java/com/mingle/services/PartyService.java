@@ -17,6 +17,7 @@ import com.mingle.domain.repositories.PartyRegistrationRepository;
 import com.mingle.domain.repositories.ServiceCategoryRepository;
 import com.mingle.domain.repositories.ServiceRepository;
 import com.mingle.dto.PartyInformationDTO;
+import com.mingle.dto.PaymentDTO;
 import com.mingle.dto.ServiceCategoryDTO;
 import com.mingle.dto.ServiceDTO;
 import com.mingle.mappers.PartyInformationMapper;
@@ -105,9 +106,15 @@ public class PartyService {
 		pmRepo.save(pme);
 	}
 	
-	// 파티 가입
-	public void insertJoinParty(Long party_registration_id, String member_id){
+	// 파티 가입 & 첫 달 결제 내역 저장
+	@Transactional
+	public void insertJoinParty(Long party_registration_id, String member_id, PaymentDTO paymentData){
 		PartyMember pme = new PartyMember(0L, party_registration_id, member_id, false);
+		paymentData.setPartyRegistrationId(party_registration_id);
+		paymentData.setMemberId(member_id);
+		paymentData.setPayment_type_id("결제");
+	
+		// paymentservice 이용해서 insert하기
 		pmRepo.save(pme);
 	}
 	

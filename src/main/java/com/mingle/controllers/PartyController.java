@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mingle.dto.PartyInformationDTO;
+import com.mingle.dto.PaymentDTO;
 import com.mingle.dto.ServiceCategoryDTO;
 import com.mingle.dto.ServiceDTO;
 import com.mingle.services.PartyService;
@@ -96,10 +97,10 @@ public class PartyController {
 		return ResponseEntity.ok(list);
 	}
 	
-	// 파티 가입
+	// 파티 가입 & 첫 달 결제 내역 저장
 	@PostMapping("/auth/joinParty/{id}")
-	public ResponseEntity<Void> joinParty(@PathVariable Long id, Authentication authentication){
-		pServ.insertJoinParty(id, authentication.getName());
+	public ResponseEntity<Void> joinParty(@PathVariable Long id, @RequestBody PaymentDTO paymentData, Authentication authentication){
+		pServ.insertJoinParty(id, authentication.getName(), paymentData);
 		return ResponseEntity.ok().build();
 	}
 	
