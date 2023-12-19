@@ -30,10 +30,10 @@ public class PartyInformation {
 	private long peopleCount;
 	@Column(name="start_date")
 	private Instant startDate;
-	@Column(name="Month_count")
-	private long MonthCount;
-	@Column(name="content")
-	private String content;
+	@Column(name="month_count")
+	private long monthCount;
+	@Column(name="calculation_date")
+	private String calculationDate;
 	@Column(name="login_id")
 	private String loginId;
 	@Column(name="login_pw")

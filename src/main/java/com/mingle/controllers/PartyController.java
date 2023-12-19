@@ -53,17 +53,7 @@ public class PartyController {
 		pServ.inertParty(partyData, authentication.getName());
 		return ResponseEntity.ok().build();
 	}
-	
-	
-	// 로그인 여부 -> 추후에 멤버로 이동
-	@GetMapping("/isAuthenticated")
-	public ResponseEntity<Boolean> isAuthenticated(Authentication authentication){
-		if(authentication != null)
-			return ResponseEntity.ok(true);
-		else
-			return ResponseEntity.ok(false);
-	}
-	
+		
 //	// 가입한 파티 목록 불러오기
 //	@GetMapping("/getMyPartyList")
 //	public ResponseEntity<List<PartyInformationDTO>> getMypartyList(Authentication authentication){

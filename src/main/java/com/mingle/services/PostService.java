@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.mingle.dao.PostDAO;
 import com.mingle.domain.entites.Post;
 import com.mingle.domain.entites.PostFile;
+import com.mingle.domain.entites.Report;
 import com.mingle.domain.repositories.PostRepository;
 import com.mingle.dto.PostDTO;
 import com.mingle.dto.UploadPostDTO;
@@ -107,5 +108,30 @@ public class PostService {
 		pRepo.delete(post);
 	}
 	
+	// 고정 중인 공지글 리스트
+	public List<PostDTO> selectByFixedNotice() {
+		List<Post> plist = pRepo.selectByFixedNotice();
+		return pMapper.toDtoList(plist);
+	}
+	
+	// 고정 중이 아닌 공지글 리스트
+	public List<PostDTO> selectByUnfixedNotice() {
+		List<Post> plist = pRepo.selectByUnFixedNotice();
+		return pMapper.toDtoList(plist);
+	}
+	
+	// 공지글 고정
+	public void updateNoticeFixTrue(Long id) {
+		Post post = pRepo.findAllById(id);
+		post.setIsFix(true);
+		pRepo.save(post);
+	}
+	
+	// 공지글 고정 해제
+	public void updateNoticeFixFalse(Long id) {
+		Post post = pRepo.findAllById(id);
+		post.setIsFix(false);
+		pRepo.save(post);
+	}
 
 }
