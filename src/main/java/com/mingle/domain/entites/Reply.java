@@ -5,6 +5,8 @@ import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -49,6 +51,7 @@ public class Reply {
 	private Reply parentReply;
 	
 	// 자식 댓글 클래스 정의
+	@JsonIgnore
 	@OneToMany(mappedBy = "parentReply")
 	private Set<Reply> childrenReplies;
 	
