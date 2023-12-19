@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="NewVideo">
+
+	<resultMap id="VideoResultMap" type="com.mingle.dto.NewVideoDTO">
+	    <result property="id" column="id" />
+	    <result property="title" column="title" />
+	    <result property="description" column="description" />
+	    <result property="url" column="url" />
+	    <result property="thumbnail" column="thumbnail" />
+	    <result property="likeCount" column="like_count" />
+	    <result property="viewCount" column="view_count" />
+	    <result property="recordedDate" column="recorded_date" />
+	    <result property="ott" column="ott" />
+	</resultMap>
+
+	<select id="selectLikestVideosDuringLatestOneMonth" resultMap="VideoResultMap">
+		SELECT v.*
+		FROM new_video v
+		INNER JOIN (
+		SELECT ott, MAX(like_count) as max_like
+		FROM new_video
+		WHERE recorded_date >= NOW() - INTERVAL 1 MONTH
+		GROUP BY ott) 
+		as max_likes ON v.ott = max_likes.ott AND v.like_count =
+		max_likes.max_like
+		WHERE v.recorded_date >= NOW() - INTERVAL 1 MONTH
+		ORDER BY ott;
+	</select>
+
+</mapper>

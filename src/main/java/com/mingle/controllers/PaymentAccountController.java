@@ -1,9 +1,11 @@
 package com.mingle.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mingle.dto.PaymentAccountDTO;
+import com.mingle.services.MemberService;
 import com.mingle.services.PaymentAccountService;
 
 @RestController
@@ -20,6 +23,9 @@ public class PaymentAccountController {
 	
 	@Autowired
 	private PaymentAccountService paServ;
+	
+	@Autowired
+	private MemberService mServ;
 	
 	// 계좌 등록
 	@PostMapping("/accountInsert")
@@ -33,7 +39,7 @@ public class PaymentAccountController {
 			dto.setMemberId(authentication.getName());
 			
 			// 로그인한 사용자의 이름 불러오기
-			dto.setAccountHolder(paServ.selectUserName(authentication.getName()));
+			dto.setAccountHolder(mServ.selectUserName(authentication.getName()));
 			
 			// 계좌 등록
 			paServ.insertAccountInfo(dto);
@@ -66,5 +72,11 @@ public class PaymentAccountController {
 		paServ.updateById(authentication.getName(),dto);
 		
 		return ResponseEntity.ok().build();
+	}
+	
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<String> exceptionHandler(Exception e) {
+		e.printStackTrace();
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 	}
 }
