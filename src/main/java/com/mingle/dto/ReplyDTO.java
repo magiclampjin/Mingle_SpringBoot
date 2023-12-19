@@ -1,7 +1,9 @@
 package com.mingle.dto;
 
 import java.time.Instant;
-import java.util.List;
+import java.util.Set;
+
+import com.mingle.domain.entites.Reply;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -17,30 +19,25 @@ public class ReplyDTO {
 	private String content;
 	private Instant writeDate;
 	private Long postId;
-	private Long replyParentId;
-	private Long replyAdoptiveParentId;
 	private MemberDTO member;
+	private Reply parentReply;
+	private Set<Reply> childrenReplies;
+	private Long replyAdoptiveParentId;
 	
 	@Builder
-	public ReplyDTO(Long id, String content, Instant writeDate, Long postId, Long replyParentId,
-			Long replyAdoptiveParentId, MemberDTO member) {
+	public ReplyDTO(Long id, String content, Instant writeDate, Long postId, MemberDTO member, Reply parentReply,
+			Set<Reply> childrenReplies, Long replyAdoptiveParentId) {
 		super();
 		this.id = id;
 		this.content = content;
 		this.writeDate = writeDate;
 		this.postId = postId;
-		this.replyParentId = replyParentId;
-		this.replyAdoptiveParentId = replyAdoptiveParentId;
 		this.member = member;
+		this.parentReply = parentReply;
+		this.childrenReplies = childrenReplies;
+		this.replyAdoptiveParentId = replyAdoptiveParentId;
 	}
 	
-	
-	
-	
-	
-	
-	
-
 	
 	
 	
