@@ -1,6 +1,7 @@
 package com.mingle.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -70,8 +71,8 @@ public class PaymentAccountController {
 	}
 	
 	@ExceptionHandler(Exception.class)
-	public String exceptionHandler(Exception e) {
+	public ResponseEntity<String> exceptionHandler(Exception e) {
 		e.printStackTrace();
-		return "error";
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 	}
 }
