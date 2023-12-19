@@ -1,7 +1,7 @@
 package com.mingle.domain.entites;
 
 import java.sql.Timestamp;
-import java.util.List;
+import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -45,24 +45,38 @@ public class Reply {
 	@JoinColumn(name = "member_id", referencedColumnName = "id", nullable = false)
 	private Member member;
 	
-	@Column(name = "reply_parent_id", nullable = true)
-	private Long replyParentId;
+	// 부모 댓글 클래스 정의
+	@ManyToOne
+	@JoinColumn(name = "reply_parent_id", referencedColumnName = "id",  nullable = true)
+	private Reply parentReply;
+	
+	// 자식 댓글 클래스 정의(순환 참조는 단 한번만 허용하도록 할것 )
+	@JsonIgnore
+	@OneToMany(mappedBy = "parentReply")
+	private Set<Reply> childrenReplies;
+	
 	
 	@Column(name = "reply_adoptive_parent_id", nullable = true)
 	private Long replyAdoptiveParentId;
+
 	
 	@Builder
-	public Reply(Long id, String content, Timestamp writeDate, Long postId, Member member, Long replyParentId,
-			Long replyAdoptiveParentId) {
+	public Reply(Long id, String content, Timestamp writeDate, Long postId, Member member, Reply parentReply,
+			Set<Reply> childrenReplies, Long replyAdoptiveParentId) {
 		super();
 		this.id = id;
 		this.content = content;
 		this.writeDate = writeDate;
 		this.postId = postId;
 		this.member = member;
-		this.replyParentId = replyParentId;
+		this.parentReply = parentReply;
+		this.childrenReplies = childrenReplies;
 		this.replyAdoptiveParentId = replyAdoptiveParentId;
 	}
+
+	
+	
+	
 	
 	
 	
