@@ -19,65 +19,79 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
 import com.mingle.dto.PostDTO;
+import com.mingle.dto.PostViewDTO;
 import com.mingle.dto.UploadPostDTO;
 import com.mingle.services.PostService;
 
 @RestController
 @RequestMapping("/api/post")
 public class PostController {
-	
+
 	@Autowired
 	private PostService pServ;
-	
+
+//	@GetMapping("/freeTop10")
+//	public ResponseEntity<List<Map<String,Object>>> getLastestFreePosts(){
+//		return ResponseEntity.ok(pServ.selectByNoticeFalseTop10());
+//	}
+//	@GetMapping("/noticeTop10")
+//	public ResponseEntity<List<Map<String,Object>>> getLastestNoticePosts(){
+//		return ResponseEntity.ok(pServ.selectByNoticeTrueTop10());
+//	}
+
 	@GetMapping("/freeTop10")
-	public ResponseEntity<List<Map<String,Object>>> getLastestFreePosts(){
-		return ResponseEntity.ok(pServ.selectByNoticeFalseTop10());
-	}
-	
-	@GetMapping("/test")
-	public ResponseEntity<List<PostDTO>> getTest(){
-		return ResponseEntity.ok(pServ.selectAll());
-	}
-	
-	@GetMapping("/noticeTop10")
-	public ResponseEntity<List<Map<String,Object>>> getLastestNoticePosts(){
-		return ResponseEntity.ok(pServ.selectByNoticeTrueTop10());
+	public ResponseEntity<List<PostViewDTO>> getLastestFreePosts() {
+		return ResponseEntity.ok(pServ.selectByFreeTop10());
 	}
 	
 	@GetMapping("/free")
-	public ResponseEntity<List<Map<String,Object>>> getFreePosts(){
-		return ResponseEntity.ok(pServ.selectByNoticeFalse());
-	}
-	
-	@GetMapping("/notice")
-	public ResponseEntity<List<Map<String,Object>>> getNoticePosts(){
-		return ResponseEntity.ok(pServ.selectByNoticeTrue());
-	}
-	
-	@GetMapping("/{id}")
-	public ResponseEntity<PostDTO> getPostInfo(@PathVariable Long id) {
-	    return ResponseEntity.ok(pServ.findPostById(id));
+	public ResponseEntity<List<PostViewDTO>> getFreePosts() {
+		return ResponseEntity.ok(pServ.selectByFree());
 	}
 
+	@GetMapping("/noticeTop10")
+	public ResponseEntity<List<PostViewDTO>> getLastestNoticePosts() {
+		return ResponseEntity.ok(pServ.selectByNoticeTop10());
+	}
+
+	@GetMapping("/notice")
+	public ResponseEntity<List<PostViewDTO>> getNoticePosts() {
+		return ResponseEntity.ok(pServ.selectByNotice());
+	}
 	
+	@GetMapping("/popularTop10")
+	public ResponseEntity<List<PostViewDTO>> getLatestPopularPosts(){
+		return ResponseEntity.ok(pServ.selectByPopularTop10());
+	}
+	
+	@GetMapping("/popular")
+	public ResponseEntity<List<PostViewDTO>> getPopularPosts(){
+		return ResponseEntity.ok(pServ.selectByPopular());
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<PostDTO> getPostInfo(@PathVariable Long id) {
+		return ResponseEntity.ok(pServ.findPostById(id));
+	}
+
 	@PostMapping
-	public ResponseEntity<Void> postInsert(@RequestBody UploadPostDTO dto) throws IllegalStateException, IOException{
+	public ResponseEntity<Void> postInsert(@RequestBody UploadPostDTO dto) throws IllegalStateException, IOException {
 		pServ.insert(dto);
 		return ResponseEntity.ok().build();
 	}
-	
+
 	@PutMapping
 	public ResponseEntity<Void> postUpdate(@RequestBody Long id, @RequestBody PostDTO dto) {
 		pServ.updateById(id, dto);
 		return ResponseEntity.ok().build();
 	}
-	
+
 	@DeleteMapping
-	public ResponseEntity<Void> postDelete(@RequestBody Long id, @RequestBody PostDTO dto) {
-		pServ.deleteById(id, dto);
+	public ResponseEntity<Void> postDelete(@RequestBody Long id) {
+		pServ.deleteById(id);
 		return ResponseEntity.ok().build();
 	}
-	
+
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> handleException(Exception e, WebRequest request) {
 		e.printStackTrace();
