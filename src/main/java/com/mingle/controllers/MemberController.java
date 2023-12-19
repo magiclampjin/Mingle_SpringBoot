@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,7 +35,7 @@ public class MemberController {
 
 	String num = "";
 
-	// 사용자 기본정보 불러오기 - 아이디, 닉네임
+	// 사용자 기본정보 불러오기 - 아이디, 닉네임, 권한 
 	@GetMapping("/userBasicInfo")
 	public ResponseEntity<Map<String, String>> selectUserNickName(Authentication authentication) {
 		Map<String, String> userInfo = new HashMap<>();
@@ -43,10 +44,15 @@ public class MemberController {
 		if (authentication != null) {
 			String username = authentication.getName();
 			// 로그인한 사용자 nickName 불러오기
-			String userNick = mServ.selectUserNickName(username);
-			// 아이디랑 닉네임 맵으로 생성
+//			String userNick = mServ.selectUserNickName(username);
+			// 로그인한 사용자 정보 불러오기
+			MemberDTO dto = mServ.selectUserNickName(username);
+			// 아이디, 닉네임, 권한 맵으로 생성
 			userInfo.put("loginID", username);
-			userInfo.put("loginNick", userNick);
+			userInfo.put("loginNick", dto.getNickname());
+			userInfo.put("loginRole", dto.getRoleId());
+			
+			System.out.println("userInfo : " + userInfo);
 		}
 
 		return ResponseEntity.ok(userInfo);
@@ -194,4 +200,22 @@ public class MemberController {
 		boolean result = mServ.updateUserPw(dto);
 		return ResponseEntity.ok(result);
 	}
+	
+	// 사용자 휴대폰번호 변경
+	@PutMapping("/mypagePhoneUpdate")
+	public ResponseEntity<Void> updatePhone(Authentication authentication, @RequestBody MemberDTO dto){
+		System.out.println(dto.getPhone());
+		mServ.updateUserPhone(authentication.getName(),dto.getPhone());
+		return ResponseEntity.ok().build();
+	}
+	
+	// 로그인 여부 (파티 생성 시 사용함 - 로그인한 사용자만 생성 가능하도록)
+	@GetMapping("/isAuthenticated")
+	public ResponseEntity<Boolean> isAuthenticated(Authentication authentication){
+		if(authentication != null)
+			return ResponseEntity.ok(true);
+		else
+			return ResponseEntity.ok(false);
+	}
+	
 }

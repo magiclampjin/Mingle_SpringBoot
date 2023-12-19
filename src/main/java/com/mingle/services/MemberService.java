@@ -79,8 +79,11 @@ public class MemberService {
 	private int number;
 
 	// 로그인한 사용자 nickName 불러오기
-	public String selectUserNickName(String id) {
-		return mRepo.selectUserNickName(id);
+//	public String selectUserNickName(String id) {
+//		return mRepo.selectUserNickName(id);
+//	}
+	public MemberDTO selectUserNickName(String id) {
+		return mMapper.toDto(mRepo.selectUserNickName(id));
 	}
 
 	// 아이디 중복검사
@@ -279,5 +282,12 @@ public class MemberService {
 		Member m = mRepo.findAllById(dto.getId());
 		m.setPassword(pwEncoding);
 		return mRepo.save(m) != null;
+	}
+	
+	// 사용자 휴대폰번호 변경
+	public void updateUserPhone(String id, String phone) {
+		Member m = mRepo.findAllById(id);
+		m.setPhone(phone);
+		mRepo.save(m);
 	}
 }

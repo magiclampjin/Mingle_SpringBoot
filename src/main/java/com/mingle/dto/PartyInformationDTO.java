@@ -18,8 +18,8 @@ public class PartyInformationDTO {
 	private long serviceId;
 	private long peopleCount;
 	private Instant startDate;
-	private long MonthCount;
-	private String content;
+	private long monthCount;
+	private long calculationDate;
 	private String loginId;
 	private String loginPw;
 }

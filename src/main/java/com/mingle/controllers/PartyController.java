@@ -1,5 +1,6 @@
 package com.mingle.controllers;
 
+import java.time.Instant;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mingle.dto.PartyInformationDTO;
@@ -51,17 +53,7 @@ public class PartyController {
 		pServ.inertParty(partyData, authentication.getName());
 		return ResponseEntity.ok().build();
 	}
-	
-	
-	// 로그인 여부 -> 추후에 멤버로 이동
-	@GetMapping("/isAuthenticated")
-	public ResponseEntity<Boolean> isAuthenticated(Authentication authentication){
-		if(authentication != null)
-			return ResponseEntity.ok(true);
-		else
-			return ResponseEntity.ok(false);
-	}
-	
+		
 //	// 가입한 파티 목록 불러오기
 //	@GetMapping("/getMyPartyList")
 //	public ResponseEntity<List<PartyInformationDTO>> getMypartyList(Authentication authentication){
@@ -72,8 +64,14 @@ public class PartyController {
 	// 생성된 파티 목록 불러오기
 	@GetMapping("/getPartyList/{id}")
 	public ResponseEntity<List<PartyInformationDTO>> getPartyList(@PathVariable Long id){
-		System.out.println(id);
 		List<PartyInformationDTO> list = pServ.selectPartyList(id);
+		return ResponseEntity.ok(list);
+	}
+	
+	// 등록된 파티 정보 중 선택한 날짜에 해당하는 파티 정보 불러오기
+	@GetMapping("/getPartyListByStartDate/{id}")
+	public ResponseEntity<List<PartyInformationDTO>> selectPartyListByStartDate(@PathVariable Long id, @RequestParam Instant start, @RequestParam Instant end){
+		List<PartyInformationDTO> list = pServ.selectPartyListByStartDate(id, start, end);
 		return ResponseEntity.ok(list);
 	}
 }

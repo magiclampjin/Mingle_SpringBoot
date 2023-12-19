@@ -10,8 +10,10 @@ import com.mingle.dto.MemberDTO;
 
 public interface MemberRepository extends JpaRepository<Member, String> {
 	// 로그인한 사용자 nickName 불러오기
-	@Query("select m.nickname from Member m where m.id = :id")
-	String selectUserNickName(@Param("id") String id);
+//	@Query("select m.nickname from Member m where m.id = :id")
+//	String selectUserNickName(@Param("id") String id);
+	@Query("select m from Member m where m.id = :id")
+	Member selectUserNickName(@Param("id") String id);
 
 	// 아이디 중복검사
 	@Query("select count(*) from Member m where m.id=:id")
