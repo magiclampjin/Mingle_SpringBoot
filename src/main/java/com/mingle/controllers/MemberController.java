@@ -1,5 +1,6 @@
 package com.mingle.controllers;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -218,4 +219,14 @@ public class MemberController {
 			return ResponseEntity.ok(false);
 	}
 	
+	// 카카오 로그인 시도
+	@PostMapping("/login/oauth/kakao")
+	public ResponseEntity<MemberDTO> loginKakao(String code) throws IOException{
+		System.out.println("카카오 접근 완료");
+		System.out.println(code);
+		String[] kakaoAccessToken = mServ.getKaKaoAccessToken(code);
+		String access_found_in_token = kakaoAccessToken[0];
+		MemberDTO userInfo = mServ.createKakaoUser(access_found_in_token);
+		return ResponseEntity.ok(userInfo);
+	}
 }
