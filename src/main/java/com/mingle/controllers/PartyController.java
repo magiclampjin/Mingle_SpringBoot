@@ -4,8 +4,10 @@ import java.time.Instant;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,8 +50,8 @@ public class PartyController {
 	}
 	
 	// 파티 정보 저장, 파티 등록, 파티장 등록
-	@PostMapping
-	public ResponseEntity<Void> inertParty(@RequestBody PartyInformationDTO partyData, Authentication authentication){
+	@PostMapping("/auth")
+	public ResponseEntity<Void> inertParty (@RequestBody PartyInformationDTO partyData, Authentication authentication){
 		pServ.inertParty(partyData, authentication.getName());
 		return ResponseEntity.ok().build();
 	}
@@ -73,5 +75,11 @@ public class PartyController {
 	public ResponseEntity<List<PartyInformationDTO>> selectPartyListByStartDate(@PathVariable Long id, @RequestParam Instant start, @RequestParam Instant end){
 		List<PartyInformationDTO> list = pServ.selectPartyListByStartDate(id, start, end);
 		return ResponseEntity.ok(list);
+	}
+	
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<String> exceptionHandler(Exception e) {
+		e.printStackTrace();
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 	}
 }

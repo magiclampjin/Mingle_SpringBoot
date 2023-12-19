@@ -28,7 +28,7 @@ public class SecurityConfig {
 		http.csrf().disable();
 		
 		http.authorizeHttpRequests()
-		//.requestMatchers(new AntPathRequestMatcher("/party/PartyCreatePage/**")).authenticated()
+		.requestMatchers(new AntPathRequestMatcher("/api/party/auth/**")).authenticated()
 		.requestMatchers(new AntPathRequestMatcher("/**")).permitAll();
 		
 		// 로그인 ( 참고해도 되고 걍 지우고 다시 써도 무관.. )

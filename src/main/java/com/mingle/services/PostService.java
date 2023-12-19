@@ -67,10 +67,10 @@ public class PostService {
 		return pdao.selectByNoticeTrue();
 	}
 	
-	// 공지 게시판 최신 글 불러오기(Mybatis)
 	public List<Map<String,Object>> selectByNoticeTrueTop10(){
 		return pdao.selectByNoticeTrueTop10();
 	}
+	
 	
 	public List<Map<String,Object>> selectByNoticeFalse(){
 		return pdao.selectByNoticeFalse();
@@ -87,8 +87,6 @@ public class PostService {
 		List<Post> plist = pRepo.findAll();
 		return pMapper.toDtoList(plist);
 	}
-	
-	
 	
 	// 공지 게시판 최신 글 10개 불러오기 (JPA)
 	public List<PostViewDTO> selectByNoticeTop10(){
@@ -177,6 +175,7 @@ public class PostService {
 	}
 	
 	// 모든 공지 게시글 가져오기
+	// 공지 게시글 불러오기 ( 관리자 대시보드 )
 	public List<PostDTO> selectNoticePosts() {
 		List<Post> plist = pRepo.findAllByNoticePosts();
 		return pMapper.toDtoList(plist);
