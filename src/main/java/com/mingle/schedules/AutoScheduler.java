@@ -1,6 +1,18 @@
 package com.mingle.schedules;
 
+import java.io.IOException;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import com.mingle.domain.repositories.NewVideoRepository;
+import com.mingle.dto.NewVideoDTO;
+import com.mingle.mappers.NewVideoMapper;
+import com.mingle.services.NewVideoAPIService;
+
+import jakarta.transaction.Transactional;
 
 @Component
 public class AutoScheduler {
@@ -11,5 +23,63 @@ public class AutoScheduler {
 //		sservice.autoDeleteInTrash();
 //		abservice.autoDeleteInTrash();
 //	}
+	
+	@Autowired
+	private NewVideoRepository nvRepo;
+	
+	@Autowired
+	private NewVideoAPIService nvAPIServ;
+	
+	@Autowired
+	private NewVideoMapper nvMapper;
+	
+
+    @Scheduled(cron = "0 0 12 * * ?")
+    @Transactional
+    public void updateNetflixVideoData() throws IOException {
+        List<NewVideoDTO> newVideos = nvAPIServ.getLatestVideosFromNetflixKorea();
+        
+        for (NewVideoDTO newVideo : newVideos) {
+            if (!nvRepo.existsById(newVideo.getId())) {
+                nvRepo.save(nvMapper.toEntity(newVideo));
+            }
+        }
+    }
+    
+    @Scheduled(cron = "0 1 12 * * ?")
+    @Transactional
+    public void updateTvingVideoData() throws IOException {
+        List<NewVideoDTO> newVideos = nvAPIServ.getLatestVideosFromTving();
+        
+        for (NewVideoDTO newVideo : newVideos) {
+            if (!nvRepo.existsById(newVideo.getId())) {
+                nvRepo.save(nvMapper.toEntity(newVideo));
+            }
+        }
+    }
+    
+    @Scheduled(cron = "0 2 12 * * ?")
+    @Transactional
+    public void updateWavveVideoData() throws IOException {
+        List<NewVideoDTO> newVideos = nvAPIServ.getLatestVideosFromWavve();
+        
+        for (NewVideoDTO newVideo : newVideos) {
+            if (!nvRepo.existsById(newVideo.getId())) {
+                nvRepo.save(nvMapper.toEntity(newVideo));
+            }
+        }
+    }
+    
+    @Scheduled(cron = "0 3 12 * * ?")
+    @Transactional
+    public void updateWavvVideoData() throws IOException {
+        List<NewVideoDTO> newVideos = nvAPIServ.getLatestVideosFromWatcha();
+        
+        for (NewVideoDTO newVideo : newVideos) {
+            if (!nvRepo.existsById(newVideo.getId())) {
+                nvRepo.save(nvMapper.toEntity(newVideo));
+            }
+        }
+    }
 	
 }

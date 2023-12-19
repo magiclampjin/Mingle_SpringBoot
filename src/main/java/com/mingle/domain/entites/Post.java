@@ -8,7 +8,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -60,13 +59,17 @@ public class Post {
 	private Member member;
 	
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	@JoinColumn(name="post_Id", referencedColumnName = "id")
+	@JoinColumn(name="post_id", referencedColumnName = "id")
 	private Set<Reply> replies;
+	
+	@OneToMany
+	@JoinColumn(name="post_id", referencedColumnName = "id")
+	private Set<PostFile> files; 
 	
 	
 	@Builder
 	public Post(Long id, String title, String content, Timestamp writeDate, Long viewCount, Boolean isNotice,
-			Boolean isFix, Long reviewGrade, Member member, Set<Reply> replies) {
+			Boolean isFix, Long reviewGrade, Member member, Set<Reply> replies, Set<PostFile> files) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -78,6 +81,7 @@ public class Post {
 		this.reviewGrade = reviewGrade;
 		this.member = member;
 		this.replies = replies;
+		this.files = files;
 	}
 	
 	
