@@ -27,6 +27,5 @@ public class SecurityService implements UserDetailsService{
 		}else {
 			return null;
 		}
-		
 	}
 }
