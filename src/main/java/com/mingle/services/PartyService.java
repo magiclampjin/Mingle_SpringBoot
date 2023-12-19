@@ -101,4 +101,10 @@ public class PartyService {
 	public List<PartyInformationDTO> selectPartyListByStartDate(Long id, Instant start, Instant end){
 		return piMap.toDtoList(piRepo.findPartyInformationByServiceIdAndCountAndStartDate(id, start, end));
 	}
+	
+	// 서비스 명 리스트 불러오기
+	public List<ServiceDTO> getServiceNameList(){
+	
+		return 	sMap.toDtoList(sRepo.findAll());
+	}
 }

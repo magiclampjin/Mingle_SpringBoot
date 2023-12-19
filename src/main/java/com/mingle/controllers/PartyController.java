@@ -74,4 +74,11 @@ public class PartyController {
 		List<PartyInformationDTO> list = pServ.selectPartyListByStartDate(id, start, end);
 		return ResponseEntity.ok(list);
 	}
+	
+	// 서비스 명 리스트 불러오기
+	@GetMapping("/getServiceNameList")
+	public ResponseEntity<List<ServiceDTO>> getServiceNameList(){
+		List<ServiceDTO> dtos = pServ.getServiceNameList();
+		return ResponseEntity.ok(dtos);
+	}
 }
