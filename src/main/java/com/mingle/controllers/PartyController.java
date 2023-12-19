@@ -77,6 +77,13 @@ public class PartyController {
 		return ResponseEntity.ok(list);
 	}
 	
+	// 파티 가입
+	@PostMapping("/auth/joinParty/{id}")
+	public ResponseEntity<Void> joinParty(@PathVariable Long id, Authentication authentication){
+		pServ.insertJoinParty(id, authentication.getName());
+		return ResponseEntity.ok().build();
+	}
+	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
 		e.printStackTrace();

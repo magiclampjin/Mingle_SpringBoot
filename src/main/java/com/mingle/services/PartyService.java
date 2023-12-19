@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.mingle.dao.PartyDAO;
 import com.mingle.domain.entites.PartyMember;
@@ -79,6 +80,7 @@ public class PartyService {
 	}
 
 	// 파티 정보 저장
+	@Transactional
 	public void inertParty(PartyInformationDTO partyData, String member_id){
 		// 파티 정보 저장
 		long id = piRepo.save(piMap.toEntity(partyData)).getId();
@@ -89,6 +91,12 @@ public class PartyService {
 		
 		// 파티장 등록
 		PartyMember pme = new PartyMember(0L, id, member_id, true);
+		pmRepo.save(pme);
+	}
+	
+	// 파티 가입
+	public void insertJoinParty(Long party_registration_id, String member_id){
+		PartyMember pme = new PartyMember(0L, party_registration_id, member_id, false);
 		pmRepo.save(pme);
 	}
 	
