@@ -59,12 +59,23 @@ public class PartyService {
 		return scMap.toDtoList(scRepo.findAll());
 	}
 	
+	
 	// 카테고리별 서비스 정보 불러오기
 	public List<ServiceDTO> selectServiceByCategoryId(String id) {
 		if(id.equals("전체")) {
 			return sMap.toDtoList(sRepo.findAll());
 		}else {
 			return sMap.toDtoList(sRepo.findByServiceCategoryId(id));
+		}
+	}
+	
+	
+	// 가입된 파티 서비스 목록 불러오기
+	public List<Integer> selectServiceByIsJoin(String service_category_id, String member_id){
+		if(service_category_id.equals("전체")) {
+			return sRepo.selectByAllAndIsJoin(member_id);
+		}else {
+			return sRepo.selectByServiceCategoryIdAndIsJoin(service_category_id, member_id);
 		}
 	}
 	
@@ -109,4 +120,5 @@ public class PartyService {
 	public List<PartyInformationDTO> selectPartyListByStartDate(Long id, Instant start, Instant end){
 		return piMap.toDtoList(piRepo.findPartyInformationByServiceIdAndCountAndStartDate(id, start, end));
 	}
+	
 }
