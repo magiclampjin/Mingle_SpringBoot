@@ -17,7 +17,7 @@ public interface PostRepository extends JpaRepository<Post, Long>{
 	Post findPostById(@Param("id") Long id);
 	
 
-	@Query("select p from Post p left join fetch p.member left join left join fetch p.files p.replies where p.isNotice = true")
+	@Query("select p from Post p left join fetch p.member left join fetch p.replies left join fetch p.files where p.isNotice = true")
 	List<Post> findAllByNoticePosts();
 	
 	// 고정 중인 공지글 오름차순으로 출력

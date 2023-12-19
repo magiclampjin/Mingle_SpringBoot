@@ -50,7 +50,7 @@ public class Reply {
 	@JoinColumn(name = "reply_parent_id", referencedColumnName = "id",  nullable = true)
 	private Reply parentReply;
 	
-	// 자식 댓글 클래스 정의
+	// 자식 댓글 클래스 정의(순환 참조는 단 한번만 허용하도록 할것 )
 	@JsonIgnore
 	@OneToMany(mappedBy = "parentReply")
 	private Set<Reply> childrenReplies;
