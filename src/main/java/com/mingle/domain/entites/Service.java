@@ -26,14 +26,23 @@ public class Service {
 	@Column(name="name")
 	private String name;
 	
+	@Column(name="english_name")
+	private String englishName;
+	
 	@Column(name="price")
 	private Long price;
+	
+	@Column(name="commission")
+	private Long commission;
+	
+	@Column(name="plan")
+	private String plan;	
 	
 	@Column(name="max_people_count")
 	private Long maxPeopleCount;
 	
-	@Column(name="commission")
-	private Long commission;
+	@Column(name="url")
+	private String url;
 	
 	@Column(name="service_category_id")
 	private String serviceCategoryId;

@@ -3,8 +3,6 @@ package com.mingle.dto;
 import java.time.Instant;
 import java.util.Set;
 
-import com.mingle.domain.entites.Reply;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +17,6 @@ public class PostDTO {
 	
 	// 공통 요소
 	private Long id;
-//	private String memberId;
 	private String title;
 	private String content;
 	private Instant writeDate;
@@ -27,8 +24,10 @@ public class PostDTO {
 	private Boolean isNotice;
 	private Boolean isFix;
 	private Long reviewGrade;
-	private Set<Reply> replies;
 	private MemberDTO member;
+	private Set<ReplyDTO> replies;
+	private Set<PostFileDTO> files; 
+	
 	
 //	@Builder
 //	public PostDTO(Long id, String memberId, String title, String contents, Instant writeDate, Long viewCount,
@@ -48,7 +47,7 @@ public class PostDTO {
 	
 	@Builder
 	public PostDTO(Long id, String title, String content, Instant writeDate, Long viewCount, Boolean isNotice,
-			Boolean isFix, Long reviewGrade, Set<Reply> replies, MemberDTO member) {
+			Boolean isFix, Long reviewGrade, MemberDTO member, Set<ReplyDTO> replies, Set<PostFileDTO> files ) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -58,8 +57,10 @@ public class PostDTO {
 		this.isNotice = isNotice;
 		this.isFix = isFix;
 		this.reviewGrade = reviewGrade;
-		this.replies = replies;
 		this.member = member;
+		this.replies = replies;
+		this.files = files;
+		
 	}
 	
 	
