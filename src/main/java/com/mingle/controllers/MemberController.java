@@ -175,4 +175,16 @@ public class MemberController {
 			return ResponseEntity.ok(false);
 	}
 	
+	// 관리자 여부 (관리자 페이지 접근 시 확인)
+	@GetMapping("/isAdmin")
+	public ResponseEntity<Boolean> isAdmin(Authentication authentication) {
+		boolean isAdmin = mServ.isAdmin(authentication.getName());
+		System.out.println("isAdmin? :" + isAdmin);
+		if(isAdmin) {
+			return ResponseEntity.ok(true);
+		} else {
+			return ResponseEntity.ok(false);
+		}
+	}
+	
 }

@@ -54,4 +54,12 @@ public interface MemberRepository extends JpaRepository<Member, String> {
 	// 닉네임으로 엔티티 가져오기
 	Member findAllById(String username);
 	
+	// 권한 가져오기
+	@Query("select count(*) from Member m where m.id = :id and m.roleId = 'ROLE_ADMIN'")
+	Long selectAuthority(@Param("id") String id);
+	
+	default boolean isAdmin(String id) {
+		return selectAuthority(id) > 0;
+	}
+	
 }

@@ -219,4 +219,9 @@ public class MemberService {
 		m.setPhone(phone);
 		mRepo.save(m);
 	}
+	
+	// 권한
+	public boolean isAdmin(String id) {
+		return mRepo.isAdmin(id);
+	}
 }
