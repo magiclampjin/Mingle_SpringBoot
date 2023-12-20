@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -456,14 +457,9 @@ public class MemberService {
 	
 	// 로그인한 사용자의 이름 불러오기
 	public String selectUserName(String userId) {
-		return mRepo.selectUserName(userId);
-		
+		return mRepo.selectUserName(userId);	
 	}
 	
-	// 사용자의 밍글머니 불러오기
-	public int selectMingleMoney(String userId) {
-		return mRepo.selectMingleMoney(userId);
-	}
 	
 	// 비밀번호 일치 확인
 	public boolean isEqualPw(String userId, String password) {
@@ -485,5 +481,10 @@ public class MemberService {
 		mRepo.deleteById(userId);
 	}
 
+	
+	// 로그인한 사용자의 mingle money 불러오기
+	public int selectMingleMoney(String id) {
+		return mRepo.selectMingleMoney(id);
+	}
 	
 }

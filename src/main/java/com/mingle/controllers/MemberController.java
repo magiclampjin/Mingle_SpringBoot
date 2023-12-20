@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -235,15 +236,6 @@ public class MemberController {
 		return ResponseEntity.ok(userInfo);
 	}
 	
-	// 사용자의 밍글머니 불러오기
-	@GetMapping("/mypageMingleMoney")
-	public ResponseEntity<Integer> selectMingleMoney(Authentication authentication){
-		
-		int money = mServ.selectMingleMoney(authentication.getName());
-		
-		return ResponseEntity.ok(money);
-	}
-	
 	// 회원 탈퇴
 	@GetMapping("/mypageMemberOut")
 	public ResponseEntity<String> memberOut(Authentication authentication, @RequestParam String password){
@@ -266,6 +258,14 @@ public class MemberController {
 				return ResponseEntity.ok("불일치");
 			}
 		}
+	}
 		
+	// 로그인한 사용자의 mingle money 불러오기 ( 파티 가입 시 사용 - 밍글 머니 우선 적용하기 위함.)
+	@GetMapping("/getMingleMoney")
+	public ResponseEntity<Integer> selectMingleMoney(Authentication authentication) {
+		if(authentication != null)
+			return ResponseEntity.ok( mServ.selectMingleMoney(authentication.getName()));
+		else 
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 	}
 }

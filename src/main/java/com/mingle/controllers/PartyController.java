@@ -104,7 +104,7 @@ public class PartyController {
 		return ResponseEntity.ok(dtos);
 	}
 
-	// 파티 가입 & 첫 달 결제 내역 저장
+	// 파티 가입 & 첫 달 결제 내역 저장  & 밍글 머니 사용
 	@PostMapping("/auth/joinParty/{id}")
 	public ResponseEntity<Void> joinParty(@PathVariable Long id, @RequestBody PaymentDTO paymentData, Authentication authentication){
 		pServ.insertJoinParty(id, authentication.getName(), paymentData);
@@ -116,6 +116,4 @@ public class PartyController {
 		e.printStackTrace();
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 	}
-	
-	
 }
