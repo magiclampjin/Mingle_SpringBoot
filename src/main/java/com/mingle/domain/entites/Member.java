@@ -77,4 +77,5 @@ public class Member {
         this.socialTypeId=social;
         this.provider = provider;
     }
+
 }

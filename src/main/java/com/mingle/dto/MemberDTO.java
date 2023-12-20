@@ -29,4 +29,5 @@ public class MemberDTO {
 	private String roleId;
 	private Long mingleMoney;
 	private String provider;
+
 }
