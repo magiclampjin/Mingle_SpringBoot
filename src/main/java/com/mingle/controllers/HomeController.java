@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class HomeController {
 	@GetMapping("/**")
 	public String home() {
-		System.out.println("요청");
 		return "forward:/index.html";
 	}
 	
