@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.mingle.dao.PartyDAO;
 import com.mingle.domain.entites.PartyMember;
@@ -16,6 +17,7 @@ import com.mingle.domain.repositories.PartyRegistrationRepository;
 import com.mingle.domain.repositories.ServiceCategoryRepository;
 import com.mingle.domain.repositories.ServiceRepository;
 import com.mingle.dto.PartyInformationDTO;
+import com.mingle.dto.PaymentDTO;
 import com.mingle.dto.ServiceCategoryDTO;
 import com.mingle.dto.ServiceDTO;
 import com.mingle.mappers.PartyInformationMapper;
@@ -58,12 +60,23 @@ public class PartyService {
 		return scMap.toDtoList(scRepo.findAll());
 	}
 	
+	
 	// 카테고리별 서비스 정보 불러오기
 	public List<ServiceDTO> selectServiceByCategoryId(String id) {
 		if(id.equals("전체")) {
 			return sMap.toDtoList(sRepo.findAll());
 		}else {
 			return sMap.toDtoList(sRepo.findByServiceCategoryId(id));
+		}
+	}
+	
+	
+	// 가입된 파티 서비스 목록 불러오기
+	public List<Integer> selectServiceByIsJoin(String service_category_id, String member_id){
+		if(service_category_id.equals("전체")) {
+			return sRepo.selectByAllAndIsJoin(member_id);
+		}else {
+			return sRepo.selectByServiceCategoryIdAndIsJoin(service_category_id, member_id);
 		}
 	}
 	
@@ -79,6 +92,7 @@ public class PartyService {
 	}
 
 	// 파티 정보 저장
+	@Transactional
 	public void inertParty(PartyInformationDTO partyData, String member_id){
 		// 파티 정보 저장
 		long id = piRepo.save(piMap.toEntity(partyData)).getId();
@@ -92,6 +106,18 @@ public class PartyService {
 		pmRepo.save(pme);
 	}
 	
+	// 파티 가입 & 첫 달 결제 내역 저장
+	@Transactional
+	public void insertJoinParty(Long party_registration_id, String member_id, PaymentDTO paymentData){
+		PartyMember pme = new PartyMember(0L, party_registration_id, member_id, false);
+		paymentData.setPartyRegistrationId(party_registration_id);
+		paymentData.setMemberId(member_id);
+		paymentData.setPayment_type_id("결제");
+	
+		// paymentservice 이용해서 insert하기
+		pmRepo.save(pme);
+	}
+	
 	// 등록된 파티 정보 불러오기
 	public List<PartyInformationDTO> selectPartyList(Long id){
 		return piMap.toDtoList(piRepo.findPartyInformationByServiceIdAndCount(id));
@@ -101,4 +127,5 @@ public class PartyService {
 	public List<PartyInformationDTO> selectPartyListByStartDate(Long id, Instant start, Instant end){
 		return piMap.toDtoList(piRepo.findPartyInformationByServiceIdAndCountAndStartDate(id, start, end));
 	}
+	
 }
