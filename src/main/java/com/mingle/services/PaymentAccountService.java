@@ -18,11 +18,7 @@ public class PaymentAccountService {
 	@Autowired
 	private PaymentAccountMapper paMapper;
 
-	// 로그인한 사용자의 이름 불러오기
-	public String selectUserName(String userId) {
-		return paRepo.selectUserName(userId);
-		
-	}
+	
 	
 	// 계좌등록
 	public void insertAccountInfo(PaymentAccountDTO dto) {

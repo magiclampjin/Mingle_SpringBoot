@@ -97,7 +97,14 @@ public class PartyController {
 		return ResponseEntity.ok(list);
 	}
 	
-	// 파티 가입 & 첫 달 결제 내역 저장
+	// 서비스 명 리스트 불러오기
+	@GetMapping("/getServiceNameList")
+	public ResponseEntity<List<ServiceDTO>> getServiceNameList(){
+		List<ServiceDTO> dtos = pServ.getServiceNameList();
+		return ResponseEntity.ok(dtos);
+	}
+
+	// 파티 가입 & 첫 달 결제 내역 저장  & 밍글 머니 사용
 	@PostMapping("/auth/joinParty/{id}")
 	public ResponseEntity<Void> joinParty(@PathVariable Long id, @RequestBody PaymentDTO paymentData, Authentication authentication){
 		pServ.insertJoinParty(id, authentication.getName(), paymentData);

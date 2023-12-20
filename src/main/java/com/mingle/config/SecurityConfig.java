@@ -50,7 +50,7 @@ public class SecurityConfig {
 		.failureHandler((request, response, exception) -> { 
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		})
-		.and().oauth2Login().loginProcessingUrl("/api/member/login")
+		.and().oauth2Login()
 		.userInfoEndpoint().userService(principalOauth2UserService);
 
 		

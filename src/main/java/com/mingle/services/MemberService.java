@@ -15,9 +15,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -489,4 +491,15 @@ public class MemberService {
 		}
 		return new MemberDTO();
 	}
+	
+	// 로그인한 사용자의 이름 불러오기
+	public String selectUserName(String userId) {
+		return mRepo.selectUserName(userId);	
+	}
+	
+	// 로그인한 사용자의 mingle money 불러오기
+	public int selectMingleMoney(String id) {
+		return mRepo.selectMingleMoney(id);
+	}
+	
 }
