@@ -26,6 +26,9 @@ public class TodayCalculationParty {
 	@Column(name="party_registration_id")
 	private Long partyRegistrationId;
 	
+	@Column(name="service_id")
+	private Long serviceId;
+	
 	@Column(name="member_id")
 	private String memberId;
 	
@@ -58,4 +61,7 @@ public class TodayCalculationParty {
 	
 	@Column(name="month_fee")
 	private Long monthFee;
+	
+	@Column(name="curr_party_member_cnt")
+	private Long currPartyMemberCnt;
 }

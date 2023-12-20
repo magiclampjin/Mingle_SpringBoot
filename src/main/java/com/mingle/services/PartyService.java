@@ -127,7 +127,7 @@ public class PartyService {
 		PartyMember pme = new PartyMember(0L, party_registration_id, member_id, false);
 		pmRepo.save(pme);
 		
-		// 첫 달 결제 내역 저장
+		// 첫 달 결제 내역 저장 -> 파티 시작일 이후에 가입했을 경우에만 첫 결제 바로 진행되도록 변경해야함
 		paymentData.setPartyRegistrationId(party_registration_id);
 		paymentData.setMemberId(member_id);
 		paymentData.setPaymentTypeId("결제");
