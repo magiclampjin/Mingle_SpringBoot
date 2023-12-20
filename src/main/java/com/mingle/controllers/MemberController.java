@@ -24,6 +24,7 @@ import com.mingle.services.MemberService;
 
 import jakarta.servlet.http.HttpSession;
 
+
 @Controller
 @RestController
 @RequestMapping("/api/member")

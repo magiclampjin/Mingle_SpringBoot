@@ -97,6 +97,13 @@ public class PartyController {
 		return ResponseEntity.ok(list);
 	}
 	
+	// 서비스 명 리스트 불러오기
+	@GetMapping("/getServiceNameList")
+	public ResponseEntity<List<ServiceDTO>> getServiceNameList(){
+		List<ServiceDTO> dtos = pServ.getServiceNameList();
+		return ResponseEntity.ok(dtos);
+	}
+
 	// 파티 가입 & 첫 달 결제 내역 저장
 	@PostMapping("/auth/joinParty/{id}")
 	public ResponseEntity<Void> joinParty(@PathVariable Long id, @RequestBody PaymentDTO paymentData, Authentication authentication){
@@ -109,4 +116,6 @@ public class PartyController {
 		e.printStackTrace();
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 	}
+	
+	
 }

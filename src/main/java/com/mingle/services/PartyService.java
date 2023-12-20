@@ -112,7 +112,7 @@ public class PartyService {
 		PartyMember pme = new PartyMember(0L, party_registration_id, member_id, false);
 		paymentData.setPartyRegistrationId(party_registration_id);
 		paymentData.setMemberId(member_id);
-		paymentData.setPayment_type_id("결제");
+		paymentData.setPaymentTypeId("결제");
 	
 		// paymentservice 이용해서 insert하기
 		pmRepo.save(pme);
@@ -128,4 +128,9 @@ public class PartyService {
 		return piMap.toDtoList(piRepo.findPartyInformationByServiceIdAndCountAndStartDate(id, start, end));
 	}
 	
+	// 서비스 명 리스트 불러오기
+	public List<ServiceDTO> getServiceNameList(){
+	
+		return 	sMap.toDtoList(sRepo.findAll());
+	}
 }

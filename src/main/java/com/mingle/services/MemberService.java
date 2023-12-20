@@ -452,4 +452,10 @@ public class MemberService {
 		}
 		
 	}
+	
+	// 로그인한 사용자의 이름 불러오기
+	public String selectUserName(String userId) {
+		return mRepo.selectUserName(userId);
+		
+	}
 }
