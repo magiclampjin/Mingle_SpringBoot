@@ -1,39 +1,46 @@
 package com.mingle.services;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mingle.domain.entites.Member;
+import com.mingle.domain.repositories.AdjectiveRepository;
+import com.mingle.domain.repositories.AdjectiveViewRepository;
 import com.mingle.domain.repositories.BankRepository;
 import com.mingle.domain.repositories.MemberRepository;
+import com.mingle.domain.repositories.NounRepository;
+import com.mingle.domain.repositories.NounViewRepository;
 import com.mingle.dto.BankDTO;
 import com.mingle.dto.MemberDTO;
 import com.mingle.mappers.BankMapper;
 import com.mingle.mappers.MemberMapper;
+import com.mingle.security.SecurityUser;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpSession;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
-import com.mingle.domain.entites.Member;
-import com.mingle.domain.repositories.AdjectiveRepository;
-import com.mingle.domain.repositories.AdjectiveViewRepository;
-import com.mingle.domain.repositories.MemberRepository;
-import com.mingle.domain.repositories.NounRepository;
-import com.mingle.domain.repositories.NounViewRepository;
-import com.mingle.dto.MemberDTO;
-import com.mingle.mappers.MemberMapper;
-
 import jakarta.transaction.Transactional;
 
 @Service
@@ -77,6 +84,14 @@ public class MemberService {
 	private JavaMailSender javaMailSender;
 	private static final String senderEmail = "mingle@gmail.com";
 	private int number;
+
+//	// 카카오 api키
+//	@Value("${REST_API_KEY}")
+//	private String REST_API_KEY;
+//
+//	// 카카오 로그인 후 리다이렉트 주소
+//	@Value("${REDIRECT_URL}")
+//	private String REDIRECT_URL;
 
 	// 로그인한 사용자 nickName 불러오기
 //	public String selectUserNickName(String id) {
@@ -145,6 +160,7 @@ public class MemberService {
 		user.setRoleId("ROLE_MEMBER");
 		user.setSignupDate(Timestamp.valueOf(koreaTime));
 		user.setEnabled(true);
+		user.setMingleMoney((long) 0);
 		return mRepo.save(user);
 	}
 
@@ -283,11 +299,207 @@ public class MemberService {
 		m.setPassword(pwEncoding);
 		return mRepo.save(m) != null;
 	}
-	
+
 	// 사용자 휴대폰번호 변경
 	public void updateUserPhone(String id, String phone) {
 		Member m = mRepo.findAllById(id);
 		m.setPhone(phone);
 		mRepo.save(m);
 	}
+
+//	// 카카오 access_token 발급받기
+//	public String[] getKaKaoAccessToken(String code) {
+//		String access_Token = "";
+//		String refresh_Token = "";
+//		String reqURL = "https://kauth.kakao.com/oauth/token";
+//		String result = null;
+//		String id_token = null;
+//		System.out.println(REST_API_KEY);
+//		try {
+//			// url로 요청을 보내기 위한 객체 생성
+//			URL url = new URL(reqURL);
+//			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+//
+//			// post 요청을 위해 기본값 이 false인 setDoOutput을 true로 변경
+//			conn.setRequestMethod("POST");
+//			conn.setDoOutput(true);
+//
+//			// post 요청에 필요로 요구하는 파라미터를 스트림을 통해 전송
+//			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream()));
+//			StringBuilder sb = new StringBuilder();
+//			sb.append("grant_type=authorization_code"); // 승인 유형은 인증 코드
+//			sb.append("&client_id=" + REST_API_KEY); // REST_API_KEY 입력
+//			sb.append("&redirect_uri=" + REDIRECT_URL); // 인가코드 받은 redirect_uri 입력
+//			sb.append("&code=" + code); // 사용자의 인증 코드
+//			bw.write(sb.toString());
+//			bw.flush(); // 스트림을 통해 값 전송
+//
+//			// 결과 코드가 200(성공) 일때
+//			int responseCode = conn.getResponseCode();
+//			System.out.println("responseCode : " + responseCode);
+//
+//			if (responseCode == 200) {
+//				BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+//				String line = "";
+//				result = "";
+//
+//				while ((line = br.readLine()) != null) {
+//					result += line;
+//				}
+//				// bearer 토큰값만 추출 (log에 찍히는 값의 이름은 id_Token)
+//				System.out.println("response body : " + result);
+//				String[] temp = result.split(",");
+//				id_token = temp[3].split("\":\"")[1];
+//				System.out.println(id_token);
+//
+//				// JSON 파싱 객체 생성
+//				// ObjectMapper를 사용하여 JSON 문자열을 JsonNode로 파싱
+//				ObjectMapper objectMapper = new ObjectMapper();
+//				JsonNode jsonNode = objectMapper.readTree(result);
+//
+//				access_Token = jsonNode.get("access_token").toString();
+//				refresh_Token = jsonNode.get("refresh_token").toString();
+//
+//				System.out.println("access_token : " + access_Token);
+//				System.out.println("refresh_token : " + refresh_Token);
+//
+//				br.close();
+//				bw.close();
+//			} else {
+//				System.out.println("error");
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		String[] arrTokens = new String[3];
+//		arrTokens[0] = access_Token;
+//		arrTokens[1] = refresh_Token;
+//		arrTokens[2] = id_token;
+//
+//		return arrTokens;
+//	}
+	
+
+	// 카카오 유저 정보 받아오기
+	public MemberDTO createKakaoUser(String token) throws IOException {
+		// 유저 정보를 요청할 url
+		String reqURL = "https://kapi.kakao.com/v2/user/me";
+
+		// access_token을 통해 사용자 정보 조회
+		URL url = new URL(reqURL);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+		// post 요청을 위해 기본값 이 false인 setDoOutput을 true로 변경
+		conn.setRequestMethod("POST");
+		conn.setDoOutput(true);
+		// 전송할 header 작성, access_token전송
+		conn.setRequestProperty("Authorization", "Bearer " + token);
+
+		// 결과 코드가 200(성공) 일때
+		int responseCode = conn.getResponseCode();
+		System.out.println("responseCode : " + responseCode);
+
+		Member savedUser = new Member();
+		if (responseCode == 200) {
+			// 요청을 통해 얻어온 JSON 타입의 Response 메시지 읽어오기
+			BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			String line = "";
+			String result = "";
+
+			while ((line = br.readLine()) != null) {
+				result += line;
+			}
+
+			System.out.println("response body : " + result);
+
+			// JSON 파싱
+			// ObjectMapper를 사용하여 JSON 문자열을 JsonNode로 파싱
+			ObjectMapper objectMapper = new ObjectMapper();
+			JsonNode jsonNode = objectMapper.readTree(result);
+			// 카카오 로그인 결과 값 아이디
+			String id = jsonNode.get("id").toString();
+			// 카카오에 사용자가 등록한 이름
+			String nickname = jsonNode.get("properties").get("nickname").toString();
+			System.out.println("id" + id);
+
+			System.out.println("nickname" + nickname);
+			// DB에 카카오 로그인한 기록이 없다면 카카오톡에서 전달한 유저 정보를 바탕으로
+			// 객체 생성 후 DB에 저장후 DTO로 반환
+			if (!mRepo.existsById(id)) {
+				System.out.println("사용자가 db에 존재하지 않음");
+				Member user = new Member();
+				user.setId(id);
+				user.setPassword("");
+				user.setName(nickname);
+				user.setNickname("");
+				user.setEmail("");
+				user.setPhone("");
+				user.setBirth(new Timestamp(0));
+				user.setRoleId("ROLE_MEMBER");
+				user.setSocialTypeId("Kakao");
+				// 현재 시각을 얻어옴
+				LocalDateTime now = LocalDateTime.now();
+				// 시간대 변환 (UTC에서 Asia/Seoul로)
+				LocalDateTime koreaTime = now.atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Asia/Seoul"))
+						.toLocalDateTime();
+
+				user.setSignupDate(Timestamp.valueOf(koreaTime));
+				user.setEnabled(true);
+				savedUser = mRepo.save(user);
+			} else {
+				// DB에 카카오로 로그인된 정보가 있다면 token 생성해서 리턴
+				System.out.println("사용자가 db에 존재");
+				savedUser = mRepo.findAllById(id);
+			}
+
+			// 사용자 정보 확인
+			SecurityUser userDetails = new SecurityUser(savedUser);
+			
+			// 현재 Authentication 객체 가져오기
+//			Authentication currentAuthentication = SecurityContextHolder.getContext().getAuthentication();
+			
+			// 업데이트된 사용자 정보로 새로운 Authentication 객체 생성
+			Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
+					userDetails.getAuthorities());
+			
+			// 로그인 시도
+//	        Authentication updatedAuthentication = authenticationManager.authenticate(authentication);
+	        
+	     // 로그인 성공 시 SecurityContextHolder에 업데이트된 Authentication 객체 저장
+	        SecurityContextHolder.getContext().setAuthentication(authentication);
+//
+//			// 현재 SecurityContextHolder에 저장된 Authentication 객체 교체
+//			SecurityContextHolder.getContext().setAuthentication(authentication);
+//
+			// 사용자 정보 확인
+			Authentication updateAuthentication = SecurityContextHolder.getContext().getAuthentication();
+			if (updateAuthentication != null) {
+//				Object principal = updateAuthentication.getPrincipal();
+//
+//				if (principal instanceof SecurityUser) {
+//					SecurityUser authenticatedUser = (SecurityUser) principal;
+//					System.out.println("Username: " + authenticatedUser.getUsername());
+//					System.out.println("Custom Field: " + authenticatedUser.getAuthorities());
+//					System.out.println("Custom: " + authenticatedUser);
+					return mMapper.toDto(savedUser);
+				}else {
+					System.out.println("Principal is not an instance of SecurityUser");
+				}
+//			}
+		} else {
+			System.out.println("error");
+		}
+		return new MemberDTO();
+	}
+	
+	// 로그인한 사용자의 이름 불러오기
+	public String selectUserName(String userId) {
+		return mRepo.selectUserName(userId);	
+	}
+	
+	// 로그인한 사용자의 mingle money 불러오기
+	public int selectMingleMoney(String id) {
+		return mRepo.selectMingleMoney(id);
+	}
+	
 }
