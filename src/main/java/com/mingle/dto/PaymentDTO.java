@@ -21,6 +21,7 @@ public class PaymentDTO {
 	private Long serviceId;
 	private String paymentTypeId;
 	private Long price;
+	private Long usedMingleMoney;
 	
 	private Service service;
 	

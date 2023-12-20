@@ -50,6 +50,9 @@ public class Payment {
 	@Column(name="price")
 	private Long price;
 	
+	@Column(name="used_mingle_money")
+	private Long usedMingleMoney;
+	
 	@ManyToOne
 	@JoinColumn(name="service_id", referencedColumnName = "id",insertable = false, updatable = false)
 	private Service service;

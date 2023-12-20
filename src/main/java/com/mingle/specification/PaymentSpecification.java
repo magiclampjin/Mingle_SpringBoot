@@ -19,7 +19,13 @@ public class PaymentSpecification {
 			@Override
 			public Predicate toPredicate(Root<Payment> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
 				// TODO Auto-generated method stub
-				return criteriaBuilder.equal(root.get("memberId"), memberId);
+				
+				Predicate memberIdPredicate = criteriaBuilder.equal(root.get("memberId"), memberId);
+				
+				// 정렬 추가 (내림차순)
+	            query.orderBy(criteriaBuilder.desc(root.get("date"))); // 정렬할 필드명으로 변경
+
+	            return memberIdPredicate;
 			}
 		};
 	}
@@ -60,3 +66,7 @@ public class PaymentSpecification {
 	  
 
 }
+
+
+
+
