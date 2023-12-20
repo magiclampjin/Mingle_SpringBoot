@@ -24,26 +24,27 @@ public class UploadPostDTO {
 	private Boolean isNotice;
 	private Boolean isFix;
 	private Long reviewGrade;
-	private MemberDTO member;
+	private String memberId;
 	
 	private List<MultipartFile> files;
 	
+	
+	
 	@Builder
 	public UploadPostDTO(Long id, String title, String content, Instant writeDate, Long viewCount, Boolean isNotice,
-			Boolean isFix, Long reviewGrade, MemberDTO member, List<MultipartFile> files) {
-		super();
-		this.id = id;
-		this.title = title;
-		this.content = content;
-		this.writeDate = writeDate;
-		this.viewCount = viewCount;
-		this.isNotice = isNotice;
-		this.isFix = isFix;
-		this.reviewGrade = reviewGrade;
-		this.member = member;
-		this.files = files;
+	        Boolean isFix, Long reviewGrade, String memberId, List<MultipartFile> files) {
+	    this.id = id;
+	    this.title = title;
+	    this.content = content;
+	    this.writeDate = writeDate != null ? writeDate : Instant.now(); // 현재 시간으로 초기화
+	    this.viewCount = viewCount != null ? viewCount : 0L; // 기본값으로 0 설정
+	    this.isNotice = isNotice;
+	    this.isFix = isFix;
+	    this.reviewGrade = reviewGrade != null ? reviewGrade : 0L; // 기본값으로 0 설정
+	    this.memberId = memberId;
+	    this.files = files;
 	} 
+ 
 	
-	
-	
+
 }

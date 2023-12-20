@@ -33,6 +33,7 @@ public class SecurityConfig {
 		http.csrf().disable();
 		
 		http.authorizeHttpRequests()
+		.requestMatchers(new AntPathRequestMatcher("/uploads/**")).permitAll()
 		.requestMatchers(new AntPathRequestMatcher("/api/party/auth/**")).authenticated()
 		.requestMatchers(new AntPathRequestMatcher("/**")).permitAll();
 		
