@@ -23,11 +23,11 @@ public class PaymentService {
 	private PaymentMapper pMapper;
 	
 	// 결제 내역 목록 불러오기
-	public List<PaymentDTO> selectById(String memberId) {
-		
-		return pMapper.toDtoList(pRepo.selectById(memberId));
-	    
-	}
+//	public List<PaymentDTO> selectById(String memberId) {
+//		
+//		return pMapper.toDtoList(pRepo.selectById(memberId));
+//	    
+//	}
 	
 	public List<PaymentDTO> findSearch(String member_id,String service, String type, Timestamp start, Timestamp end){
 	

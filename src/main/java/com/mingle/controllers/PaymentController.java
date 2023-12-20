@@ -26,18 +26,18 @@ public class PaymentController {
 	private PaymentService pServ;
 	
 	// 결제 내역 목록 불러오기
-	@GetMapping
-	public ResponseEntity<List<PaymentDTO>> selectAll(Authentication authentication) {
-	    PaymentId pId = new PaymentId();
-	    pId.setMemberId(authentication.getName());
-	    
-	    System.out.println("pid : "+pId.getMemberId());
-	    
-	    List<PaymentDTO> list = pServ.selectById(pId.getMemberId());
-	    
-	   
-	    return ResponseEntity.ok(list);
-	}
+//	@GetMapping
+//	public ResponseEntity<List<PaymentDTO>> selectAll(Authentication authentication) {
+//	    PaymentId pId = new PaymentId();
+//	    pId.setMemberId(authentication.getName());
+//	    
+//	    System.out.println("pid : "+pId.getMemberId());
+//	    
+//	    List<PaymentDTO> list = pServ.selectById(pId.getMemberId());
+//	    
+//	   
+//	    return ResponseEntity.ok(list);
+//	}
 	
 	// 동적 검색
 	@GetMapping("/searchBy")
@@ -53,6 +53,14 @@ public class PaymentController {
 		System.out.println("결제 타입 : "+type);
 		System.out.println("시작 : "+start);
 		System.out.println("끝 : "+end);
+		
+		if(service.equals("전체")) {
+			service=null;
+		}
+		
+		if(type.equals("전체")) {
+			type=null;
+		}
 		
 		List<PaymentDTO> searchResults = null;
 		
