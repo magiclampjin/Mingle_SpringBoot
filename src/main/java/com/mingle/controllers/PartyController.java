@@ -106,7 +106,7 @@ public class PartyController {
 
 	// 파티 가입 & 첫 달 결제 내역 저장  & 밍글 머니 사용
 	@PostMapping("/auth/joinParty/{id}")
-	public ResponseEntity<Void> joinParty(@PathVariable Long id, @RequestBody PaymentDTO paymentData, Authentication authentication){
+	public ResponseEntity<Void> joinParty(@PathVariable Long id, @RequestBody(required = false) PaymentDTO paymentData, Authentication authentication){
 		pServ.insertJoinParty(id, authentication.getName(), paymentData);
 		return ResponseEntity.ok().build();
 	}

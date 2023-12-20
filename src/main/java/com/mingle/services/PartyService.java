@@ -127,17 +127,30 @@ public class PartyService {
 		PartyMember pme = new PartyMember(0L, party_registration_id, member_id, false);
 		pmRepo.save(pme);
 		
-		// 첫 달 결제 내역 저장 -> 파티 시작일 이후에 가입했을 경우에만 첫 결제 바로 진행되도록 변경해야함
-		paymentData.setPartyRegistrationId(party_registration_id);
-		paymentData.setMemberId(member_id);
-		paymentData.setPaymentTypeId("결제");
-		payRepo.save(payMap.toEntity(paymentData));
-		
-		// 밍글 머니 사용했을 경우 업데이트
-		if(paymentData.getUsedMingleMoney()!=0) {
-			Member m = mRepo.findById(member_id).get();
-			m.setMingleMoney(m.getMingleMoney()-paymentData.getUsedMingleMoney());
-			mRepo.save(m);
+		// 파티 시작일이 지난 경우
+		if(paymentData != null) {
+			Long managerReceiveMoney = paymentData.getPartyRegistrationId();
+			
+			// 첫 달 결제 내역 저장
+			paymentData.setPartyRegistrationId(party_registration_id);
+			paymentData.setMemberId(member_id);
+			paymentData.setPaymentTypeId("결제");
+			payRepo.save(payMap.toEntity(paymentData));
+			
+			// 밍글 머니 사용했을 경우 업데이트
+			if(paymentData.getUsedMingleMoney()!=0) {
+				Member m = mRepo.findById(member_id).get();
+				m.setMingleMoney(m.getMingleMoney()-paymentData.getUsedMingleMoney());
+				mRepo.save(m);
+			}
+			
+			// 파티장에게 밍글 머니에 바로 적립
+			Member manager = mRepo.findById(pmRepo.selectMemberIdBypartyRegistrationIdAndIsPartyManagerTrue(party_registration_id)).get();
+			// 가격 ( 클라이언트 -> 서버로 데이터 보낼 때 party_registration_id 속성을 pathVariable에 담아 보냄에 따라, 
+			// long형인 party_registration_id 속성이 비어있는 채로 객체 전송 -> 이 자리에 다른 long형 데이터를 담아 보내서 꺼내쓰고, 
+			// 실제 party_registration_id 값은 pathVariable 로 받아 setter로 주입함.
+			manager.setMingleMoney(manager.getMingleMoney()+managerReceiveMoney);
+			mRepo.save(manager);
 		}
 	}
 	
