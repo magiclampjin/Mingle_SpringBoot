@@ -27,4 +27,12 @@ public class MemberDTO {
 	private Timestamp signupDate;
 	private boolean enabled;
 	private String roleId;
+	
+	
+	public MemberDTO(String id) {
+		super();
+		this.id = id;
+	}
+	
+	
 }

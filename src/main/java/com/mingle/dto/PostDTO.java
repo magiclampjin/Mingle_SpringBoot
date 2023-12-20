@@ -29,21 +29,6 @@ public class PostDTO {
 	private Set<PostFileDTO> files; 
 	
 	
-//	@Builder
-//	public PostDTO(Long id, String memberId, String title, String contents, Instant writeDate, Long viewCount,
-//			Boolean isNotice, Boolean isFix, Long reviewGrade, Set<Reply> replies) {
-//		super();
-//		this.id = id;
-//		this.memberId = memberId;
-//		this.title = title;
-//		this.contents = contents;
-//		this.writeDate = writeDate;
-//		this.viewCount = viewCount;
-//		this.isNotice = isNotice;
-//		this.isFix = isFix;
-//		this.reviewGrade = reviewGrade;
-//		this.replies = replies;
-//	}
 	
 	@Builder
 	public PostDTO(Long id, String title, String content, Instant writeDate, Long viewCount, Boolean isNotice,

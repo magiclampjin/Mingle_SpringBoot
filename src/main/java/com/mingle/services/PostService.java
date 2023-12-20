@@ -2,6 +2,7 @@ package com.mingle.services;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -15,18 +16,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.mingle.dao.PostDAO;
+import com.mingle.domain.entites.Member;
 import com.mingle.domain.entites.Post;
 import com.mingle.domain.entites.PostFile;
 import com.mingle.domain.repositories.FreePostViewRepository;
+import com.mingle.domain.repositories.MemberRepository;
 import com.mingle.domain.repositories.NoticePostViewRepository;
 import com.mingle.domain.repositories.PopularPostViewRepository;
+import com.mingle.domain.repositories.PostFileRepository;
 import com.mingle.domain.repositories.PostRepository;
 import com.mingle.dto.PostDTO;
+import com.mingle.dto.PostFileDTO;
 import com.mingle.dto.PostViewDTO;
 import com.mingle.dto.UploadPostDTO;
 import com.mingle.mappers.FreePostViewMapper;
+import com.mingle.mappers.MemberMapper;
 import com.mingle.mappers.NoticePostViewMapper;
 import com.mingle.mappers.PopularPostViewMapper;
+import com.mingle.mappers.PostFileMapper;
 import com.mingle.mappers.PostMapper;
 
 import jakarta.transaction.Transactional;
@@ -60,6 +67,18 @@ public class PostService {
 	
 	@Autowired
 	private PopularPostViewMapper ppvMapper;
+	
+	@Autowired
+	private PostFileRepository pfRepo;
+	
+	@Autowired
+	private PostFileMapper pfMapper;
+	
+	@Autowired
+	private MemberRepository mRepo;
+	
+	@Autowired
+	private MemberMapper mMapper;
 	
 //---------------------------------------------------------------------------------	
 	// 공지 게시판 글 불러오기
@@ -130,9 +149,19 @@ public class PostService {
 	// 게시글 등록
 	@Transactional
 	public void insert(UploadPostDTO dto) throws IllegalStateException, IOException {
-		Post post = pMapper.toEntity(dto);
+		Member member = mRepo.selectMypageInfo(dto.getMemberId());
+		System.out.println(dto.getMemberId()+" 접속 아이디");
+		Post post = new Post();
+		post.setMember(member);
+		System.out.println(member + "0000000000000");
+		post.setTitle(dto.getTitle());
+		post.setContent(dto.getContent());
+		post.setWriteDate(Timestamp.from(dto.getWriteDate()));
+		post.setIsFix(dto.getIsFix());
+		post.setIsNotice(dto.getIsNotice());
+		post.setReviewGrade(dto.getReviewGrade());
+		post.setViewCount(dto.getViewCount());
 		
-		post.setViewCount(0L);
 		post.setFiles(new HashSet<>());
 		
 		Long parentSeq = pRepo.save(post).getId();
@@ -140,11 +169,11 @@ public class PostService {
 		Set<PostFile> entityFiles = post.getFiles();
 		List<MultipartFile> multiList = dto.getFiles();
 		
-		if(multiList.size() != 0) {
-			String upload = "/uploads/";
+		if(multiList != null && !multiList.isEmpty())  {
+			String upload = "C:/Mingle/uploads/";
 			File uploadPath = new File(upload);
 			if(!uploadPath.exists()) {
-				uploadPath.mkdir();
+				uploadPath.mkdirs();
 			}
 			for(MultipartFile f : multiList) {
 				String oriName = f.getOriginalFilename();
@@ -157,6 +186,23 @@ public class PostService {
 		}
 		
 		pRepo.save(post);
+	}
+	
+	//텍스트 에디터로부터 파일을 받아 업로드 한 뒤 url 반환
+	public String imageUploadFromTextEditor(MultipartFile image) throws IllegalStateException, IOException {
+		String upload = "C:/Mingle/uploads/";
+		File uploadPath = new File(upload);
+		if(!uploadPath.exists()) {
+			uploadPath.mkdirs();
+		}
+		String oriName = image.getOriginalFilename();
+		String sysName = UUID.randomUUID() + oriName;
+		
+		image.transferTo(new File(uploadPath,sysName));
+		
+		pfRepo.save(pfMapper.toEntity(new PostFileDTO(null,oriName,sysName,0L)));
+		
+		return "/uploads/" + sysName;
 	}
 	
 	
