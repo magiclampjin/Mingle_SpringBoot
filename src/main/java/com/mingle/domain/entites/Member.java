@@ -52,12 +52,10 @@ public class Member {
 	
 	@Column(name="role_id")
 	private String roleId;
-
 	
-	public Member(String id) {
-		super();
-		this.id = id;
-	}
+	@Column(name="mingle_money")
+	private Long mingleMoney;
+
 
 
 }
