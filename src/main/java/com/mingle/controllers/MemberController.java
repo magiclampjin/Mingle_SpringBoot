@@ -21,6 +21,7 @@ import com.mingle.domain.entites.Member;
 import com.mingle.dto.BankDTO;
 import com.mingle.dto.MemberDTO;
 import com.mingle.services.MemberService;
+import com.mingle.services.PartyService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -36,6 +37,9 @@ public class MemberController {
 	private HttpSession session;
 
 	String num = "";
+	
+	@Autowired
+	private PartyService pServ;
 
 	// 사용자 기본정보 불러오기 - 아이디, 닉네임, 권한 
 	@GetMapping("/userBasicInfo")
@@ -229,5 +233,39 @@ public class MemberController {
 		String access_found_in_token = kakaoAccessToken[0];
 		MemberDTO userInfo = mServ.createKakaoUser(access_found_in_token);
 		return ResponseEntity.ok(userInfo);
+	}
+	
+	// 사용자의 밍글머니 불러오기
+	@GetMapping("/mypageMingleMoney")
+	public ResponseEntity<Integer> selectMingleMoney(Authentication authentication){
+		
+		int money = mServ.selectMingleMoney(authentication.getName());
+		
+		return ResponseEntity.ok(money);
+	}
+	
+	// 회원 탈퇴
+	@GetMapping("/mypageMemberOut")
+	public ResponseEntity<String> memberOut(Authentication authentication, @RequestParam String password){
+		
+		// 이미 가입된 파티가 있는지 확인
+		boolean result = pServ.isMemberParty(authentication.getName());
+		
+		if(result) {
+			return ResponseEntity.ok("파티있음");
+		}else {
+			// 비밀번호 일치하는지 확인
+			Boolean pwResult = mServ.isEqualPw(authentication.getName(),password);
+			
+			if(pwResult) {
+				// 일치 -> 계정 삭제
+				mServ.memberOut(authentication.getName());
+				return ResponseEntity.ok("삭제 완료");
+				
+			}else {
+				return ResponseEntity.ok("불일치");
+			}
+		}
+		
 	}
 }

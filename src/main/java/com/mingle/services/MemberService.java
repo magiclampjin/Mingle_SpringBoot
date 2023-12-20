@@ -15,6 +15,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -458,4 +459,31 @@ public class MemberService {
 		return mRepo.selectUserName(userId);
 		
 	}
+	
+	// 사용자의 밍글머니 불러오기
+	public int selectMingleMoney(String userId) {
+		return mRepo.selectMingleMoney(userId);
+	}
+	
+	// 비밀번호 일치 확인
+	public boolean isEqualPw(String userId, String password) {
+		
+		// 입력받은 비밀번호를 암호화
+		String inputPw = passwordEncoder.encode(password);
+		
+		// 데이터베이스에서 사용자의 비밀번호 가져오기
+		String dbPw = mRepo.selectUserPw(userId);
+		
+		// 입력받은 비밀번호와 데이터베이스의 비밀번호 비교
+		boolean matches = passwordEncoder.matches(inputPw, dbPw);
+		
+		return matches;
+	}
+	
+	// 회원 탈퇴
+	public void memberOut(String userId) {
+		mRepo.deleteById(userId);
+	}
+
+	
 }
