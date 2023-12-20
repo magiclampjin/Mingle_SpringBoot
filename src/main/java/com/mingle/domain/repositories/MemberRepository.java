@@ -67,5 +67,7 @@ public interface MemberRepository extends JpaRepository<Member, String> {
 	default boolean userPWVerification(MemberDTO dto) {
 		return findByIdAndNameAndEmail(dto.getId(),dto.getName(), dto.getEmail())!=null?true:false;
 	}
+	
+	Member findByIdAndProvider(String id, String provider);
 
 }

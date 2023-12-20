@@ -3,15 +3,17 @@ package com.mingle.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
+import com.mingle.services.PrincipalOauth2UserService;
 import com.mingle.services.SecurityService;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,6 +25,9 @@ public class SecurityConfig {
 	@Autowired
 	private SecurityService sServ;
 	
+	@Autowired
+	private PrincipalOauth2UserService principalOauth2UserService;
+	
 	@Bean	
 	protected SecurityFilterChain config(HttpSecurity http) throws Exception{
 		http.csrf().disable();
@@ -31,7 +36,7 @@ public class SecurityConfig {
 		.requestMatchers(new AntPathRequestMatcher("/api/party/auth/**")).authenticated()
 		.requestMatchers(new AntPathRequestMatcher("/**")).permitAll();
 		
-		// 로그인 ( 참고해도 되고 걍 지우고 다시 써도 무관.. )
+		// 로그인 
 		http.formLogin().loginProcessingUrl("/api/member/login").defaultSuccessUrl("/")
 		// id input tag name
 		.usernameParameter("id")
@@ -44,18 +49,17 @@ public class SecurityConfig {
 		// 로그인 실패
 		.failureHandler((request, response, exception) -> { 
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-		});
+		})
+		.and().oauth2Login().loginProcessingUrl("/api/member/login")
+		.userInfoEndpoint().userService(principalOauth2UserService);
 
 		
 	
 		// 인증이 되어있지 않을 때 발생하는 예외 처리
 		http.exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
 			response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-		});
-		
-		// 접근 권한이 없을 때 이동할 페이지
-		http.exceptionHandling().accessDeniedPage("/denied");
-		
+		}).accessDeniedPage("/denied");// 접근 권한이 없을 때 이동할 페이지
+			
 		
 		// 로그아웃 - 특정 url 사용
 		http.logout().logoutUrl("/api/member/logout").invalidateHttpSession(true)
@@ -63,7 +67,7 @@ public class SecurityConfig {
 			response.setStatus(HttpServletResponse.SC_OK);
 		});
 		
-		http.userDetailsService(sServ);
+//		http.userDetailsService(sServ);
 		return http.build();
 	}
 	
@@ -71,4 +75,14 @@ public class SecurityConfig {
 	protected PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder(); 
 	}
+	
+//	private CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration configuration = new CorsConfiguration();
+//        configuration.addAllowedOrigin("http://localhost:3000"); // 허용할 출처
+//        configuration.addAllowedMethod("*");
+//        configuration.addAllowedHeader("*");
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", configuration);
+//        return (CorsConfigurationSource) source;
+//    }
 }
