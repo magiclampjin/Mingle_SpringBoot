@@ -52,5 +52,8 @@ public class Member {
 	
 	@Column(name="role_id")
 	private String roleId;
+	
+	@Column(name="mingle_money")
+	private Long mingleMoney;
 
 }

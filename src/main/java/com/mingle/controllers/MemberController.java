@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -23,6 +24,7 @@ import com.mingle.dto.MemberDTO;
 import com.mingle.services.MemberService;
 
 import jakarta.servlet.http.HttpSession;
+
 
 @Controller
 @RestController
@@ -238,5 +240,14 @@ public class MemberController {
 		String access_found_in_token = kakaoAccessToken[0];
 		MemberDTO userInfo = mServ.createKakaoUser(access_found_in_token);
 		return ResponseEntity.ok(userInfo);
+	}
+	
+	// 로그인한 사용자의 mingle money 불러오기 ( 파티 가입 시 사용 - 밍글 머니 우선 적용하기 위함.)
+	@GetMapping("/getMingleMoney")
+	public ResponseEntity<Integer> selectMingleMoney(Authentication authentication) {
+		if(authentication != null)
+			return ResponseEntity.ok( mServ.selectMingleMoney(authentication.getName()));
+		else 
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 	}
 }
