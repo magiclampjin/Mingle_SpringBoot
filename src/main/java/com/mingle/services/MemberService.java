@@ -87,12 +87,9 @@ public class MemberService {
 	@Value("${REDIRECT_URL}")
 	private String REDIRECT_URL;
 
-	// 로그인한 사용자 nickName 불러오기
-//	public String selectUserNickName(String id) {
-//		return mRepo.selectUserNickName(id);
-//	}
-	public MemberDTO selectUserNickName(String id) {
-		return mMapper.toDto(mRepo.selectUserNickName(id));
+	// 로그인한 사용자 정보 불러오기
+	public MemberDTO userBasicInfo(String id) {
+		return mMapper.toDto(mRepo.userBasicInfo(id));
 	}
 
 	// 아이디 중복검사

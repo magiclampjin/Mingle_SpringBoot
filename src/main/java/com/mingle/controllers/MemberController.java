@@ -38,16 +38,14 @@ public class MemberController {
 
 	// 사용자 기본정보 불러오기 - 아이디, 닉네임, 권한 
 	@GetMapping("/userBasicInfo")
-	public ResponseEntity<Map<String, String>> selectUserNickName(Authentication authentication) {
+	public ResponseEntity<Map<String, String>> userBasicInfo(Authentication authentication) {
 		Map<String, String> userInfo = new HashMap<>();
 
 		// 사용자 아이디 가져오기
 		if (authentication != null) {
 			String username = authentication.getName();
-			// 로그인한 사용자 nickName 불러오기
-//			String userNick = mServ.selectUserNickName(username);
 			// 로그인한 사용자 정보 불러오기
-			MemberDTO dto = mServ.selectUserNickName(username);
+			MemberDTO dto = mServ.userBasicInfo(username);
 			// 아이디, 닉네임, 권한 맵으로 생성
 			userInfo.put("loginID", username);
 			userInfo.put("loginNick", dto.getNickname());
