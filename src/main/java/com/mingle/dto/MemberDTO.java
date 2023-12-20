@@ -28,4 +28,5 @@ public class MemberDTO {
 	private boolean enabled;
 	private String roleId;
 	private Long mingleMoney;
+	private String provider;
 }
