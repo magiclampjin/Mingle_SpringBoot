@@ -29,7 +29,6 @@ public class Payment {
 
 	@Id
 	@Column(name="party_registration_id")
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long partyRegistrationId;
 	
 	@Id
