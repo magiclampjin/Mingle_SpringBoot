@@ -150,10 +150,8 @@ public class PostService {
 	@Transactional
 	public void insert(UploadPostDTO dto) throws IllegalStateException, IOException {
 		Member member = mRepo.selectMypageInfo(dto.getMemberId());
-		System.out.println(dto.getMemberId()+" 접속 아이디");
 		Post post = new Post();
 		post.setMember(member);
-		System.out.println(member + "0000000000000");
 		post.setTitle(dto.getTitle());
 		post.setContent(dto.getContent());
 		post.setWriteDate(Timestamp.from(dto.getWriteDate()));
@@ -180,6 +178,7 @@ public class PostService {
 				String sysName = UUID.randomUUID()+"_"+oriName;
 				
 				f.transferTo(new File(uploadPath,sysName));
+				pfRepo.save(pfMapper.toEntity(new PostFileDTO(null,oriName,sysName,parentSeq)));
 				
 				entityFiles.add(new PostFile(null,oriName,sysName,parentSeq));
 			}
