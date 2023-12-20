@@ -27,4 +27,5 @@ public class MemberDTO {
 	private Timestamp signupDate;
 	private boolean enabled;
 	private String roleId;
+	private Long mingleMoney;
 }
