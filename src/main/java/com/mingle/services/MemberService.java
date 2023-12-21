@@ -15,8 +15,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
-
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -70,12 +71,6 @@ public class MemberService {
 	// 비밀번호 인코딩
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-
-	@Autowired
-	private BankRepository bRepo;
-
-	@Autowired
-	private BankMapper bMapper;
 
 	@Autowired
 	private HttpSession session;
@@ -213,11 +208,6 @@ public class MemberService {
 		mRepo.save(m);
 	}
 
-	// 은행 목록 불러오기
-	public List<BankDTO> selectBank() {
-
-		return bMapper.toDtoList(bRepo.findAll());
-	}
 
 	// 이메일 인증코드 생성 - 아이디 찾기
 	public void idVerificationCode() {
@@ -498,6 +488,26 @@ public class MemberService {
 		return mRepo.selectUserName(userId);
 	}
 
+	
+	// 비밀번호 일치 확인
+	public boolean isEqualPw(String userId, String password) {
+		
+		// 데이터베이스에서 사용자의 비밀번호 가져오기
+		String dbPw = mRepo.selectUserPw(userId);
+		
+		// 입력받은 비밀번호와 데이터베이스의 비밀번호 비교
+		boolean matches = passwordEncoder.matches(password, dbPw);
+		
+		
+		return matches;
+	}
+	
+	// 회원 탈퇴
+	public void memberOut(String userId) {
+		mRepo.deleteById(userId);
+	}
+
+	
 	// 로그인한 사용자의 mingle money 불러오기
 	public int selectMingleMoney(String id) {
 		return mRepo.selectMingleMoney(id);
