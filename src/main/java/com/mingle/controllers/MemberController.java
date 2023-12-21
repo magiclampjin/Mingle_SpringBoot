@@ -25,8 +25,9 @@ import com.mingle.dto.BankDTO;
 import com.mingle.dto.MemberDTO;
 import com.mingle.services.MemberService;
 
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import jakarta.servlet.http.HttpSession;
-
 
 @Controller
 @RestController
@@ -169,16 +170,16 @@ public class MemberController {
 
 	// 아이디 찾기 본인 인증 메일 보내기
 	@PostMapping("/verificationEmail")
-	public ResponseEntity<Boolean> findId(@RequestBody MemberDTO dto) {
-		boolean result = mServ.findId(dto);
+	public ResponseEntity<Boolean> verificationEmail(@RequestBody MemberDTO dto) {
+		boolean result = mServ.verificationEmail(dto);
 		return ResponseEntity.ok(result);
 	}
 
 	// 아이디 찾기 본인 인증 코드 확인하기
 	@PostMapping("/certification/id")
-	public ResponseEntity<Boolean> certification(Integer code) {
-		boolean result = (code.equals(session.getAttribute("idVerificationCode")));
-		session.invalidate();
+	public ResponseEntity<Boolean> certification(String code) {
+		boolean result = (code.equals(session.getAttribute("idVerificationCode").toString()));
+//		session.invalidate();
 		return ResponseEntity.ok(result);
 	}
 
@@ -195,9 +196,9 @@ public class MemberController {
 
 	// 비밀번호 찾기 본인 인증 코드 확인하기
 	@PostMapping("/certification/pw")
-	public ResponseEntity<Boolean> pwFindcertification(Integer code) {
-		boolean result = (code.equals(session.getAttribute("pwVerificationCode")));
-		session.invalidate();
+	public ResponseEntity<Boolean> pwFindcertification(String code) {
+		boolean result = (code.equals(session.getAttribute("pwVerificationCode").toString()));
+//		session.invalidate();
 		return ResponseEntity.ok(result);
 	}
 
@@ -243,14 +244,26 @@ public class MemberController {
 		return "실패";
 	}
 
-	
 	// 로그인한 사용자의 mingle money 불러오기 ( 파티 가입 시 사용 - 밍글 머니 우선 적용하기 위함.)
 	@GetMapping("/getMingleMoney")
 	public ResponseEntity<Integer> selectMingleMoney(Authentication authentication) {
-		if(authentication != null)
-			return ResponseEntity.ok( mServ.selectMingleMoney(authentication.getName()));
-		else 
+		if (authentication != null)
+			return ResponseEntity.ok(mServ.selectMingleMoney(authentication.getName()));
+		else
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 	}
 
+	// 회원가입 본인 인증 메일 보내기
+	@PostMapping("/verificationSignupEmail")
+	public ResponseEntity<Boolean> verificationSignupEmail(String email) throws MessagingException {
+		boolean result = mServ.verificationSignupEmail(email);
+		return ResponseEntity.ok(result);
+	}
+
+	// 비밀번호 찾기 본인 인증 코드 확인하기
+	@PostMapping("/certification/signup")
+	public ResponseEntity<Boolean> signupcertification(String code) {
+		boolean result = (code.equals(session.getAttribute("signupVerificationCode").toString()));
+		return ResponseEntity.ok(result);
+	}
 }
