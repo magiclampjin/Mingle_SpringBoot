@@ -11,6 +11,7 @@ import com.mingle.domain.repositories.NewVideoRepository;
 import com.mingle.dto.NewVideoDTO;
 import com.mingle.mappers.NewVideoMapper;
 import com.mingle.services.NewVideoAPIService;
+import com.mingle.services.PaymentService;
 
 import jakarta.transaction.Transactional;
 
@@ -32,6 +33,11 @@ public class AutoScheduler {
 	
 	@Autowired
 	private NewVideoMapper nvMapper;
+	
+	
+	// 정산일마다 요금 정산
+	@Autowired
+	private PaymentService payServ;
 	
 
     @Scheduled(cron = "0 0 12 * * ?")
@@ -80,6 +86,27 @@ public class AutoScheduler {
                 nvRepo.save(nvMapper.toEntity(newVideo));
             }
         }
+    }
+    
+    
+    // 파티 시작일에 첫 정산
+    // 매일 오전 12시에 정산 진행
+    public void firstPaymentScheduler() {
+    	// 1. 파티 시작일이 오늘인 파티 정보를 불러온다.
+    	// 단, 시작일 = 정산일이 동일하면 
+    	// 2. 해당 파티들의 member 목록 불러오기
+    	// 3. 정산액 계산
+    	// 4. 파티원의 경우 요금 결제 (밍글머니 우선적용)
+    	// 5. 파티장에게 결제된 요금 충전 (밍글머니)
+   
+    	payServ.firstPayment();
+    }
+    
+    // 정산일마다 파티 요금 결제(파티원) 및 머니 충전(파티장)
+    // 매일 오전 12시에 정산 진행
+    @Scheduled(cron = "0 0 0 * * *")
+    public void paymentScheduler() {
+    	payServ.todayPayment();
     }
 	
 }

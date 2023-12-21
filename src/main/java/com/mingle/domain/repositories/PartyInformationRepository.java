@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.mingle.domain.entites.PartyInformation;
+import com.mingle.domain.entites.TodayCalculationParty;
 
 public interface PartyInformationRepository extends JpaRepository<PartyInformation, Long> {
 

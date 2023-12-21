@@ -1,7 +1,6 @@
 package com.mingle.dto;
 
 import java.time.Instant;
-import java.util.Set;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -9,14 +8,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
 @ToString
-public class PostDTO {
+public class PostViewDTO {
 	
-	// 공통 요소
 	private Long id;
+	private Long rownum;
+	private String memberId;
+	private String memberNickname;
 	private String title;
 	private String content;
 	private Instant writeDate;
@@ -24,17 +25,16 @@ public class PostDTO {
 	private Boolean isNotice;
 	private Boolean isFix;
 	private Long reviewGrade;
-	private MemberDTO member;
-	private Set<ReplyDTO> replies;
-	private Set<PostFileDTO> files; 
-	
-	
+	private Long totalVotes;
 	
 	@Builder
-	public PostDTO(Long id, String title, String content, Instant writeDate, Long viewCount, Boolean isNotice,
-			Boolean isFix, Long reviewGrade, MemberDTO member, Set<ReplyDTO> replies, Set<PostFileDTO> files ) {
+	public PostViewDTO(Long id, Long rownum, String memberId, String memberNickname, String title, String content,
+			Instant writeDate, Long viewCount, Boolean isNotice, Boolean isFix, Long reviewGrade, Long totalVotes) {
 		super();
 		this.id = id;
+		this.rownum = rownum;
+		this.memberId = memberId;
+		this.memberNickname = memberNickname;
 		this.title = title;
 		this.content = content;
 		this.writeDate = writeDate;
@@ -42,18 +42,9 @@ public class PostDTO {
 		this.isNotice = isNotice;
 		this.isFix = isFix;
 		this.reviewGrade = reviewGrade;
-		this.member = member;
-		this.replies = replies;
-		this.files = files;
-		
+		this.totalVotes = totalVotes;
 	}
 	
 	
-	
-	
-	
-	
-	
 
-	
 }
