@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### google analytics key json file###
+client_secrets.json

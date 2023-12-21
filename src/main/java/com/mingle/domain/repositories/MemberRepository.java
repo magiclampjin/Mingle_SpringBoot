@@ -10,10 +10,8 @@ import com.mingle.dto.MemberDTO;
 
 public interface MemberRepository extends JpaRepository<Member, String> {
 	// 로그인한 사용자 nickName 불러오기
-//	@Query("select m.nickname from Member m where m.id = :id")
-//	String selectUserNickName(@Param("id") String id);
 	@Query("select m from Member m where m.id = :id")
-	Member selectUserNickName(@Param("id") String id);
+	Member userBasicInfo(@Param("id") String id);
 
 	// 아이디 중복검사
 	@Query("select count(*) from Member m where m.id=:id")
@@ -54,6 +52,14 @@ public interface MemberRepository extends JpaRepository<Member, String> {
 	// 닉네임으로 엔티티 가져오기
 	Member findAllById(String username);
 	
+	// 권한 가져오기
+	@Query("select count(*) from Member m where m.id = :id and m.roleId = 'ROLE_ADMIN'")
+	Long selectAuthority(@Param("id") String id);
+	
+	default boolean isAdmin(String id) {
+		return selectAuthority(id) > 0;
+	}
+
 	// 이름과 메일 정보가 일치하는 사용자가 있는지 검증
 	Member findByNameAndEmail(String name, String email);
 	
