@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mingle.dto.PaymentAccountDTO;
 import com.mingle.services.MemberService;
+import com.mingle.services.PartyService;
 import com.mingle.services.PaymentAccountService;
 
 @RestController
@@ -26,6 +27,9 @@ public class PaymentAccountController {
 	
 	@Autowired
 	private MemberService mServ;
+	
+	@Autowired
+	private PartyService pServ;
 	
 	// 계좌 등록
 	@PostMapping("/accountInsert")
@@ -59,10 +63,18 @@ public class PaymentAccountController {
 	
 	// 등록된 계좌 삭제하기
 	@DeleteMapping("/accountDelete")
-	public ResponseEntity<Void> deleteById(Authentication authentication){
-		paServ.deleteById(authentication.getName());
+	public ResponseEntity<String> deleteById(Authentication authentication){
 		
-		return ResponseEntity.ok().build();
+		
+		// 이미 가입된 파티가 있는지 확인
+		boolean result = pServ.isMemberParty(authentication.getName());
+		
+		if(result) {
+			return ResponseEntity.ok("삭제에 실패했습니다.");
+		}else {
+			paServ.deleteById(authentication.getName());
+			return ResponseEntity.ok("삭제 완료");
+		}
 		
 	}
 	
