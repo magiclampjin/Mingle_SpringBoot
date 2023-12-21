@@ -73,12 +73,6 @@ public class MemberService {
 	private PasswordEncoder passwordEncoder;
 
 	@Autowired
-	private BankRepository bRepo;
-
-	@Autowired
-	private BankMapper bMapper;
-
-	@Autowired
 	private HttpSession session;
 
 	@Autowired
@@ -217,11 +211,6 @@ public class MemberService {
 		mRepo.save(m);
 	}
 
-	// 은행 목록 불러오기
-	public List<BankDTO> selectBank() {
-
-		return bMapper.toDtoList(bRepo.findAll());
-	}
 
 	// 이메일 인증코드 생성 - 아이디 찾기
 	public void idVerificationCode() {
@@ -502,14 +491,12 @@ public class MemberService {
 	// 비밀번호 일치 확인
 	public boolean isEqualPw(String userId, String password) {
 		
-		// 입력받은 비밀번호를 암호화
-		String inputPw = passwordEncoder.encode(password);
-		
 		// 데이터베이스에서 사용자의 비밀번호 가져오기
 		String dbPw = mRepo.selectUserPw(userId);
 		
 		// 입력받은 비밀번호와 데이터베이스의 비밀번호 비교
-		boolean matches = passwordEncoder.matches(inputPw, dbPw);
+		boolean matches = passwordEncoder.matches(password, dbPw);
+		
 		
 		return matches;
 	}

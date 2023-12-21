@@ -1,5 +1,7 @@
 package com.mingle.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mingle.dto.BankDTO;
 import com.mingle.dto.PaymentAccountDTO;
 import com.mingle.services.MemberService;
 import com.mingle.services.PartyService;
@@ -70,10 +73,10 @@ public class PaymentAccountController {
 		boolean result = pServ.isMemberParty(authentication.getName());
 		
 		if(result) {
-			return ResponseEntity.ok("삭제에 실패했습니다.");
+			return ResponseEntity.ok("가입된 파티가 있으면 삭제 불가능합니다.");
 		}else {
 			paServ.deleteById(authentication.getName());
-			return ResponseEntity.ok("삭제 완료");
+			return ResponseEntity.ok("삭제 완료되었습니다.");
 		}
 		
 	}
@@ -84,6 +87,15 @@ public class PaymentAccountController {
 		paServ.updateById(authentication.getName(),dto);
 		
 		return ResponseEntity.ok().build();
+	}
+	
+	// 은행 목록 불러오기
+	@GetMapping("/selectBankList")
+	public ResponseEntity<List<BankDTO>> selectBank() {
+		List<BankDTO> dto = paServ.selectBank();
+
+		return ResponseEntity.ok(dto);
+
 	}
 	
 	@ExceptionHandler(Exception.class)

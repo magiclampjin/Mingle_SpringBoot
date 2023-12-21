@@ -1,7 +1,6 @@
 package com.mingle.controllers;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,11 +21,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mingle.domain.entites.Member;
-import com.mingle.dto.BankDTO;
 import com.mingle.dto.MemberDTO;
 import com.mingle.services.MemberService;
 import com.mingle.services.PartyService;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 
@@ -43,6 +44,9 @@ public class MemberController {
 	
 	@Autowired
 	private PartyService pServ;
+	
+	@Autowired
+    private LogoutHandler customLogoutHandler;
 
 	// 사용자 기본정보 불러오기 - 아이디, 닉네임, 권한
 	@GetMapping("/userBasicInfo")
@@ -162,14 +166,6 @@ public class MemberController {
 
 	}
 
-	// 은행 목록 불러오기
-	@GetMapping("/bankList")
-	public ResponseEntity<List<BankDTO>> selectBank() {
-		List<BankDTO> dto = mServ.selectBank();
-
-		return ResponseEntity.ok(dto);
-
-	}
 
 	// 아이디 찾기 본인 인증 메일 보내기
 	@PostMapping("/verificationEmail")
@@ -250,24 +246,29 @@ public class MemberController {
 	
 	// 회원 탈퇴
 	@GetMapping("/mypageMemberOut")
-	public ResponseEntity<String> memberOut(Authentication authentication, @RequestParam String password){
+	public ResponseEntity<String> memberOut(Authentication authentication, @RequestParam String password,
+			HttpServletRequest request, HttpServletResponse response){
 		
 		// 이미 가입된 파티가 있는지 확인
 		boolean result = pServ.isMemberParty(authentication.getName());
 		
 		if(result) {
-			return ResponseEntity.ok("파티있음");
+			return ResponseEntity.ok("파티에 가입되어있으면 탈퇴 불가능합니다.");
 		}else {
 			// 비밀번호 일치하는지 확인
 			Boolean pwResult = mServ.isEqualPw(authentication.getName(),password);
 			
 			if(pwResult) {
 				// 일치 -> 계정 삭제
+				// 로그아웃 처리
+                customLogoutHandler.logout(request, response, authentication);
+                
+				// 계정삭제
 				mServ.memberOut(authentication.getName());
-				return ResponseEntity.ok("삭제 완료");
+				return ResponseEntity.ok("탈퇴되었습니다.");
 				
 			}else {
-				return ResponseEntity.ok("불일치");
+				return ResponseEntity.ok("비밀번호가 일치하지 않습니다.");
 			}
 		}
 	}
