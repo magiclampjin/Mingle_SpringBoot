@@ -52,11 +52,6 @@ public class PaymentController {
             @RequestParam(required = false) String end,
             Authentication authentication){
 		
-		System.out.println("서비스 아이디"+service);
-		System.out.println("결제 타입 "+type);
-		System.out.println("시작 "+start);
-		System.out.println("끝 "+end);
-		
 		if(service.equals("전체")) {
 			service=null;
 		}
@@ -97,7 +92,7 @@ public class PaymentController {
 	// 인출하기
 	@GetMapping("/withdrawMingleMoney")
 	public ResponseEntity<Integer> withdrawMingleMoney(Authentication authentication, String money){
-		System.out.println(money);
+
 		// 멤버의 밍글머니에서 빼기
 		mServ.minusMoney(authentication.getName(), money);
 		
