@@ -536,4 +536,11 @@ public class MemberService {
 		return true;
 	}
 
+	// 인출하기 - 멤버의 밍글머니에서 빼기
+	public void minusMoney(String userId,String money) {
+		Member m = mRepo.findById(userId).get();
+		Long resultMoney = m.getMingleMoney()-Long.parseLong(money);
+		m.setMingleMoney(resultMoney);
+		mRepo.save(m);
+	}
 }
