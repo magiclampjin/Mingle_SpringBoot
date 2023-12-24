@@ -192,6 +192,7 @@ public class MemberController {
 		// 맨 뒷자리 2개를 '*'로 변경
 		int length = id.length();
 		String securityId = id.substring(0, length - 2) + "**";
+		session.invalidate(); // 아이디 찾기 하고 나면 세션 비우기 ( 추후 같은 인증코드 사용 방지 및 로그인 하지 않았으므로 세션 필요없다고 판단하여 비워버림 -> 혹시 사용자 방문 기록등에서 세션을 사용하게된다면 통으로 비우지 않고 해당 키값만 비우는 걸로 변경 필요) 
 		return ResponseEntity.ok(securityId);
 	}
 
@@ -207,6 +208,7 @@ public class MemberController {
 	@PutMapping("/updatePw")
 	public ResponseEntity<Boolean> updatePw(@RequestBody MemberDTO dto) {
 		boolean result = mServ.updateUserPw(dto);
+		session.invalidate(); // 아이디 찾기 하고 나면 세션 비우기 ( 추후 같은 인증코드 사용 방지 및 로그인 하지 않았으므로 세션 필요없다고 판단하여 비워버림 -> 혹시 사용자 방문 기록등에서 세션을 사용하게된다면 통으로 비우지 않고 해당 키값만 비우는 걸로 변경 필요) 
 		return ResponseEntity.ok(result);
 	}
 
