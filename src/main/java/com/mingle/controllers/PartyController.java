@@ -113,9 +113,19 @@ public class PartyController {
 	
 	// 메인에서 사용할 전체 서비스 리스트
 	@GetMapping("/getServiceMainPage")
-	public ResponseEntity<List<ServiceDTO>> getServiceMainPage() {
+	public ResponseEntity<Map<String, Object>> getServiceMainPage(Authentication authentication) {
 		List<ServiceDTO> list = pServ.selectServiceByCategoryId("전체");
-		return ResponseEntity.ok(list);
+		
+		// 로그인한 사용자일 경우 가입한 목록 가져오기
+		List<Integer> joinList = new ArrayList<>();
+		if(authentication != null) {
+			joinList = pServ.selectServiceByIsJoin("전체", authentication.getName());
+		}
+		Map<String, Object> param = new HashMap<>();
+		param.put("list", list);
+		param.put("joinList", joinList);
+		return ResponseEntity.ok(param);
+//		return ResponseEntity.ok(list);
 	} 
 	
 	@ExceptionHandler(Exception.class)
