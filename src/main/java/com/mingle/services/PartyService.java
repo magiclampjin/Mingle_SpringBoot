@@ -7,6 +7,9 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.mingle.dao.PartyDAO;
 import com.mingle.domain.entites.Member;
@@ -171,8 +174,12 @@ public class PartyService {
 	}
 	
 	// 사용자가 이미 가입된 파티가 있는지 확인
-	public boolean isMemberParty(String userId) {
-		
+	public boolean isMemberParty(String userId) {	
 		return pmRepo.isAlreadyMember(userId);
+	}
+	
+	// 입력한 아이디가 중복된 아이디인지 확인
+	public boolean isIdDupChk(Long serviceId, String loginId ) {
+		return piRepo.isIdDupChk(serviceId, loginId);
 	}
 }

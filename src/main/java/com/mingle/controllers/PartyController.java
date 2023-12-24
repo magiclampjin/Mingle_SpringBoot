@@ -111,6 +111,12 @@ public class PartyController {
 		return ResponseEntity.ok().build();
 	}
 	
+	// 입력한 아이디가 중복된 아이디인지 확인
+	@GetMapping("/idDupChk/{serviceId}")
+	public boolean isDupId(@PathVariable Long serviceId, @RequestParam String loginId ) {
+		return pServ.isIdDupChk(serviceId, loginId);
+	}
+	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
 		e.printStackTrace();

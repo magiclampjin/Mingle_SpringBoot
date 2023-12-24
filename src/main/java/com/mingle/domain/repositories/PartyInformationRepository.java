@@ -20,4 +20,11 @@ public interface PartyInformationRepository extends JpaRepository<PartyInformati
 	@Query(value = "select * from current_party_info WHERE service_id = :serviceId and start_date >= :start and start_date <= :end order by start_date, id desc", nativeQuery = true)
 	List<PartyInformation> findPartyInformationByServiceIdAndCountAndStartDate(@Param("serviceId") Long serviceId, @Param("start") Instant start, @Param("end") Instant end);
 
+
+	@Query("select count(*) from PartyInformation pi where pi.serviceId=:serviceId and pi.loginId=:loginId")
+	Long idDupChk(@Param("serviceId") Long serviceId, @Param("loginId") String loginId);
+	
+	default boolean isIdDupChk(Long serviceId, String loginId) {
+		return idDupChk(serviceId, loginId)>0;
+	}
 }
