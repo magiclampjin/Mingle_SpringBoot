@@ -8,10 +8,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 import com.mingle.services.PrincipalOauth2UserService;
 import com.mingle.services.SecurityService;
@@ -78,6 +77,13 @@ public class SecurityConfig {
 	protected PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder(); 
 	}
+	
+	// 탈퇴 시 로그아웃에 필요
+	@Bean
+	public LogoutHandler securityContextLogoutHandler() {
+	    return new SecurityContextLogoutHandler();
+	}
+
 	
 //	private CorsConfigurationSource corsConfigurationSource() {
 //        CorsConfiguration configuration = new CorsConfiguration();

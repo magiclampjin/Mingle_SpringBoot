@@ -15,8 +15,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
-
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -70,12 +71,6 @@ public class MemberService {
 	// 비밀번호 인코딩
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-
-	@Autowired
-	private BankRepository bRepo;
-
-	@Autowired
-	private BankMapper bMapper;
 
 	@Autowired
 	private HttpSession session;
@@ -213,11 +208,6 @@ public class MemberService {
 		mRepo.save(m);
 	}
 
-	// 은행 목록 불러오기
-	public List<BankDTO> selectBank() {
-
-		return bMapper.toDtoList(bRepo.findAll());
-	}
 
 	// 이메일 인증코드 생성 - 아이디 찾기
 	public void idVerificationCode() {
@@ -232,7 +222,7 @@ public class MemberService {
 	}
 
 	// 아이디 찾기, 비밀번호 변경 본인 인증 메일 보내기
-	public boolean findId(MemberDTO dto) {
+	public boolean verificationEmail(MemberDTO dto) {
 		// 이름과 메일 정보가 일치하는 사용자가 있는지 검증
 		boolean verification = false;
 		if (dto.getId() == null) {// 아이디 찾기
@@ -380,7 +370,6 @@ public class MemberService {
 //
 //		return arrTokens;
 //	}
-	
 
 	// 카카오 유저 정보 받아오기
 	public MemberDTO createKakaoUser(String token) throws IOException {
@@ -456,19 +445,19 @@ public class MemberService {
 
 			// 사용자 정보 확인
 			SecurityUser userDetails = new SecurityUser(savedUser);
-			
+
 			// 현재 Authentication 객체 가져오기
 //			Authentication currentAuthentication = SecurityContextHolder.getContext().getAuthentication();
-			
+
 			// 업데이트된 사용자 정보로 새로운 Authentication 객체 생성
 			Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
 					userDetails.getAuthorities());
-			
+
 			// 로그인 시도
 //	        Authentication updatedAuthentication = authenticationManager.authenticate(authentication);
-	        
-	     // 로그인 성공 시 SecurityContextHolder에 업데이트된 Authentication 객체 저장
-	        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+			// 로그인 성공 시 SecurityContextHolder에 업데이트된 Authentication 객체 저장
+			SecurityContextHolder.getContext().setAuthentication(authentication);
 //
 //			// 현재 SecurityContextHolder에 저장된 Authentication 객체 교체
 //			SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -483,25 +472,75 @@ public class MemberService {
 //					System.out.println("Username: " + authenticatedUser.getUsername());
 //					System.out.println("Custom Field: " + authenticatedUser.getAuthorities());
 //					System.out.println("Custom: " + authenticatedUser);
-					return mMapper.toDto(savedUser);
-				}else {
-					System.out.println("Principal is not an instance of SecurityUser");
-				}
+				return mMapper.toDto(savedUser);
+			} else {
+				System.out.println("Principal is not an instance of SecurityUser");
+			}
 //			}
 		} else {
 			System.out.println("error");
 		}
 		return new MemberDTO();
 	}
-	
+
 	// 로그인한 사용자의 이름 불러오기
 	public String selectUserName(String userId) {
-		return mRepo.selectUserName(userId);	
+		return mRepo.selectUserName(userId);
 	}
+
+	
+	// 비밀번호 일치 확인
+	public boolean isEqualPw(String userId, String password) {
+		
+		// 데이터베이스에서 사용자의 비밀번호 가져오기
+		String dbPw = mRepo.selectUserPw(userId);
+		
+		// 입력받은 비밀번호와 데이터베이스의 비밀번호 비교
+		boolean matches = passwordEncoder.matches(password, dbPw);
+		
+		
+		return matches;
+	}
+	
+	// 회원 탈퇴
+	public void memberOut(String userId) {
+		mRepo.deleteById(userId);
+	}
+
 	
 	// 로그인한 사용자의 mingle money 불러오기
 	public int selectMingleMoney(String id) {
 		return mRepo.selectMingleMoney(id);
 	}
-	
+
+	// 이메일 인증코드 생성 - 회원가입
+	public void signupVerificationCode() {
+		int number = (int) (Math.random() * (90000)) + 10000;
+		session.setAttribute("signupVerificationCode", number);
+	}
+
+	// 회원가입 본인 인증 메일 보내기
+	public boolean verificationSignupEmail(String email) throws MessagingException {
+		signupVerificationCode();//이메일 인증코드 생성
+		// 메일 전송 객체 생성
+		MimeMessage message = javaMailSender.createMimeMessage();
+		message.setFrom(senderEmail);// 보내는 사람 설정
+		message.setRecipients(MimeMessage.RecipientType.TO, email);// 받는사람 설정
+		message.setSubject("Mingle - [회원가입] 이메일 본인 인증");// 제목 설정
+		String body = "";// 메일 본문 설정
+		body += "<h3>" + "본인인증을 위해 요청하신 인증 번호입니다." + "<h3>";
+		body += "<h1>" + session.getAttribute("signupVerificationCode") + "<h1>";
+		body += "<h3>" + "감사합니다." + "<h3>";
+		message.setText(body, "UTF-8", "html");
+		javaMailSender.send(message);
+		return true;
+	}
+
+	// 인출하기 - 멤버의 밍글머니에서 빼기
+	public void minusMoney(String userId,String money) {
+		Member m = mRepo.findById(userId).get();
+		Long resultMoney = m.getMingleMoney()-Long.parseLong(money);
+		m.setMingleMoney(resultMoney);
+		mRepo.save(m);
+	}
 }

@@ -169,4 +169,10 @@ public class PartyService {
 	
 		return 	sMap.toDtoList(sRepo.findAll());
 	}
+	
+	// 사용자가 이미 가입된 파티가 있는지 확인
+	public boolean isMemberParty(String userId) {
+		
+		return pmRepo.isAlreadyMember(userId);
+	}
 }
