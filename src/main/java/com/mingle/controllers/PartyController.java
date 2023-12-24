@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mingle.dto.CurrJoinPartyInfoDTO;
 import com.mingle.dto.PartyInformationDTO;
 import com.mingle.dto.PaymentDTO;
 import com.mingle.dto.ServiceCategoryDTO;
@@ -75,13 +76,6 @@ public class PartyController {
 		pServ.inertParty(partyData, authentication.getName());
 		return ResponseEntity.ok().build();
 	}
-		
-//	// 가입한 파티 목록 불러오기
-//	@GetMapping("/getMyPartyList")
-//	public ResponseEntity<List<PartyInformationDTO>> getMypartyList(Authentication authentication){
-//		List<PartyInformationDTO> list = pServ.getMypartyList(authentication.getName());
-//		return ResponseEntity.ok(list);
-//	}
 
 	// 생성된 파티 목록 불러오기
 	@GetMapping("/getPartyList/{id}")
@@ -106,9 +100,12 @@ public class PartyController {
 
 	// 파티 가입 & 첫 달 결제 내역 저장  & 밍글 머니 사용
 	@PostMapping("/auth/joinParty/{id}")
-	public ResponseEntity<Void> joinParty(@PathVariable Long id, @RequestBody(required = false) PaymentDTO paymentData, Authentication authentication){
-		pServ.insertJoinParty(id, authentication.getName(), paymentData);
-		return ResponseEntity.ok().build();
+	public ResponseEntity<Void> joinParty(@PathVariable Long id, @RequestBody(required = false) PaymentDTO paymentData, Authentication authentication){	
+		if (authentication != null) {
+			pServ.insertJoinParty(id, authentication.getName(), paymentData);
+			return ResponseEntity.ok().build();
+		}else
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 	}
 	
 	// 입력한 아이디가 중복된 아이디인지 확인
@@ -116,6 +113,27 @@ public class PartyController {
 	public boolean isDupId(@PathVariable Long serviceId, @RequestParam String loginId ) {
 		return pServ.isIdDupChk(serviceId, loginId);
 	}
+	
+	// 가입한 파티 목록 불러오기
+	@GetMapping("/getMyPartyList")
+	public ResponseEntity<List<CurrJoinPartyInfoDTO>> selectMyPartyList(Authentication authentication){
+		if (authentication != null) {
+			List<CurrJoinPartyInfoDTO> list = pServ.selectMyPartyList(authentication.getName());
+			return ResponseEntity.ok(list);
+		}else
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+	}
+	
+	// 특정 파티 정보 불러오기
+	@GetMapping("/getPartyInfo/{id}")
+	public ResponseEntity<CurrJoinPartyInfoDTO> selectMyPartyInfo(@PathVariable Long id, Authentication authentication){
+		if (authentication != null) {
+			CurrJoinPartyInfoDTO info = pServ.selectMyPartyInfo(id, authentication.getName());
+			return ResponseEntity.ok(info);
+		}else
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+	}
+	
 	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
