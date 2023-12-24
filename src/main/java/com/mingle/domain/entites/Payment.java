@@ -2,18 +2,15 @@ package com.mingle.domain.entites;
 
 import java.sql.Timestamp;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,21 +21,22 @@ import lombok.ToString;
 @Setter
 @ToString
 @NoArgsConstructor
-@IdClass(PaymentId.class)
 public class Payment {
-
+	
 	@Id
+	@Column(name="id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
 	@Column(name="party_registration_id")
 	private Long partyRegistrationId;
 	
-	@Id
 	@Column(name="member_id")
 	private String memberId;
 	
-	@Id
 	@Column(name="date")
+	@CreationTimestamp
     private Timestamp date;
-	
 	
 	@Column(name="service_id")
 	private Long serviceId;

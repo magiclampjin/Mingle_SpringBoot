@@ -167,4 +167,17 @@ public class PaymentService {
 			}
 		}
 	}
+	
+	// 인출하기
+	public void withdrawMingleMoney(String userId, String money) {
+		Payment p = new Payment();
+		p.setMemberId(userId);
+		p.setPaymentTypeId("인출");
+		p.setPrice(Long.parseLong(money));
+		p.setUsedMingleMoney(Long.parseLong(money));
+		
+		pRepo.save(p);
+	}
+	
+	
 }

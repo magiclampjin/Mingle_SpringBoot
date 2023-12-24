@@ -262,31 +262,41 @@ public class MemberController {
 	
 	// 회원 탈퇴
 	@GetMapping("/mypageMemberOut")
-	public ResponseEntity<String> memberOut(Authentication authentication, @RequestParam String password,
+	public ResponseEntity<Integer> memberOut(Authentication authentication, @RequestParam String password,
 			HttpServletRequest request, HttpServletResponse response){
 		
-		// 이미 가입된 파티가 있는지 확인
-		boolean result = pServ.isMemberParty(authentication.getName());
+		// 1 : 계정 삭제 
+		// 2 : 비밀번호 일치하지 않음
+		// 3 : 가입한 파티가 있음
 		
-		if(result) {
-			return ResponseEntity.ok("파티에 가입되어있으면 탈퇴 불가능합니다.");
-		}else {
-			// 비밀번호 일치하는지 확인
-			Boolean pwResult = mServ.isEqualPw(authentication.getName(),password);
+		// 비밀번호 일치하는지 먼저 확인
+		Boolean pwResult = mServ.isEqualPw(authentication.getName(),password);
+		
+		// 비밀번호가 일치
+		if(pwResult) {
 			
-			if(pwResult) {
-				// 일치 -> 계정 삭제
+			// 이미 가입된 파티가 있는지 확인
+			boolean result = pServ.isMemberParty(authentication.getName());
+			
+			// 가입한 파티가 있다면
+			if(result) {
+				// 탈퇴 불가능
+				return ResponseEntity.ok(3); 
+			}else {
+				// 가입한 파티가 없다면 탈퇴 가능
 				// 로그아웃 처리
-                customLogoutHandler.logout(request, response, authentication);
-                
+	            customLogoutHandler.logout(request, response, authentication);
+	            
 				// 계정삭제
 				mServ.memberOut(authentication.getName());
-				return ResponseEntity.ok("탈퇴되었습니다.");
-				
-			}else {
-				return ResponseEntity.ok("비밀번호가 일치하지 않습니다.");
+				return ResponseEntity.ok(1);
 			}
+			
+		}else {
+			// 비밀번호 일치하지 않음
+			return ResponseEntity.ok(2);
 		}
+		
 	}
 		
 	// 로그인한 사용자의 mingle money 불러오기 ( 파티 가입 시 사용 - 밍글 머니 우선 적용하기 위함.)
