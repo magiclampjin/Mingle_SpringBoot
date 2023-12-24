@@ -111,6 +111,13 @@ public class PartyController {
 		return ResponseEntity.ok().build();
 	}
 	
+	// 메인에서 사용할 전체 서비스 리스트
+	@GetMapping("/getServiceMainPage")
+	public ResponseEntity<List<ServiceDTO>> getServiceMainPage() {
+		List<ServiceDTO> list = pServ.selectServiceByCategoryId("전체");
+		return ResponseEntity.ok(list);
+	} 
+	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
 		e.printStackTrace();
