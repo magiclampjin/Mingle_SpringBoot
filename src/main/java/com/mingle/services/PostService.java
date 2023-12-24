@@ -2,6 +2,8 @@ package com.mingle.services;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.List;
@@ -36,7 +38,6 @@ import com.mingle.mappers.NoticePostViewMapper;
 import com.mingle.mappers.PopularPostViewMapper;
 import com.mingle.mappers.PostFileMapper;
 import com.mingle.mappers.PostMapper;
-import com.mingle.mappers.PostReactionsMapper;
 
 import jakarta.transaction.Transactional;
 
@@ -81,9 +82,7 @@ public class PostService {
 	
 	@Autowired
 	private PostReactionsRepository prRepo;
-	
-	@Autowired
-	private PostReactionsMapper prMapper;
+    
 	
 	
 //---------------------------------------------------------------------------------	
@@ -195,8 +194,8 @@ public class PostService {
 	
 	//텍스트 에디터로부터 파일을 받아 업로드 한 뒤 url 반환
 	public String imageUploadFromTextEditor(MultipartFile image) throws IllegalStateException, IOException {
-		String upload = "C:/Mingle/uploads/";
-		File uploadPath = new File(upload);
+		String realPath = this.getRealPath();
+		File uploadPath = new File(realPath);
 		if(!uploadPath.exists()) {
 			uploadPath.mkdirs();
 		}
@@ -209,7 +208,6 @@ public class PostService {
 		
 		return "/uploads/" + sysName;
 	}
-	
 	
 	
 	// 게시글 정보 업데이트
@@ -269,10 +267,21 @@ public class PostService {
 	    }
 	}
 	
+	
 	// 게시글 삭제
-	public void deleteById(Long id) {
+	@Transactional
+	public void deleteById(Long id) throws IOException {
+		List<String> fileList = pfRepo.selectSysNameListByPostId(id);
+		this.deleteServerFileList(fileList);
+		pfRepo.deleteByPostId(id); // 게시글 삭제 시 관련 파일정보를 DB에서 삭제.
 		Post post = pRepo.findById(id).get();
 		pRepo.delete(post);
+	}
+	
+	// 특정 파일 삭제
+	public void deleteFileBySysName(String sysName) throws IOException {
+		this.deleteServerFile(sysName);
+		pfRepo.deleteFileBySysName(sysName);
 	}
 	
 	// 모든 공지 게시글 가져오기
@@ -307,6 +316,41 @@ public class PostService {
 		post.setIsFix(false);
 		pRepo.save(post);
 	}
+	
+	// 서버 파일 리스트 삭제 함수
+	protected void deleteServerFileList(List<String> fileList) throws IOException{
+		String realPath = this.getRealPath();
+		File uploadPath = new File(realPath);
+		if(!uploadPath.exists()) {uploadPath.mkdirs();}
+
+		if(fileList != null) {
+			for(String delFile : fileList) {
+				if(delFile != null) {
+					Path path = Paths.get(uploadPath + "/" + delFile);
+					java.nio.file.Files.deleteIfExists(path);
+				}
+			}
+		}
+	}
+	
+	// 서버 파일 삭제 함수
+	protected void deleteServerFile(String sysName) throws IOException {
+		String realPath = this.getRealPath();
+		File uploadPath = new File(realPath);
+		if(!uploadPath.exists()) {uploadPath.mkdirs();}
+		
+		if(sysName != null) {
+			Path path = Paths.get(uploadPath + "/" + sysName);
+			java.nio.file.Files.deleteIfExists(path);
+		}
+		
+	}
+	
+	public String getRealPath() {
+		return "C:/Mingle/uploads/";
+	}
+	
+	
 
 	
 
