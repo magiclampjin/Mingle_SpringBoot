@@ -12,6 +12,7 @@ import jakarta.persistence.Tuple;
 
 public interface ReplyRepository extends JpaRepository<Reply, Long>{
 	
+	// 최상위 댓글 가져오기
 	@Query("select r from Reply r "
 		      + "left join fetch r.member "
 		      + "left join fetch r.parentReply "
@@ -19,12 +20,22 @@ public interface ReplyRepository extends JpaRepository<Reply, Long>{
 		      + "where r.parentReply is null")
 	Set<Reply> findReplyHasNullParent();
 	
+	// id를 기반으로 댓글 찾기
 	@Query("select r from Reply r "
 		      + "left join fetch r.member "
 		      + "left join fetch r.parentReply "
 		      + "left join fetch r.childrenReplies "
 		      + "where r.id = :id")
 	Reply findReplyById(@Param(value = "id") Long id);
+	
+	// id를 기반으로 자식 댓글들 찾기
+	@Query("select r from Reply r "		      
+			  + "left join fetch r.member "
+		      + "left join fetch r.parentReply "
+		      + "left join fetch r.childrenReplies "
+		      + "where r.parentReply.id = :reply_parent_id")
+	Set<Reply> findChildRepliesById(@Param(value = "reply_parent_id") Long id);
+	
 	
 	@Query("select r, case when (SIZE(r.childrenReplies) > 0) then true else false end from Reply r "
 		      + "left join fetch r.member "

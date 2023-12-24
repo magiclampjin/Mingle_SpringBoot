@@ -19,22 +19,24 @@ import com.mingle.dao.PostDAO;
 import com.mingle.domain.entites.Member;
 import com.mingle.domain.entites.Post;
 import com.mingle.domain.entites.PostFile;
+import com.mingle.domain.entites.PostReactions;
 import com.mingle.domain.repositories.FreePostViewRepository;
 import com.mingle.domain.repositories.MemberRepository;
 import com.mingle.domain.repositories.NoticePostViewRepository;
 import com.mingle.domain.repositories.PopularPostViewRepository;
 import com.mingle.domain.repositories.PostFileRepository;
+import com.mingle.domain.repositories.PostReactionsRepository;
 import com.mingle.domain.repositories.PostRepository;
 import com.mingle.dto.PostDTO;
 import com.mingle.dto.PostFileDTO;
 import com.mingle.dto.PostViewDTO;
 import com.mingle.dto.UploadPostDTO;
 import com.mingle.mappers.FreePostViewMapper;
-import com.mingle.mappers.MemberMapper;
 import com.mingle.mappers.NoticePostViewMapper;
 import com.mingle.mappers.PopularPostViewMapper;
 import com.mingle.mappers.PostFileMapper;
 import com.mingle.mappers.PostMapper;
+import com.mingle.mappers.PostReactionsMapper;
 
 import jakarta.transaction.Transactional;
 
@@ -78,7 +80,11 @@ public class PostService {
 	private MemberRepository mRepo;
 	
 	@Autowired
-	private MemberMapper mMapper;
+	private PostReactionsRepository prRepo;
+	
+	@Autowired
+	private PostReactionsMapper prMapper;
+	
 	
 //---------------------------------------------------------------------------------	
 	// 공지 게시판 글 불러오기
@@ -211,6 +217,56 @@ public class PostService {
 		Post post = pRepo.findById(id).get();
 		pMapper.updateEntityFromDTO(dto,post);
 		pRepo.save(post);
+	}
+	
+	// 게시글 접속 시 게시글 수 증가.
+	@Transactional
+	public Long incrementViewCount(Long id) {
+		pRepo.incrementViewCount(id);
+		return pRepo.selectViewcountByPostId(id);
+	}
+	
+	// 게시글의 좋아요 수 반환
+	public Long sumVotesByPostId(Long id) {
+	    Long voteCount = prRepo.sumVotesByPostId(id);
+	    return (voteCount != null) ? voteCount : 0; // null인 경우 0으로 반환
+	}
+	
+	// 게시글 좋아요 누를 시 투표 이력이 있는 지 검사 후, 없다면 좋아요 투표 진행.
+	@Transactional
+	public Long likeVote(Long postId, String memberId) {
+	    if (prRepo.isVoted(postId, memberId)) {
+	        return null; // 이미 투표한 경우
+	    } else {
+	        PostReactions postReaction = PostReactions.builder()
+	                .postId(postId)
+	                .memberId(memberId)
+	                .vote(1L) // 좋아요는 '1'로 설정
+	                .build();
+
+	        prRepo.save(postReaction);
+	        
+	        return prRepo.sumVotesByPostId(postId); // 총 좋아요 수 반환
+	    }
+	}
+
+	
+	// 게시글 싫어요 누를 시 투표 이력이 있는 지 검사 후, 없다면 좋아요 투표 진행.
+	@Transactional
+	public Long dislikeVote(Long postId, String memberId) {
+	    if (prRepo.isVoted(postId, memberId)) {
+	        return null;
+	    } else {
+	        PostReactions postReaction = PostReactions.builder()
+	                .postId(postId)
+	                .memberId(memberId)
+	                .vote(-1L) // 싫어요는 '-1'로 설정
+	                .build();
+
+	        prRepo.save(postReaction);
+	        
+	        return prRepo.sumVotesByPostId(postId);
+	    }
 	}
 	
 	// 게시글 삭제

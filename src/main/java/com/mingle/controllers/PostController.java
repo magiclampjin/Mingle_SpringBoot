@@ -31,6 +31,7 @@ public class PostController {
 
 	@Autowired
 	private PostService pServ;
+	
 
 //	@GetMapping("/freeTop10")
 //	public ResponseEntity<List<Map<String,Object>>> getLastestFreePosts(){
@@ -76,6 +77,11 @@ public class PostController {
 		return ResponseEntity.ok(pServ.findPostById(id));
 	}
 	
+	@GetMapping("/likes/{id}")
+	public ResponseEntity<Long> getVotesByPostId(@PathVariable Long id){
+		return ResponseEntity.ok(pServ.sumVotesByPostId(id));
+	}
+	
 	@PostMapping("/imageUpload")
 	public ResponseEntity<String> uploadImage(@RequestParam("image") MultipartFile image) throws IllegalStateException, IOException{
 		return ResponseEntity.ok(pServ.imageUploadFromTextEditor(image));
@@ -87,15 +93,41 @@ public class PostController {
 		pServ.insert(dto);
 		return ResponseEntity.ok().build();
 	}
+	
+	// 추천 요청
+    @PostMapping("/{postId}/like")
+    public ResponseEntity<Long> likePost(@PathVariable Long postId, @RequestParam("memberId") String memberId) {
+        Long likeCount = pServ.likeVote(postId, memberId);
+        if (likeCount == null) {
+            return ResponseEntity.badRequest().body(-1L); // 이미 투표한 경우
+        }
+        return ResponseEntity.ok(likeCount); // 총 추천 수 반환
+    }
+    
+    // 비추천 요청
+    @PostMapping("/{postId}/dislike")
+    public ResponseEntity<Long> dislikePost(@PathVariable Long postId, @RequestParam("memberId") String memberId) {
+        Long likeCount = pServ.dislikeVote(postId, memberId);
+        if (likeCount == null) {
+            return ResponseEntity.badRequest().body(-1L); // 이미 투표한 경우
+        }
+        return ResponseEntity.ok(likeCount); // 총 추천 수 반환
+    }
 
 	@PutMapping
 	public ResponseEntity<Void> postUpdate(@RequestBody Long id, @RequestBody PostDTO dto) {
 		pServ.updateById(id, dto);
 		return ResponseEntity.ok().build();
 	}
+	
+	@PutMapping("/updateViewCount/{id}")
+	public ResponseEntity<Long> incrementViewCount(@PathVariable Long id){
+		return ResponseEntity.ok(pServ.incrementViewCount(id));
+	}
+	
 
-	@DeleteMapping
-	public ResponseEntity<Void> postDelete(@RequestBody Long id) {
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> postDelete(@PathVariable Long id) {
 		pServ.deleteById(id);
 		return ResponseEntity.ok().build();
 	}

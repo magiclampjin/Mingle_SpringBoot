@@ -60,6 +60,20 @@ public class Reply {
 	private Long replyAdoptiveParentId;
 
 	
+	
+	@Builder
+	public Reply(Long id, String content, Timestamp writeDate, Long postId, Member member) {
+		super();
+		this.id = id;
+		this.content = content;
+		this.writeDate = writeDate;
+		this.postId = postId;
+		this.member = member;
+	}
+
+
+
+
 	@Builder
 	public Reply(Long id, String content, Timestamp writeDate, Long postId, Member member, Reply parentReply,
 			Set<Reply> childrenReplies, Long replyAdoptiveParentId) {
