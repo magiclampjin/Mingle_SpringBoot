@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -39,6 +40,7 @@ import com.mingle.mappers.PopularPostViewMapper;
 import com.mingle.mappers.PostFileMapper;
 import com.mingle.mappers.PostMapper;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -153,7 +155,7 @@ public class PostService {
 	
 	// 게시글 등록
 	@Transactional
-	public void insert(UploadPostDTO dto) throws IllegalStateException, IOException {
+	public Long insert(UploadPostDTO dto) throws IllegalStateException, IOException {
 		Member member = mRepo.selectMypageInfo(dto.getMemberId());
 		Post post = new Post();
 		post.setMember(member);
@@ -173,7 +175,7 @@ public class PostService {
 		List<MultipartFile> multiList = dto.getFiles();
 		
 		if(multiList != null && !multiList.isEmpty())  {
-			String upload = "C:/Mingle/uploads/";
+			String upload = this.getRealPath();
 			File uploadPath = new File(upload);
 			if(!uploadPath.exists()) {
 				uploadPath.mkdirs();
@@ -189,7 +191,7 @@ public class PostService {
 			}
 		}
 		
-		pRepo.save(post);
+		return pRepo.save(post).getId();
 	}
 	
 	//텍스트 에디터로부터 파일을 받아 업로드 한 뒤 url 반환
@@ -209,13 +211,47 @@ public class PostService {
 		return "/uploads/" + sysName;
 	}
 	
-	
-	// 게시글 정보 업데이트
-	public void updateById(Long id, PostDTO dto) {
-		Post post = pRepo.findById(id).get();
-		pMapper.updateEntityFromDTO(dto,post);
-		pRepo.save(post);
+	// 게시글 업데이트
+	@Transactional
+	public void updatePost(Long postId, UploadPostDTO dto) throws IllegalStateException, IOException {
+	    Post post = pRepo.findById(postId)
+	                    .orElseThrow(() -> new EntityNotFoundException("Post not found"));
+
+	    // Post 정보 업데이트
+	    post.setTitle(dto.getTitle());
+	    post.setContent(dto.getContent());
+	    // 기타 필요한 필드 업데이트
+
+	    // 기존 파일 목록 가져오기
+	    Set<String> existingOriNames = post.getFiles().stream()
+	                                        .map(PostFile::getOriName)
+	                                        .collect(Collectors.toSet());
+
+	    List<MultipartFile> newFiles = dto.getFiles();
+	    if (newFiles != null && !newFiles.isEmpty()) {
+	        String uploadDir = this.getRealPath();
+	        File uploadPath = new File(uploadDir);
+	        if (!uploadPath.exists()) {
+	            uploadPath.mkdirs();
+	        }
+
+	        for (MultipartFile file : newFiles) {
+	            String oriName = file.getOriginalFilename();
+	            String sysName = UUID.randomUUID() + "_" + oriName;
+
+	            // 중복 파일 체크
+	            if (!existingOriNames.contains(oriName)) {
+	                file.transferTo(new File(uploadPath, oriName));
+	                PostFile newFile = new PostFile(null, oriName, sysName, post.getId());
+	                post.getFiles().add(newFile);
+	            }
+	        }
+	    }
+
+	    // 변경된 Post 객체 저장
+	    pRepo.save(post);
 	}
+
 	
 	// 게시글 접속 시 게시글 수 증가.
 	@Transactional

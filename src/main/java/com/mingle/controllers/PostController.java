@@ -132,11 +132,10 @@ public class PostController {
 
 	// 게시글 삽입
 	@PostMapping
-	public ResponseEntity<Void> postInsert(@ModelAttribute UploadPostDTO dto)
+	public ResponseEntity<Long> postInsert(@ModelAttribute UploadPostDTO dto)
 			throws IllegalStateException, IOException {
-		System.out.println(dto);
-		pServ.insert(dto);
-		return ResponseEntity.ok().build();
+		
+		return ResponseEntity.ok(pServ.insert(dto));
 	}
 
 	// 추천 요청
@@ -159,11 +158,11 @@ public class PostController {
 		return ResponseEntity.ok(likeCount); // 총 추천 수 반환
 	}
 
-	// 업데이트 로직(변경 예정)
-	@PutMapping
-	public ResponseEntity<Void> postUpdate(@RequestBody Long id, @RequestBody PostDTO dto) {
-		pServ.updateById(id, dto);
-		return ResponseEntity.ok().build();
+	// 게시글 업데이트 로직
+	@PutMapping("/{id}")
+	public ResponseEntity<Void> postUpdate(@PathVariable Long id, @ModelAttribute UploadPostDTO dto) throws IllegalStateException, IOException {
+	    pServ.updatePost(id, dto);
+	    return ResponseEntity.ok().build();
 	}
 
 	// 게시글 입장 시 조회 수 업데이트
@@ -179,12 +178,15 @@ public class PostController {
 		return ResponseEntity.ok().build();
 	}
 	
-	// 특정 sysName을 가진 파일 삭제 
-	@DeleteMapping("/file/{sysName}")
-	public ResponseEntity<Void> postFileDelete(@PathVariable String sysName) throws IOException{
-		pServ.deleteFileBySysName(sysName);
-		return ResponseEntity.ok().build();
+	// 여러 sysName을 가진 파일 삭제
+	@DeleteMapping(value = "/file/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Void> deleteFiles(@RequestBody List<String> sysNames) throws IOException {
+	    for (String sysName : sysNames) {
+	        pServ.deleteFileBySysName(sysName);
+	    }
+	    return ResponseEntity.ok().build();
 	}
+
 
 	// 에러 핸들러
 	@ExceptionHandler(Exception.class)
