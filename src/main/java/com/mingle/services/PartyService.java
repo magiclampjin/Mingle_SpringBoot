@@ -13,6 +13,7 @@ import com.mingle.domain.entites.Member;
 import com.mingle.domain.entites.PartyMember;
 import com.mingle.domain.entites.PartyRegistration;
 import com.mingle.domain.repositories.MemberRepository;
+import com.mingle.domain.repositories.PartyInformationForMainRepository;
 import com.mingle.domain.repositories.PartyInformationRepository;
 import com.mingle.domain.repositories.PartyMemberRepository;
 import com.mingle.domain.repositories.PartyRegistrationRepository;
@@ -20,9 +21,11 @@ import com.mingle.domain.repositories.PaymentRepository;
 import com.mingle.domain.repositories.ServiceCategoryRepository;
 import com.mingle.domain.repositories.ServiceRepository;
 import com.mingle.dto.PartyInformationDTO;
+import com.mingle.dto.PartyInformationForMainDTO;
 import com.mingle.dto.PaymentDTO;
 import com.mingle.dto.ServiceCategoryDTO;
 import com.mingle.dto.ServiceDTO;
+import com.mingle.mappers.PartyInformationForMainMapper;
 import com.mingle.mappers.PartyInformationMapper;
 import com.mingle.mappers.PaymentMapper;
 import com.mingle.mappers.ServiceCategoryMapper;
@@ -58,6 +61,12 @@ public class PartyService {
 	// 파티장 등록
 	@Autowired
 	private PartyMemberRepository pmRepo;
+	
+	// 파티 정보 메인 페이지
+	@Autowired
+	private PartyInformationForMainRepository pimRepo;
+	@Autowired
+	private PartyInformationForMainMapper pimMap;
 	
 	// 첫 달 결제 정보 저장을 위한 paymentRepo, mapper
 	@Autowired
@@ -174,5 +183,11 @@ public class PartyService {
 	public boolean isMemberParty(String userId) {
 		
 		return pmRepo.isAlreadyMember(userId);
+	}
+	
+	// 메인페이지에 출력할 파티 정보 불러오기
+	public List<PartyInformationForMainDTO> selectPartyListForMain(Instant start, Instant end){
+//		return pimMap.toDtoList(pimRepo.findPartyInfoForMain(start, end));
+		return pimMap.toDtoList(pimRepo.findPartyInfoForMain(start, end));
 	}
 }
