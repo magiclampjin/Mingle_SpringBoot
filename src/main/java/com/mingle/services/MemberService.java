@@ -1,26 +1,21 @@
 package com.mingle.services;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
+import java.time.ZonedDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,13 +24,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mingle.domain.entites.Member;
 import com.mingle.domain.repositories.AdjectiveRepository;
 import com.mingle.domain.repositories.AdjectiveViewRepository;
-import com.mingle.domain.repositories.BankRepository;
 import com.mingle.domain.repositories.MemberRepository;
 import com.mingle.domain.repositories.NounRepository;
 import com.mingle.domain.repositories.NounViewRepository;
-import com.mingle.dto.BankDTO;
 import com.mingle.dto.MemberDTO;
-import com.mingle.mappers.BankMapper;
 import com.mingle.mappers.MemberMapper;
 import com.mingle.security.SecurityUser;
 
@@ -141,18 +133,22 @@ public class MemberService {
 	public Member insertMember(MemberDTO dto) {
 		// 비밀번호 인코딩
 		String pwEncoding = passwordEncoder.encode(dto.getPassword());
-		// 현재 시각을 얻어옴
+		// 현재 시각을 얻어옴 -> 가입 일자 저장
 		LocalDateTime now = LocalDateTime.now();
-		// 시간대 변환 (UTC에서 Asia/Seoul로)
-		LocalDateTime koreaTime = now.atZone(ZoneId.of("UTC")).withZoneSameInstant(ZoneId.of("Asia/Seoul"))
-				.toLocalDateTime();
-
+		System.out.println(dto.getBirth());
+		
+		// birth를 -9시간으로 조정
+	    Instant adjustedBirth = dto.getBirth().minusSeconds(9 * 60 * 60);	
+	    System.out.println(adjustedBirth);
 		Member user = mMapper.toEntity(dto);
 		user.setPassword(pwEncoding);
 		user.setRoleId("ROLE_MEMBER");
-		user.setSignupDate(Timestamp.valueOf(koreaTime));
+		user.setSignupDate(Timestamp.valueOf(now));
 		user.setEnabled(true);
 		user.setMingleMoney((long) 0);
+		// 조정된 birth를 Timestamp로 변환
+	    Timestamp timestampBirth = Timestamp.from(adjustedBirth);
+	    user.setBirth(timestampBirth);
 		return mRepo.save(user);
 	}
 
