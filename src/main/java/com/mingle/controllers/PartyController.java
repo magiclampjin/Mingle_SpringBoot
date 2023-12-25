@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mingle.dto.CurrJoinPartyInfoDTO;
 import com.mingle.dto.PartyInformationDTO;
+import com.mingle.dto.PartyInformationForMainDTO;
 import com.mingle.dto.PaymentDTO;
 import com.mingle.dto.ServiceCategoryDTO;
 import com.mingle.dto.ServiceDTO;
@@ -29,10 +30,10 @@ import com.mingle.services.PartyService;
 @RestController
 @RequestMapping("/api/party")
 public class PartyController {
-	
+
 	@Autowired
-	private PartyService pServ ;
-	
+	private PartyService pServ;
+
 	// 제공하는 서비스 카테고리명 불러오기
 	@GetMapping
 	public ResponseEntity<List<ServiceCategoryDTO>> selectCategoryAll() {
@@ -46,15 +47,16 @@ public class PartyController {
 //		List<ServiceDTO> list = pServ.selectServiceByCategoryId(id);
 //		return ResponseEntity.ok(list);
 //	}
-	
+
 	// 카테고리별 서비스 정보 & 가입한 서비스 정보 불러오기
 	@GetMapping("/getService/{id}")
-	public ResponseEntity<Map<String, Object>> selectServiceByCategoryId(@PathVariable String id, Authentication authentication) {
+	public ResponseEntity<Map<String, Object>> selectServiceByCategoryId(@PathVariable String id,
+			Authentication authentication) {
 		List<ServiceDTO> list = pServ.selectServiceByCategoryId(id);
-		
+
 		// 로그인한 사용자일 경우 가입한 목록 가져오기
 		List<Integer> joinList = new ArrayList<>();
-		if(authentication != null) {
+		if (authentication != null) {
 			joinList = pServ.selectServiceByIsJoin(id, authentication.getName());
 		}
 		Map<String, Object> param = new HashMap<>();
@@ -62,43 +64,45 @@ public class PartyController {
 		param.put("joinList", joinList);
 		return ResponseEntity.ok(param);
 	}
-	
+
 	// 특정 서비스 정보 불러오기
 	@GetMapping("/getServiceById/{id}")
 	public ResponseEntity<ServiceDTO> selectServiceByServiceId(@PathVariable Long id) {
 		ServiceDTO dto = pServ.selectServiceByServiceId(id);
 		return ResponseEntity.ok(dto);
 	}
-	
+
 	// 파티 정보 저장, 파티 등록, 파티장 등록
 	@PostMapping("/auth")
-	public ResponseEntity<Void> inertParty (@RequestBody PartyInformationDTO partyData, Authentication authentication){
+	public ResponseEntity<Void> inertParty(@RequestBody PartyInformationDTO partyData, Authentication authentication) {
 		pServ.inertParty(partyData, authentication.getName());
 		return ResponseEntity.ok().build();
 	}
 
+
 	// 생성된 파티 목록 불러오기
 	@GetMapping("/getPartyList/{id}")
-	public ResponseEntity<List<PartyInformationDTO>> getPartyList(@PathVariable Long id){
+	public ResponseEntity<List<PartyInformationDTO>> getPartyList(@PathVariable Long id) {
 		List<PartyInformationDTO> list = pServ.selectPartyList(id);
 		return ResponseEntity.ok(list);
 	}
-	
+
 	// 등록된 파티 정보 중 선택한 날짜에 해당하는 파티 정보 불러오기
 	@GetMapping("/getPartyListByStartDate/{id}")
-	public ResponseEntity<List<PartyInformationDTO>> selectPartyListByStartDate(@PathVariable Long id, @RequestParam Instant start, @RequestParam Instant end){
+	public ResponseEntity<List<PartyInformationDTO>> selectPartyListByStartDate(@PathVariable Long id,
+			@RequestParam Instant start, @RequestParam Instant end) {
 		List<PartyInformationDTO> list = pServ.selectPartyListByStartDate(id, start, end);
 		return ResponseEntity.ok(list);
 	}
-	
+
 	// 서비스 명 리스트 불러오기
 	@GetMapping("/getServiceNameList")
-	public ResponseEntity<List<ServiceDTO>> getServiceNameList(){
+	public ResponseEntity<List<ServiceDTO>> getServiceNameList() {
 		List<ServiceDTO> dtos = pServ.getServiceNameList();
 		return ResponseEntity.ok(dtos);
 	}
 
-	// 파티 가입 & 첫 달 결제 내역 저장  & 밍글 머니 사용
+	// 파티 가입 & 첫 달 결제 내역 저장 & 밍글 머니 사용
 	@PostMapping("/auth/joinParty/{id}")
 	public ResponseEntity<Void> joinParty(@PathVariable Long id, @RequestBody(required = false) PaymentDTO paymentData, Authentication authentication){	
 		if (authentication != null) {
@@ -106,8 +110,34 @@ public class PartyController {
 			return ResponseEntity.ok().build();
 		}else
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
+	}
+
+//	// 메인 페이지에 출력할
+//	// 카테고리별 서비스 정보 & 가입한 서비스 정보 불러오기
+//	@GetMapping("/getService/{id}")
+//	public ResponseEntity<Map<String, Object>> selectServiceByCategoryId(Authentication authentication) {
+//		List<ServiceDTO> list = pServ.selectServiceByCategoryId("전");
+//
+//		// 로그인한 사용자일 경우 가입한 목록 가져오기
+//		List<Integer> joinList = new ArrayList<>();
+//		if (authentication != null) {
+//			joinList = pServ.selectServiceByIsJoin(id, authentication.getName());
+//		}
+//		Map<String, Object> param = new HashMap<>();
+//		param.put("list", list);
+//		param.put("joinList", joinList);
+//		return ResponseEntity.ok(param);
+//	}
+
+	// 메인페이지에 출력할 파티 정보 불러오기
+	@GetMapping("/getPartyListForMain")
+	public ResponseEntity<List<PartyInformationForMainDTO>> selectPartyListForMain(@RequestParam Instant start, @RequestParam Instant end) {
+		List<PartyInformationForMainDTO> list = pServ.selectPartyListForMain(start, end);
+		return ResponseEntity.ok(list);
 	}
 	
+
 	// 입력한 아이디가 중복된 아이디인지 확인
 	@GetMapping("/idDupChk/{serviceId}")
 	public boolean isDupId(@PathVariable Long serviceId, @RequestParam String loginId ) {
@@ -135,6 +165,14 @@ public class PartyController {
 	}
 	
 	
+
+	// 메인페이지 모집중인 파티 개수
+	@GetMapping("/selectAllPartyCountForMain")
+	public ResponseEntity<Integer> selectAllPartyCountForMain(){
+		return ResponseEntity.ok(pServ.selectAllPartyCountForMain());
+	}
+
+
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
 		e.printStackTrace();

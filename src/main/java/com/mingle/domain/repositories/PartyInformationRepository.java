@@ -27,4 +27,7 @@ public interface PartyInformationRepository extends JpaRepository<PartyInformati
 	default boolean isIdDupChk(Long serviceId, String loginId) {
 		return idDupChk(serviceId, loginId)>0;
 	}
+	
+	@Query(value = "select * from current_party_info", nativeQuery = true)
+	List<PartyInformation> selectAllParty();
 }
