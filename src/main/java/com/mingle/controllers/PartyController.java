@@ -136,8 +136,13 @@ public class PartyController {
 	@GetMapping("/getPartyListForMain")
 	public ResponseEntity<List<PartyInformationForMainDTO>> selectPartyListForMain(@RequestParam Instant start, @RequestParam Instant end) {
 		List<PartyInformationForMainDTO> list = pServ.selectPartyListForMain(start, end);
-		System.out.println(list);
 		return ResponseEntity.ok(list);
+	}
+	
+	// 메인페이지 모집중인 파티 개수
+	@GetMapping("/selectAllPartyCountForMain")
+	public ResponseEntity<Integer> selectAllPartyCountForMain(){
+		return ResponseEntity.ok(pServ.selectAllPartyCountForMain());
 	}
 
 	@ExceptionHandler(Exception.class)

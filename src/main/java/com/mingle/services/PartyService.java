@@ -186,8 +186,12 @@ public class PartyService {
 	}
 	
 	// 메인페이지에 출력할 파티 정보 불러오기
-	public List<PartyInformationForMainDTO> selectPartyListForMain(Instant start, Instant end){
-//		return pimMap.toDtoList(pimRepo.findPartyInfoForMain(start, end));
+	public List<PartyInformationForMainDTO> selectPartyListForMain(Instant start, Instant end){	
 		return pimMap.toDtoList(pimRepo.findPartyInfoForMain(start, end));
+	}
+	
+	// 메인페이지 모집중인 파티 개수
+	public int selectAllPartyCountForMain() {
+		return piRepo.selectAllParty().size();
 	}
 }
