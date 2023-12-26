@@ -3,6 +3,7 @@ package com.mingle.domain.repositories;
 import java.util.Set;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -43,5 +44,18 @@ public interface ReplyRepository extends JpaRepository<Reply, Long>{
 		      + "left join fetch r.childrenReplies "
 		      + "where r.id = :id")
 	Tuple findReplyAndHasChildrenById(@Param(value = "id") Long id);
+	
+	@Modifying
+	@Query("update Reply r set r.content = :content where id = :id")
+	void updateReplyById(@Param(value = "id") Long id, @Param(value = "content") String content);
+	
+	@Modifying
+	@Query("delete from Reply r where r.id = :id")
+	void deleteReplyById(@Param(value = "id") Long id);
+	
+	@Modifying
+	@Query("delete from Reply r where r.postId = :postId")
+	void deleteReplyByPostId(@Param(value = "postId") Long postId);
+
 
 }

@@ -7,11 +7,11 @@ import org.springframework.stereotype.Service;
 
 import com.mingle.domain.entites.Reply;
 import com.mingle.domain.repositories.MemberRepository;
+import com.mingle.domain.repositories.PostRepository;
 import com.mingle.domain.repositories.ReplyReactionsRepository;
 import com.mingle.domain.repositories.ReplyRepository;
 import com.mingle.dto.ReplyDTO;
 import com.mingle.dto.UploadReplyDTO;
-import com.mingle.mappers.MemberMapper;
 import com.mingle.mappers.ReplyMapper;
 import com.mingle.mappers.ReplyReactionsMapper;
 
@@ -34,6 +34,9 @@ public class ReplyService {
 	
 	@Autowired
 	private MemberRepository mRepo;
+	
+	@Autowired
+	private PostRepository pRepo;
 	
 	
 	

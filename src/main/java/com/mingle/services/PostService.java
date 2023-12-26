@@ -30,6 +30,7 @@ import com.mingle.domain.repositories.PopularPostViewRepository;
 import com.mingle.domain.repositories.PostFileRepository;
 import com.mingle.domain.repositories.PostReactionsRepository;
 import com.mingle.domain.repositories.PostRepository;
+import com.mingle.domain.repositories.ReplyRepository;
 import com.mingle.dto.PostDTO;
 import com.mingle.dto.PostFileDTO;
 import com.mingle.dto.PostViewDTO;
@@ -84,6 +85,9 @@ public class PostService {
 	
 	@Autowired
 	private PostReactionsRepository prRepo;
+	
+	@Autowired
+	private ReplyRepository rRepo;
     
 	
 	
@@ -211,46 +215,44 @@ public class PostService {
 		return "/uploads/" + sysName;
 	}
 	
-	// 게시글 업데이트
 	@Transactional
 	public void updatePost(Long postId, UploadPostDTO dto) throws IllegalStateException, IOException {
 	    Post post = pRepo.findById(postId)
 	                    .orElseThrow(() -> new EntityNotFoundException("Post not found"));
 
-	    // Post 정보 업데이트
 	    post.setTitle(dto.getTitle());
 	    post.setContent(dto.getContent());
 	    // 기타 필요한 필드 업데이트
 
-	    // 기존 파일 목록 가져오기
-	    Set<String> existingOriNames = post.getFiles().stream()
-	                                        .map(PostFile::getOriName)
-	                                        .collect(Collectors.toSet());
+	    Set<PostFile> entityFiles = post.getFiles();
+	    // 중복방지 로직
+	    Set<String> existingOriNames = entityFiles.stream()
+	                                              .map(PostFile::getOriName)
+	                                              .collect(Collectors.toSet());
+	    
+	    List<MultipartFile> multiList = dto.getFiles();
+	    Long parentSeq = post.getId();
 
-	    List<MultipartFile> newFiles = dto.getFiles();
-	    if (newFiles != null && !newFiles.isEmpty()) {
-	        String uploadDir = this.getRealPath();
-	        File uploadPath = new File(uploadDir);
+	    if (multiList != null && !multiList.isEmpty()) {
+	        String upload = this.getRealPath();
+	        File uploadPath = new File(upload);
 	        if (!uploadPath.exists()) {
 	            uploadPath.mkdirs();
 	        }
-
-	        for (MultipartFile file : newFiles) {
-	            String oriName = file.getOriginalFilename();
-	            String sysName = UUID.randomUUID() + "_" + oriName;
-
-	            // 중복 파일 체크
-	            if (!existingOriNames.contains(oriName)) {
-	                file.transferTo(new File(uploadPath, oriName));
-	                PostFile newFile = new PostFile(null, oriName, sysName, post.getId());
-	                post.getFiles().add(newFile);
+	        for (MultipartFile f : multiList) {
+	            String oriName = f.getOriginalFilename();
+	            if (!existingOriNames.contains(oriName)) { // 중복 체크
+	                String sysName = UUID.randomUUID() + "_" + oriName;
+	                f.transferTo(new File(uploadPath, sysName));
+	                pfRepo.save(pfMapper.toEntity(new PostFileDTO(null, oriName, sysName, parentSeq)));
+	                entityFiles.add(new PostFile(null, oriName, sysName, parentSeq));
 	            }
 	        }
 	    }
 
-	    // 변경된 Post 객체 저장
 	    pRepo.save(post);
 	}
+
 
 	
 	// 게시글 접속 시 게시글 수 증가.
@@ -307,9 +309,11 @@ public class PostService {
 	// 게시글 삭제
 	@Transactional
 	public void deleteById(Long id) throws IOException {
+		System.out.println(id);
 		List<String> fileList = pfRepo.selectSysNameListByPostId(id);
 		this.deleteServerFileList(fileList);
 		pfRepo.deleteByPostId(id); // 게시글 삭제 시 관련 파일정보를 DB에서 삭제.
+		rRepo.deleteReplyByPostId(id);
 		Post post = pRepo.findById(id).get();
 		pRepo.delete(post);
 	}
