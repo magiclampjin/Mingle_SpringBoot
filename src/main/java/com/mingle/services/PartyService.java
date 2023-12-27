@@ -1,6 +1,8 @@
 package com.mingle.services;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +14,7 @@ import com.mingle.dao.PartyDAO;
 import com.mingle.domain.entites.Member;
 import com.mingle.domain.entites.PartyMember;
 import com.mingle.domain.entites.PartyRegistration;
+import com.mingle.domain.repositories.CurrJoinPartyInfoRepository;
 import com.mingle.domain.repositories.MemberRepository;
 import com.mingle.domain.repositories.PartyInformationForMainRepository;
 import com.mingle.domain.repositories.PartyInformationRepository;
@@ -20,11 +23,13 @@ import com.mingle.domain.repositories.PartyRegistrationRepository;
 import com.mingle.domain.repositories.PaymentRepository;
 import com.mingle.domain.repositories.ServiceCategoryRepository;
 import com.mingle.domain.repositories.ServiceRepository;
+import com.mingle.dto.CurrJoinPartyInfoDTO;
 import com.mingle.dto.PartyInformationDTO;
 import com.mingle.dto.PartyInformationForMainDTO;
 import com.mingle.dto.PaymentDTO;
 import com.mingle.dto.ServiceCategoryDTO;
 import com.mingle.dto.ServiceDTO;
+import com.mingle.mappers.CurrJoinPartyInfoMapper;
 import com.mingle.mappers.PartyInformationForMainMapper;
 import com.mingle.mappers.PartyInformationMapper;
 import com.mingle.mappers.PaymentMapper;
@@ -77,6 +82,12 @@ public class PartyService {
 	// 밍글머니 계산을 위한 MemberRepo
 	@Autowired
 	private MemberRepository mRepo;
+	
+	// 내 파티 정보
+	@Autowired
+	private CurrJoinPartyInfoRepository jpRepo;
+	@Autowired
+	private CurrJoinPartyInfoMapper jpMap;
 	
 	// 제공하는 서비스 카테고리명 불러오기
 	public List<ServiceCategoryDTO> selectCategoryAll() {
@@ -175,16 +186,43 @@ public class PartyService {
 	
 	// 서비스 명 리스트 불러오기
 	public List<ServiceDTO> getServiceNameList(){
-	
-		return 	sMap.toDtoList(sRepo.findAll());
+		return sMap.toDtoList(sRepo.findAll());
 	}
 	
 	// 사용자가 이미 가입된 파티가 있는지 확인
-	public boolean isMemberParty(String userId) {
-		
+	public boolean isMemberParty(String userId) {	
 		return pmRepo.isAlreadyMember(userId);
 	}
 	
+
+	// 입력한 아이디가 중복된 아이디인지 확인
+	public boolean isIdDupChk(Long serviceId, String loginId) {
+		return piRepo.isIdDupChk(serviceId, loginId);
+	}
+	
+	// 가입한 파티 목록 불러오기
+	public List<CurrJoinPartyInfoDTO> selectMyPartyList(String loginId){
+		List<CurrJoinPartyInfoDTO> list = jpRepo.selectMyPartyList(loginId);
+		return list;
+	}
+	
+	// 특정 파티 정보 불러오기
+	public CurrJoinPartyInfoDTO selectMyPartyInfo(Long id, String memberId){
+		CurrJoinPartyInfoDTO info = jpMap.toDto(jpRepo.selectMyPartyInfo(id, memberId));
+		
+		// 아직 파티 시작 전이면 아이디, 비밀번호 정보 비활성화
+
+		// 현재 날짜와 시간을 얻기
+        LocalDateTime midnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        Instant instant = midnight.toInstant(ZoneOffset.UTC);
+        // 파티 시작 전이면
+        if (info.getStartDate().toInstant().isAfter(instant)) {
+        	info.setLoginId(null);
+        	info.setLoginPw(null);
+        }
+        return info;
+	}
+
 	// 메인페이지에 출력할 파티 정보 불러오기
 	public List<PartyInformationForMainDTO> selectPartyListForMain(){	
 		return pimMap.toDtoList(pimRepo.findPartyInfoForMain());
