@@ -46,7 +46,7 @@ public interface ReplyRepository extends JpaRepository<Reply, Long>{
 	Tuple findReplyAndHasChildrenById(@Param(value = "id") Long id);
 	
 	@Modifying
-	@Query("update Reply r set r.content = :content where id = :id")
+	@Query("update Reply r set r.content = :content where r.id = :id")
 	void updateReplyById(@Param(value = "id") Long id, @Param(value = "content") String content);
 	
 	@Modifying
