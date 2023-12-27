@@ -134,8 +134,8 @@ public class PartyController {
 
 	// 메인페이지에 출력할 파티 정보 불러오기
 	@GetMapping("/getPartyListForMain")
-	public ResponseEntity<List<PartyInformationForMainDTO>> selectPartyListForMain(@RequestParam Instant start, @RequestParam Instant end) {
-		List<PartyInformationForMainDTO> list = pServ.selectPartyListForMain(start, end);
+	public ResponseEntity<List<PartyInformationForMainDTO>> selectPartyListForMain() {
+		List<PartyInformationForMainDTO> list = pServ.selectPartyListForMain();
 		return ResponseEntity.ok(list);
 	}
 	

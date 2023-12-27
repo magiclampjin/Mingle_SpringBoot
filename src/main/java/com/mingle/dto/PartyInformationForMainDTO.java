@@ -20,8 +20,8 @@ public class PartyInformationForMainDTO {
 	private Instant startDate;
 	private long monthCount;
 	private long calculationDate;
-	private String loginId;
-	private String loginPw;
+//	private String loginId;
+//	private String loginPw;
 	private Long price;
 	private Long maxPeopleCount;
 	private String englishName;
