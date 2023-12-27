@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mingle.dto.BankDTO;
 import com.mingle.dto.PaymentAccountDTO;
+import com.mingle.exceptions.AxiosPageAsyncException;
 import com.mingle.services.MemberService;
 import com.mingle.services.PartyService;
 import com.mingle.services.PaymentAccountService;
@@ -57,11 +58,14 @@ public class PaymentAccountController {
 	
 	// 등록된 계좌 불러오기
 	@GetMapping("/accountSelect")
-	public ResponseEntity<PaymentAccountDTO> selectById(Authentication authentication){
-		// 로그인한 사용자의 아이디로 계좌 목록 불러오기
-		PaymentAccountDTO dto = paServ.selectById(authentication.getName());
+	public ResponseEntity<PaymentAccountDTO> selectById(Authentication authentication) throws AxiosPageAsyncException{
 		
-		return ResponseEntity.ok(dto);
+		// 로그인한 사용자의 아이디로 계좌 목록 불러오기]
+		if(authentication != null) {
+			PaymentAccountDTO dto = paServ.selectById(authentication.getName());
+			return ResponseEntity.ok(dto);
+		}
+		throw new AxiosPageAsyncException();
 	}
 	
 	// 등록된 계좌 삭제하기
@@ -96,6 +100,11 @@ public class PaymentAccountController {
 
 		return ResponseEntity.ok(dto);
 
+	}
+	
+	@ExceptionHandler(AxiosPageAsyncException.class)
+	public ResponseEntity<Void> AxiosAsyncHandler(Exception e){
+		return ResponseEntity.ok().build();
 	}
 	
 	@ExceptionHandler(Exception.class)
