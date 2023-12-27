@@ -1,7 +1,6 @@
 package com.mingle.controllers;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,12 +21,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mingle.domain.entites.Member;
-import com.mingle.dto.BankDTO;
 import com.mingle.dto.MemberDTO;
 import com.mingle.services.MemberService;
+import com.mingle.services.PartyService;
+
+
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import jakarta.servlet.http.HttpSession;
-
 
 @Controller
 @RestController
@@ -39,19 +45,23 @@ public class MemberController {
 	private HttpSession session;
 
 	String num = "";
+	
+	@Autowired
+	private PartyService pServ;
+	
+	@Autowired
+    private LogoutHandler customLogoutHandler;
 
 	// 사용자 기본정보 불러오기 - 아이디, 닉네임, 권한
 	@GetMapping("/userBasicInfo")
-	public ResponseEntity<Map<String, String>> selectUserNickName(Authentication authentication) {
+	public ResponseEntity<Map<String, String>> userBasicInfo(Authentication authentication) {
 		Map<String, String> userInfo = new HashMap<>();
 
 		// 사용자 아이디 가져오기
 		if (authentication != null) {
 			String username = authentication.getName();
-			// 로그인한 사용자 nickName 불러오기
-//			String userNick = mServ.selectUserNickName(username);
 			// 로그인한 사용자 정보 불러오기
-			MemberDTO dto = mServ.selectUserNickName(username);
+			MemberDTO dto = mServ.userBasicInfo(username);
 			// 아이디, 닉네임, 권한 맵으로 생성
 			userInfo.put("loginID", username);
 			userInfo.put("loginNick", dto.getNickname());
@@ -158,27 +168,19 @@ public class MemberController {
 
 	}
 
-	// 은행 목록 불러오기
-	@GetMapping("/bankList")
-	public ResponseEntity<List<BankDTO>> selectBank() {
-		List<BankDTO> dto = mServ.selectBank();
-
-		return ResponseEntity.ok(dto);
-
-	}
 
 	// 아이디 찾기 본인 인증 메일 보내기
 	@PostMapping("/verificationEmail")
-	public ResponseEntity<Boolean> findId(@RequestBody MemberDTO dto) {
-		boolean result = mServ.findId(dto);
+	public ResponseEntity<Boolean> verificationEmail(@RequestBody MemberDTO dto) {
+		boolean result = mServ.verificationEmail(dto);
 		return ResponseEntity.ok(result);
 	}
 
 	// 아이디 찾기 본인 인증 코드 확인하기
 	@PostMapping("/certification/id")
-	public ResponseEntity<Boolean> certification(Integer code) {
-		boolean result = (code.equals(session.getAttribute("idVerificationCode")));
-		session.invalidate();
+	public ResponseEntity<Boolean> certification(String code) {
+		boolean result = (code.equals(session.getAttribute("idVerificationCode").toString()));
+//		session.invalidate();
 		return ResponseEntity.ok(result);
 	}
 
@@ -190,14 +192,15 @@ public class MemberController {
 		// 맨 뒷자리 2개를 '*'로 변경
 		int length = id.length();
 		String securityId = id.substring(0, length - 2) + "**";
+		session.invalidate(); // 아이디 찾기 하고 나면 세션 비우기 ( 추후 같은 인증코드 사용 방지 및 로그인 하지 않았으므로 세션 필요없다고 판단하여 비워버림 -> 혹시 사용자 방문 기록등에서 세션을 사용하게된다면 통으로 비우지 않고 해당 키값만 비우는 걸로 변경 필요) 
 		return ResponseEntity.ok(securityId);
 	}
 
 	// 비밀번호 찾기 본인 인증 코드 확인하기
 	@PostMapping("/certification/pw")
-	public ResponseEntity<Boolean> pwFindcertification(Integer code) {
-		boolean result = (code.equals(session.getAttribute("pwVerificationCode")));
-		session.invalidate();
+	public ResponseEntity<Boolean> pwFindcertification(String code) {
+		boolean result = (code.equals(session.getAttribute("pwVerificationCode").toString()));
+//		session.invalidate();
 		return ResponseEntity.ok(result);
 	}
 
@@ -205,6 +208,7 @@ public class MemberController {
 	@PutMapping("/updatePw")
 	public ResponseEntity<Boolean> updatePw(@RequestBody MemberDTO dto) {
 		boolean result = mServ.updateUserPw(dto);
+		session.invalidate(); // 아이디 찾기 하고 나면 세션 비우기 ( 추후 같은 인증코드 사용 방지 및 로그인 하지 않았으므로 세션 필요없다고 판단하여 비워버림 -> 혹시 사용자 방문 기록등에서 세션을 사용하게된다면 통으로 비우지 않고 해당 키값만 비우는 걸로 변경 필요) 
 		return ResponseEntity.ok(result);
 	}
 
@@ -223,6 +227,18 @@ public class MemberController {
 			return ResponseEntity.ok(true);
 		else
 			return ResponseEntity.ok(false);
+	}
+	
+	// 관리자 여부 (관리자 페이지 접근 시 확인)
+	@GetMapping("/isAdmin")
+	public ResponseEntity<Boolean> isAdmin(Authentication authentication) {
+		boolean isAdmin = mServ.isAdmin(authentication.getName());
+		System.out.println("isAdmin? :" + isAdmin);
+		if(isAdmin) {
+			return ResponseEntity.ok(true);
+		} else {
+			return ResponseEntity.ok(false);
+		}
 	}
 
 	@GetMapping("/oauth/loginInfo")
@@ -244,13 +260,65 @@ public class MemberController {
 	}
 
 	
+	// 회원 탈퇴
+	@GetMapping("/mypageMemberOut")
+	public ResponseEntity<Integer> memberOut(Authentication authentication, @RequestParam String password,
+			HttpServletRequest request, HttpServletResponse response){
+		
+		// 1 : 계정 삭제 
+		// 2 : 비밀번호 일치하지 않음
+		// 3 : 가입한 파티가 있음
+		
+		// 비밀번호 일치하는지 먼저 확인
+		Boolean pwResult = mServ.isEqualPw(authentication.getName(),password);
+		
+		// 비밀번호가 일치
+		if(pwResult) {
+			
+			// 이미 가입된 파티가 있는지 확인
+			boolean result = pServ.isMemberParty(authentication.getName());
+			
+			// 가입한 파티가 있다면
+			if(result) {
+				// 탈퇴 불가능
+				return ResponseEntity.ok(3); 
+			}else {
+				// 가입한 파티가 없다면 탈퇴 가능
+				// 로그아웃 처리
+	            customLogoutHandler.logout(request, response, authentication);
+	            
+				// 계정삭제
+				mServ.memberOut(authentication.getName());
+				return ResponseEntity.ok(1);
+			}
+			
+		}else {
+			// 비밀번호 일치하지 않음
+			return ResponseEntity.ok(2);
+		}
+		
+	}
+		
 	// 로그인한 사용자의 mingle money 불러오기 ( 파티 가입 시 사용 - 밍글 머니 우선 적용하기 위함.)
 	@GetMapping("/getMingleMoney")
 	public ResponseEntity<Integer> selectMingleMoney(Authentication authentication) {
-		if(authentication != null)
-			return ResponseEntity.ok( mServ.selectMingleMoney(authentication.getName()));
-		else 
+		if (authentication != null)
+			return ResponseEntity.ok(mServ.selectMingleMoney(authentication.getName()));
+		else
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 	}
 
+	// 회원가입 본인 인증 메일 보내기
+	@PostMapping("/verificationSignupEmail")
+	public ResponseEntity<Boolean> verificationSignupEmail(String email) throws MessagingException {
+		boolean result = mServ.verificationSignupEmail(email);
+		return ResponseEntity.ok(result);
+	}
+
+	// 비밀번호 찾기 본인 인증 코드 확인하기
+	@PostMapping("/certification/signup")
+	public ResponseEntity<Boolean> signupcertification(String code) {
+		boolean result = (code.equals(session.getAttribute("signupVerificationCode").toString()));
+		return ResponseEntity.ok(result);
+	}
 }

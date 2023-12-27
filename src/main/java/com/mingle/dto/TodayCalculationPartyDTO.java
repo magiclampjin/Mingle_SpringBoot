@@ -16,6 +16,7 @@ import lombok.ToString;
 public class TodayCalculationPartyDTO {
 	private Long pmId;
 	private Long partyRegistrationId;
+	private Long serviceId;
 	private String memberId;
 	private boolean isPartyManager;
 	private Instant startDate;
@@ -27,4 +28,5 @@ public class TodayCalculationPartyDTO {
 	private Long mingleMoney;
 	private Long deposit;
 	private Long monthFee;
+	private Long currPartyMemberCnt;
 }

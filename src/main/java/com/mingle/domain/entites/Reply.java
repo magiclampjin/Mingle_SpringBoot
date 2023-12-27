@@ -38,8 +38,8 @@ public class Reply {
 	@CreationTimestamp
 	private Timestamp writeDate;
 	
-	@Column(name = "post_id", nullable = false)
-	private Long postId;
+    @Column(name = "post_id", nullable = false)
+    private Long postId;
 	
 	@ManyToOne
 	@JoinColumn(name = "member_id", referencedColumnName = "id", nullable = false)
@@ -60,6 +60,7 @@ public class Reply {
 	private Long replyAdoptiveParentId;
 
 	
+
 	@Builder
 	public Reply(Long id, String content, Timestamp writeDate, Long postId, Member member, Reply parentReply,
 			Set<Reply> childrenReplies, Long replyAdoptiveParentId) {

@@ -1,11 +1,16 @@
 package com.mingle.services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.mingle.domain.entites.PaymentAccount;
+import com.mingle.domain.repositories.BankRepository;
 import com.mingle.domain.repositories.PaymentAccountRepository;
+import com.mingle.dto.BankDTO;
 import com.mingle.dto.PaymentAccountDTO;
+import com.mingle.mappers.BankMapper;
 import com.mingle.mappers.PaymentAccountMapper;
 
 @Service
@@ -18,7 +23,11 @@ public class PaymentAccountService {
 	@Autowired
 	private PaymentAccountMapper paMapper;
 
-	
+	@Autowired
+	private BankRepository bRepo;
+
+	@Autowired
+	private BankMapper bMapper;
 	
 	// 계좌등록
 	public void insertAccountInfo(PaymentAccountDTO dto) {
@@ -47,5 +56,11 @@ public class PaymentAccountService {
 		pa.setBankId(dto.getBankId());
 		
 		paRepo.save(pa);
+	}
+	
+	// 은행 목록 불러오기
+	public List<BankDTO> selectBank() {
+
+		return bMapper.toDtoList(bRepo.findAll());
 	}
 }

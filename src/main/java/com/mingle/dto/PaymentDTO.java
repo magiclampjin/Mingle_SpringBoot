@@ -15,6 +15,7 @@ import lombok.ToString;
 @ToString
 public class PaymentDTO {
 	
+	private Long id;
 	private Long partyRegistrationId;
 	private String memberId;
 	private Instant date;
