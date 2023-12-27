@@ -58,7 +58,7 @@ public class Post {
 	@JoinColumn(name = "member_id", referencedColumnName = "id")
 	private Member member;
 	
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany
 	@JoinColumn(name="post_id", referencedColumnName = "id")
 	private Set<Reply> replies;
 	
