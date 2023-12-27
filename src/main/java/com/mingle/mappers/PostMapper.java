@@ -9,5 +9,5 @@ import com.mingle.dto.UploadPostDTO;
 @Mapper(componentModel = "spring")
 public interface PostMapper extends GenericMapper<PostDTO, Post>{
 
-	Post toEntity(UploadPostDTO dto);
+	
 }
