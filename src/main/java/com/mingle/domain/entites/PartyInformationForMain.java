@@ -34,10 +34,10 @@ public class PartyInformationForMain {
 	private long monthCount;
 	@Column(name="calculation_date")
 	private String calculationDate;
-	@Column(name="login_id")
-	private String loginId;
-	@Column(name="login_pw")
-	private String loginPw;
+//	@Column(name="login_id")
+//	private String loginId;
+//	@Column(name="login_pw")
+//	private String loginPw;
 	@Column(name="price")
 	private Long price;
 	@Column(name="max_people_count")
