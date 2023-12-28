@@ -6,9 +6,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,6 +26,8 @@ import com.mingle.services.PaymentService;
 @RestController
 @RequestMapping("/api/payment")
 public class PaymentController {
+	
+	private static final Logger logger = LoggerFactory.getLogger(PaymentController.class);
 	
 	@Autowired
 	private PaymentService pServ;
@@ -70,7 +76,7 @@ public class PaymentController {
 	        // 이제 startTimestamp와 endTimestamp를 사용하여 검색 또는 다른 로직 수행
 	        searchResults = pServ.findSearch(authentication.getName(), service, type, startTimestamp, endTimestamp);
 	    } catch (ParseException e) {
-	        e.printStackTrace();
+	    	logger.error(e.getMessage());
 	        // 예외 처리 로직 추가: 사용자에게 잘못된 날짜 형식을 알릴 수 있습니다.
 	    }
 		
@@ -100,5 +106,11 @@ public class PaymentController {
 		pServ.withdrawMingleMoney(authentication.getName(), money);
 		
 		return ResponseEntity.ok().build();
+	}
+	
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<String> exceptionHandler(Exception e) {
+		logger.error(e.getMessage());
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 	}
 }

@@ -1,8 +1,12 @@
 package com.mingle.controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -17,6 +21,8 @@ import com.mingle.services.ReplyService;
 @RestController
 @RequestMapping("/api/reply")
 public class ReplyController {
+	
+	private static final Logger logger = LoggerFactory.getLogger(ReplyController.class);
 	
 	@Autowired
 	private ReplyService rServ;
@@ -35,6 +41,12 @@ public class ReplyController {
 	public ResponseEntity<Void> delete(@PathVariable Long id) {
 		rServ.deleteById(id);
 		return ResponseEntity.ok().build();
+	}
+	
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<String> exceptionHandler(Exception e) {
+		logger.error(e.getMessage());
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 	}
 
 }

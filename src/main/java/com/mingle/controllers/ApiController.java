@@ -3,6 +3,8 @@ package com.mingle.controllers;
 import java.io.IOException;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,8 @@ import com.mingle.services.NewVideoService;
 @RequestMapping("/api/external/")
 public class ApiController {
 
+	private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
+	
 	@Autowired
 	private NewVideoService nvServ;
 
@@ -38,7 +42,7 @@ public class ApiController {
 	public ResponseEntity<String> handleException(Exception e, WebRequest request) {
 		// 로그 기록, 에러 메시지 생성 등 필요한 처리를 수행
 		// 여기서는 예외 메시지를 반환
-		e.printStackTrace();
+		logger.error(e.getMessage());
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
 	}
 
