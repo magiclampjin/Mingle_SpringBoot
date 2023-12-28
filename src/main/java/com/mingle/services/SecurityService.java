@@ -17,9 +17,7 @@ public class SecurityService implements UserDetailsService{
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		System.out.println("loginID : "+username);
 		Member m = mRepo.findById(username).get();
-		System.out.println("loginRole :" + m.getRoleId());
 		if(m!=null) {
 			SecurityUser user = new SecurityUser(m);
 			System.out.println(user.toString());

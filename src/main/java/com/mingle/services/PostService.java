@@ -2,12 +2,15 @@ package com.mingle.services;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -19,23 +22,26 @@ import com.mingle.dao.PostDAO;
 import com.mingle.domain.entites.Member;
 import com.mingle.domain.entites.Post;
 import com.mingle.domain.entites.PostFile;
+import com.mingle.domain.entites.PostReactions;
 import com.mingle.domain.repositories.FreePostViewRepository;
 import com.mingle.domain.repositories.MemberRepository;
 import com.mingle.domain.repositories.NoticePostViewRepository;
 import com.mingle.domain.repositories.PopularPostViewRepository;
 import com.mingle.domain.repositories.PostFileRepository;
+import com.mingle.domain.repositories.PostReactionsRepository;
 import com.mingle.domain.repositories.PostRepository;
+import com.mingle.domain.repositories.ReplyRepository;
 import com.mingle.dto.PostDTO;
 import com.mingle.dto.PostFileDTO;
 import com.mingle.dto.PostViewDTO;
 import com.mingle.dto.UploadPostDTO;
 import com.mingle.mappers.FreePostViewMapper;
-import com.mingle.mappers.MemberMapper;
 import com.mingle.mappers.NoticePostViewMapper;
 import com.mingle.mappers.PopularPostViewMapper;
 import com.mingle.mappers.PostFileMapper;
 import com.mingle.mappers.PostMapper;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -78,7 +84,12 @@ public class PostService {
 	private MemberRepository mRepo;
 	
 	@Autowired
-	private MemberMapper mMapper;
+	private PostReactionsRepository prRepo;
+	
+	@Autowired
+	private ReplyRepository rRepo;
+    
+	
 	
 //---------------------------------------------------------------------------------	
 	// 공지 게시판 글 불러오기
@@ -148,7 +159,7 @@ public class PostService {
 	
 	// 게시글 등록
 	@Transactional
-	public void insert(UploadPostDTO dto) throws IllegalStateException, IOException {
+	public Long insert(UploadPostDTO dto) throws IllegalStateException, IOException {
 		Member member = mRepo.selectMypageInfo(dto.getMemberId());
 		Post post = new Post();
 		post.setMember(member);
@@ -168,7 +179,7 @@ public class PostService {
 		List<MultipartFile> multiList = dto.getFiles();
 		
 		if(multiList != null && !multiList.isEmpty())  {
-			String upload = "C:/Mingle/uploads/";
+			String upload = this.getRealPath();
 			File uploadPath = new File(upload);
 			if(!uploadPath.exists()) {
 				uploadPath.mkdirs();
@@ -184,13 +195,13 @@ public class PostService {
 			}
 		}
 		
-		pRepo.save(post);
+		return pRepo.save(post).getId();
 	}
 	
 	//텍스트 에디터로부터 파일을 받아 업로드 한 뒤 url 반환
 	public String imageUploadFromTextEditor(MultipartFile image) throws IllegalStateException, IOException {
-		String upload = "C:/Mingle/uploads/";
-		File uploadPath = new File(upload);
+		String realPath = this.getRealPath();
+		File uploadPath = new File(realPath);
 		if(!uploadPath.exists()) {
 			uploadPath.mkdirs();
 		}
@@ -204,19 +215,112 @@ public class PostService {
 		return "/uploads/" + sysName;
 	}
 	
+	@Transactional
+	public void updatePost(Long postId, UploadPostDTO dto) throws IllegalStateException, IOException {
+	    Post post = pRepo.findById(postId)
+	                    .orElseThrow(() -> new EntityNotFoundException("Post not found"));
+
+	    post.setTitle(dto.getTitle());
+	    post.setContent(dto.getContent());
+	    // 기타 필요한 필드 업데이트
+
+	    Set<PostFile> entityFiles = post.getFiles();
+	    // 중복방지 로직
+	    Set<String> existingOriNames = entityFiles.stream()
+	                                              .map(PostFile::getOriName)
+	                                              .collect(Collectors.toSet());
+	    
+	    List<MultipartFile> multiList = dto.getFiles();
+	    Long parentSeq = post.getId();
+
+	    if (multiList != null && !multiList.isEmpty()) {
+	        String upload = this.getRealPath();
+	        File uploadPath = new File(upload);
+	        if (!uploadPath.exists()) {
+	            uploadPath.mkdirs();
+	        }
+	        for (MultipartFile f : multiList) {
+	            String oriName = f.getOriginalFilename();
+	            if (!existingOriNames.contains(oriName)) { // 중복 체크
+	                String sysName = UUID.randomUUID() + "_" + oriName;
+	                f.transferTo(new File(uploadPath, sysName));
+	                pfRepo.save(pfMapper.toEntity(new PostFileDTO(null, oriName, sysName, parentSeq)));
+	                entityFiles.add(new PostFile(null, oriName, sysName, parentSeq));
+	            }
+	        }
+	    }
+
+	    pRepo.save(post);
+	}
+
+
 	
-	
-	// 게시글 정보 업데이트
-	public void updateById(Long id, PostDTO dto) {
-		Post post = pRepo.findById(id).get();
-		pMapper.updateEntityFromDTO(dto,post);
-		pRepo.save(post);
+	// 게시글 접속 시 게시글 수 증가.
+	@Transactional
+	public Long incrementViewCount(Long id) {
+		pRepo.incrementViewCount(id);
+		return pRepo.selectViewcountByPostId(id);
 	}
 	
+	// 게시글의 좋아요 수 반환
+	public Long sumVotesByPostId(Long id) {
+	    Long voteCount = prRepo.sumVotesByPostId(id);
+	    return (voteCount != null) ? voteCount : 0; // null인 경우 0으로 반환
+	}
+	
+	// 게시글 좋아요 누를 시 투표 이력이 있는 지 검사 후, 없다면 좋아요 투표 진행.
+	@Transactional
+	public Long likeVote(Long postId, String memberId) {
+	    if (prRepo.isVoted(postId, memberId)) {
+	        return null; // 이미 투표한 경우
+	    } else {
+	        PostReactions postReaction = PostReactions.builder()
+	                .postId(postId)
+	                .memberId(memberId)
+	                .vote(1L) // 좋아요는 '1'로 설정
+	                .build();
+
+	        prRepo.save(postReaction);
+	        
+	        return prRepo.sumVotesByPostId(postId); // 총 좋아요 수 반환
+	    }
+	}
+
+	
+	// 게시글 싫어요 누를 시 투표 이력이 있는 지 검사 후, 없다면 좋아요 투표 진행.
+	@Transactional
+	public Long dislikeVote(Long postId, String memberId) {
+	    if (prRepo.isVoted(postId, memberId)) {
+	        return null;
+	    } else {
+	        PostReactions postReaction = PostReactions.builder()
+	                .postId(postId)
+	                .memberId(memberId)
+	                .vote(-1L) // 싫어요는 '-1'로 설정
+	                .build();
+
+	        prRepo.save(postReaction);
+	        
+	        return prRepo.sumVotesByPostId(postId);
+	    }
+	}
+	
+	
 	// 게시글 삭제
-	public void deleteById(Long id) {
+	@Transactional
+	public void deleteById(Long id) throws IOException {
+		List<String> fileList = pfRepo.selectSysNameListByPostId(id);
+		this.deleteServerFileList(fileList);
+		pfRepo.deleteByPostId(id); // 게시글 삭제 시 관련 파일정보를 DB에서 삭제.
+		rRepo.deleteReplyByPostId(id);
 		Post post = pRepo.findById(id).get();
 		pRepo.delete(post);
+	}
+	
+	// 특정 파일 삭제
+	public void deleteFileBySysName(String sysName) throws IOException {
+		this.deleteServerFile(sysName);
+		pfRepo.deleteFileBySysName(sysName);
 	}
 	
 	// 모든 공지 게시글 가져오기
@@ -251,6 +355,41 @@ public class PostService {
 		post.setIsFix(false);
 		pRepo.save(post);
 	}
+	
+	// 서버 파일 리스트 삭제 함수
+	protected void deleteServerFileList(List<String> fileList) throws IOException{
+		String realPath = this.getRealPath();
+		File uploadPath = new File(realPath);
+		if(!uploadPath.exists()) {uploadPath.mkdirs();}
+
+		if(fileList != null) {
+			for(String delFile : fileList) {
+				if(delFile != null) {
+					Path path = Paths.get(uploadPath + "/" + delFile);
+					java.nio.file.Files.deleteIfExists(path);
+				}
+			}
+		}
+	}
+	
+	// 서버 파일 삭제 함수
+	protected void deleteServerFile(String sysName) throws IOException {
+		String realPath = this.getRealPath();
+		File uploadPath = new File(realPath);
+		if(!uploadPath.exists()) {uploadPath.mkdirs();}
+		
+		if(sysName != null) {
+			Path path = Paths.get(uploadPath + "/" + sysName);
+			java.nio.file.Files.deleteIfExists(path);
+		}
+		
+	}
+	
+	public String getRealPath() {
+		return "C:/Mingle/uploads/";
+	}
+	
+	
 
 	
 
