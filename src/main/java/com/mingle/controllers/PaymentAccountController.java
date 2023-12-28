@@ -2,6 +2,8 @@ package com.mingle.controllers;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,8 @@ import com.mingle.services.PaymentAccountService;
 @RequestMapping("/api/paymentAccount")
 public class PaymentAccountController {
 	
+	private static final Logger logger = LoggerFactory.getLogger(PaymentAccountController.class);
+	
 	@Autowired
 	private PaymentAccountService paServ;
 	
@@ -38,9 +42,7 @@ public class PaymentAccountController {
 	// 계좌 등록
 	@PostMapping("/accountInsert")
 	public ResponseEntity<Void> insertAccountInfo(Authentication authentication, @RequestBody PaymentAccountDTO dto){
-		System.out.println(dto.getBankId());
-		System.out.println(dto.getAccountNumber());
-		
+
 		// 사용자 아이디 가져오기
 		if (authentication != null) {
 			// 로그인한 사용자의 아이디
@@ -104,12 +106,13 @@ public class PaymentAccountController {
 	
 	@ExceptionHandler(AxiosPageAsyncException.class)
 	public ResponseEntity<Void> AxiosAsyncHandler(Exception e){
+		logger.error(e.getMessage());
 		return ResponseEntity.ok().build();
 	}
 	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
-		e.printStackTrace();
+		logger.error(e.getMessage());
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 	}
 }

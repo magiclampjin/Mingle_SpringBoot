@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +33,8 @@ import com.mingle.services.PartyService;
 @RequestMapping("/api/party")
 public class PartyController {
 
+	private static final Logger logger = LoggerFactory.getLogger(PartyController.class);
+	
 	@Autowired
 	private PartyService pServ;
 
@@ -132,8 +136,8 @@ public class PartyController {
 
 	// 메인페이지에 출력할 파티 정보 불러오기
 	@GetMapping("/getPartyListForMain")
-	public ResponseEntity<List<PartyInformationForMainDTO>> selectPartyListForMain(@RequestParam Instant start, @RequestParam Instant end) {
-		List<PartyInformationForMainDTO> list = pServ.selectPartyListForMain(start, end);
+	public ResponseEntity<List<PartyInformationForMainDTO>> selectPartyListForMain() {
+		List<PartyInformationForMainDTO> list = pServ.selectPartyListForMain();
 		return ResponseEntity.ok(list);
 	}
 	
@@ -175,7 +179,7 @@ public class PartyController {
 
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
-		e.printStackTrace();
+		logger.error(e.getMessage());
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 	}
 }

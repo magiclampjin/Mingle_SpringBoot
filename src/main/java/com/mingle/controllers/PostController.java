@@ -9,6 +9,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -40,6 +42,8 @@ import com.mingle.services.PostService;
 @RequestMapping("/api/post")
 public class PostController {
 
+	private static final Logger logger = LoggerFactory.getLogger(PostController.class);
+	
 	@Autowired
 	private PostService pServ;
 
@@ -191,8 +195,9 @@ public class PostController {
 	// 에러 핸들러
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> handleException(Exception e, WebRequest request) {
-		e.printStackTrace();
+		logger.error(e.getMessage());
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("에러 발생: " + e.getMessage());
 	}
+	
 
 }
