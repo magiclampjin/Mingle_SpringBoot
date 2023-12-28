@@ -106,6 +106,7 @@ public class PaymentAccountController {
 	
 	@ExceptionHandler(AxiosPageAsyncException.class)
 	public ResponseEntity<Void> AxiosAsyncHandler(Exception e){
+		logger.error(e.getMessage());
 		return ResponseEntity.ok().build();
 	}
 	
