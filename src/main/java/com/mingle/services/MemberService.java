@@ -153,6 +153,10 @@ public class MemberService {
 		// 조정된 birth를 Timestamp로 변환
 	    Timestamp timestampBirth = Timestamp.from(adjustedBirth);
 	    user.setBirth(timestampBirth);
+	    
+	    if(user.getMemberRecommenderId().equals("")) {
+	    	user.setMemberRecommenderId(null);
+	    }
 		return mRepo.save(user);
 	}
 
