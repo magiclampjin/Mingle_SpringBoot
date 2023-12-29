@@ -20,7 +20,7 @@ public class RoutingFilter implements Filter {
                          FilterChain chain) throws IOException, ServletException {
 
         HttpServletRequest req = (HttpServletRequest) request;
-        String requestURI = req.getRequestURI();
+        String requestURI = req.getRequestURI().toLowerCase();
         if(requestURI.startsWith("/api")) {
             chain.doFilter(request, response);
             return;
