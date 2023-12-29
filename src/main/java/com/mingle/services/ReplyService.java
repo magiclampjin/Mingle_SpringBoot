@@ -27,12 +27,6 @@ public class ReplyService {
 	private ReplyMapper rMapper;
 	
 	@Autowired
-	private ReplyReactionsRepository rrRepo;
-	
-	@Autowired
-	private ReplyReactionsMapper rrMapper;
-	
-	@Autowired
 	private MemberRepository mRepo;
 	
 	
@@ -77,11 +71,7 @@ public class ReplyService {
 	}
 	
 	
-	// 댓글 좋아요
-	
-	
-	
-	// 댓글 싫어요
+
 	
 	
 	
