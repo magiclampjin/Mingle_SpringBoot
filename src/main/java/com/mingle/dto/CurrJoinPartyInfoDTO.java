@@ -33,6 +33,7 @@ public class CurrJoinPartyInfoDTO {
 	private String plan;
 	private String loginId;	
 	private String loginPw;
+	private int memberCnt;
 	
 	
 	public CurrJoinPartyInfoDTO(Long id, String memberId, boolean isPartyManager, Timestamp startDate, String name, String englishName, String plan) {
