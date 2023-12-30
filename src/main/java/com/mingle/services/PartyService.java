@@ -225,7 +225,6 @@ public class PartyService {
 		CurrJoinPartyInfoDTO info = jpMap.toDto(jpRepo.selectMyPartyInfo(id, memberId));
 		
 		// 아직 파티 시작 전이면 아이디, 비밀번호 정보 비활성화
-
 		// 현재 날짜와 시간을 얻기
         LocalDateTime midnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         Instant instant = midnight.toInstant(ZoneOffset.UTC);
@@ -292,4 +291,14 @@ public class PartyService {
 	}
 	
 	
+	// 파티 삭제하기
+	public int deleteById(Long id) {
+		int memberCnt = pmRepo.selectCntById(id);
+		if(memberCnt==1){
+			piRepo.delete(piRepo.findById(id).get());
+			return 1;
+		}else {
+			return 0;
+		}
+	}
 }

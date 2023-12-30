@@ -16,4 +16,14 @@ public interface PartyMemberRepository  extends JpaRepository<PartyMember, Long>
 	default boolean isAlreadyMember(String userId) {
 		return isMemberParty(userId)>0;
 	}
+	
+	@Query("select count(*) from PartyMember pm where pm.partyRegistrationId=:id group by pm.partyRegistrationId")
+	int selectCntById(Long id);
+	
+	
+	@Query("select count(*) from PartyMember pm where pm.memberId=:userId and  partyRegistrationId=:partyRegistrationId")
+	Long isMemberPartyAttending(@Param("userId") String userId, @Param("partyRegistrationId") Long partyRegistrationId);
+	default boolean isAlreadyMemberAttendig(String userId, Long partyRegistrationId) {
+		return isMemberPartyAttending(userId, partyRegistrationId)>0;
+	}
 }

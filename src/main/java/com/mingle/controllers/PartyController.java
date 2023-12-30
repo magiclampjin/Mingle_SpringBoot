@@ -33,6 +33,7 @@ import com.mingle.dto.ServiceCategoryDTO;
 import com.mingle.dto.ServiceDTO;
 import com.mingle.dto.UploadPartyReplyDTO;
 import com.mingle.services.PartyService;
+import com.mingle.services.ReportService;
 
 @RestController
 @RequestMapping("/api/party")
@@ -42,6 +43,10 @@ public class PartyController {
 	
 	@Autowired
 	private PartyService pServ;
+	
+	//신고
+	@Autowired
+	private ReportService rServ;
 
 	// 제공하는 서비스 카테고리명 불러오기
 	@GetMapping
@@ -49,13 +54,6 @@ public class PartyController {
 		List<ServiceCategoryDTO> list = pServ.selectCategoryAll();
 		return ResponseEntity.ok(list);
 	}
-
-//	// 카테고리별 서비스 정보 불러오기
-//	@GetMapping("/getService/{id}")
-//	public ResponseEntity<List<ServiceDTO>> selectServiceByCategoryId(@PathVariable String id) {
-//		List<ServiceDTO> list = pServ.selectServiceByCategoryId(id);
-//		return ResponseEntity.ok(list);
-//	}
 
 	// 카테고리별 서비스 정보 & 가입한 서비스 정보 불러오기
 	@GetMapping("/getService/{id}")
@@ -173,15 +171,13 @@ public class PartyController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 	}
 	
-	
-
 	// 메인페이지 모집중인 파티 개수
 	@GetMapping("/selectAllPartyCountForMain")
 	public ResponseEntity<Integer> selectAllPartyCountForMain(){
 		return ResponseEntity.ok(pServ.selectAllPartyCountForMain());
 	}
 	
-	
+
 	// 파티 댓글 리스트 가져오기
 	@GetMapping("/reply/{id}")
 	public ResponseEntity<Set<PartyReplyDTO>> selectPartyReplyByPartyRestrationId(@PathVariable Long partyRegistrationId){
@@ -204,6 +200,23 @@ public class PartyController {
 	@DeleteMapping("/reply/{id}")
 	public ResponseEntity<Void> deletePartyReplyById(@PathVariable Long id){
 		pServ.deletePartyReplyById(id);
+		return ResponseEntity.ok().build();
+	}
+
+	// 파티 삭제
+	@DeleteMapping("/delete/{id}")
+	public ResponseEntity<Integer> deleteById(@PathVariable Long id){
+		return ResponseEntity.ok(pServ.deleteById(id));
+	}
+	
+	// 파티 신고
+	@PostMapping("/insertReport")
+	public ResponseEntity<Void> insertReport(@RequestBody Map<String,Object> param, Authentication authentication){
+		// report 테이블 등록
+		System.out.println(param);
+		rServ.insertReportByParty(param, authentication.getName());
+		// id 이용해 report_party 등록
+		
 		return ResponseEntity.ok().build();
 	}
 
