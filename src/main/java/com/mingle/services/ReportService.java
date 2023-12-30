@@ -127,25 +127,28 @@ public class ReportService {
 	
 	// 게시글 신고 처리
 	@Transactional
-	public void insertPostReport(ReportDTO rdto, ReportPostDTO rpdto) {
-		Report report = rRepo.save(rMapper.toEntity(rdto));
-		ReportPost reportPost = new ReportPost();
-		reportPost.setReportId(report.getId());
-		reportPost.setPostId(rpdto.getPostId());
-		reportPost.setReport(rRepo.findAllById(reportPost.getReportId()));
-		reportPost.setPost(pRepo.findAllById(reportPost.getPostId()));
-		rpRepo.save(reportPost);
+	public void insertPostReport(Long postId, ReportDTO rdto) {
+	    // Report 엔티티 저장
+	    Report report = rRepo.save(rMapper.toEntity(rdto));
+
+	    // ReportPost 엔티티 생성 및 초기화
+	    ReportPost reportPost = new ReportPost();
+	    reportPost.setReportId(report.getId()); // Report 엔티티의 ID 할당
+	    reportPost.setPostId(postId);
+
+
+	    // ReportPost 엔티티 저장
+	    rpRepo.save(reportPost);
 	}
-	
 	// 댓글 신고 처리
 	@Transactional
-	public void insertReplyReport(ReportDTO rdto, ReportReplyDTO rrdto) {
+	public void insertReplyReport(Long replyId, ReportDTO rdto) {
 		Report report = rRepo.save(rMapper.toEntity(rdto));
+		
 		ReportReply reportReply = new ReportReply();
 		reportReply.setReportId(report.getId());
-		reportReply.setReplyId(rrdto.getReplyId());
-		reportReply.setReport(rRepo.findAllById(reportReply.getReportId()));
-		reportReply.setReply(rpyRepo.findReplyById(reportReply.getReplyId()));
+		reportReply.setReplyId(replyId);
+
 		rrRepo.save(reportReply);
 	}
 }

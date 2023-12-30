@@ -36,7 +36,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.mingle.dto.PostDTO;
 import com.mingle.dto.PostViewDTO;
 import com.mingle.dto.ReportDTO;
-import com.mingle.dto.ReportPostDTO;
 import com.mingle.dto.UploadPostDTO;
 import com.mingle.services.PostService;
 import com.mingle.services.ReportService;
@@ -189,9 +188,9 @@ public class PostController {
 	}
 	
 	// 게시글 신고
-	@PostMapping("/report")
-	public ResponseEntity<Void> reportPost(ReportDTO rdto, ReportPostDTO rpdto){
-		reportServ.insertPostReport(rdto, rpdto);
+	@PostMapping("/report/{postId}")
+	public ResponseEntity<Void> reportPost(@PathVariable Long postId, ReportDTO rdto){
+		reportServ.insertPostReport(postId,rdto);
 		return ResponseEntity.ok().build();
 	}
 

@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mingle.dto.ReplyDTO;
 import com.mingle.dto.ReportDTO;
-import com.mingle.dto.ReportReplyDTO;
 import com.mingle.dto.UploadReplyDTO;
 import com.mingle.services.ReplyService;
 import com.mingle.services.ReportService;
@@ -48,9 +47,10 @@ public class ReplyController {
 		return ResponseEntity.ok().build();
 	}
 	
-	@PostMapping("/report")
-	public ResponseEntity<Void> insertReplyReport(ReportDTO rdto, ReportReplyDTO rrdto){
-		reportServ.insertReplyReport(rdto, rrdto);
+	// 댓글 신고로직
+	@PostMapping("/report/{replyId}")
+	public ResponseEntity<Void> insertReplyReport(@PathVariable Long replyId, ReportDTO rdto){
+		reportServ.insertReplyReport(replyId, rdto);
 		return ResponseEntity.ok().build();
 	}
 	
