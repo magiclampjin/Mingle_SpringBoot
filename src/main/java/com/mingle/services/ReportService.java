@@ -7,7 +7,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.mingle.domain.entites.Report;
+import com.mingle.domain.entites.ReportPost;
+import com.mingle.domain.entites.ReportReply;
 import com.mingle.domain.entites.Warning;
+import com.mingle.domain.repositories.PostRepository;
+import com.mingle.domain.repositories.ReplyRepository;
 import com.mingle.domain.repositories.ReportPartyRepository;
 import com.mingle.domain.repositories.ReportPostRepository;
 import com.mingle.domain.repositories.ReportReplyRepository;
@@ -21,6 +25,8 @@ import com.mingle.mappers.ReportMapper;
 import com.mingle.mappers.ReportPartyMapper;
 import com.mingle.mappers.ReportPostMapper;
 import com.mingle.mappers.ReportReplyMapper;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class ReportService {
@@ -37,6 +43,7 @@ public class ReportService {
 	@Autowired
 	private ReportPostMapper rpMapper;
 	
+	
 	// 댓글 신고
 	@Autowired
 	private ReportReplyRepository rrRepo;
@@ -52,6 +59,14 @@ public class ReportService {
 	// 경고
 	@Autowired
 	private WarningRepository wRepo;
+	
+	// 게시글 정보
+	@Autowired
+	private PostRepository pRepo;
+	
+	// 댓글 정보
+	@Autowired
+	private ReplyRepository rpyRepo;
 	
 	// 미처리 신고 리스트
 	public List<ReportDTO> findTop10ByIsProcessFalseOrderByReportDateDesc() {
@@ -108,5 +123,29 @@ public class ReportService {
 		Report report = rRepo.findAllById(id); // 해당하는 report 가져옴
 		report.setIsProcess(true);
 		rRepo.save(report); 
+	}
+	
+	// 게시글 신고 처리
+	@Transactional
+	public void insertPostReport(ReportDTO rdto, ReportPostDTO rpdto) {
+		Report report = rRepo.save(rMapper.toEntity(rdto));
+		ReportPost reportPost = new ReportPost();
+		reportPost.setReportId(report.getId());
+		reportPost.setPostId(rpdto.getPostId());
+		reportPost.setReport(rRepo.findAllById(reportPost.getReportId()));
+		reportPost.setPost(pRepo.findAllById(reportPost.getPostId()));
+		rpRepo.save(reportPost);
+	}
+	
+	// 댓글 신고 처리
+	@Transactional
+	public void insertReplyReport(ReportDTO rdto, ReportReplyDTO rrdto) {
+		Report report = rRepo.save(rMapper.toEntity(rdto));
+		ReportReply reportReply = new ReportReply();
+		reportReply.setReportId(report.getId());
+		reportReply.setReplyId(rrdto.getReplyId());
+		reportReply.setReport(rRepo.findAllById(reportReply.getReportId()));
+		reportReply.setReply(rpyRepo.findReplyById(reportReply.getReplyId()));
+		rrRepo.save(reportReply);
 	}
 }

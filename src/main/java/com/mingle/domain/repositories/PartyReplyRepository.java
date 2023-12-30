@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.mingle.domain.entites.PartyReply;
-import com.mingle.domain.entites.Reply;
 
 public interface PartyReplyRepository extends JpaRepository<PartyReply, Long>{
 
@@ -26,7 +25,7 @@ public interface PartyReplyRepository extends JpaRepository<PartyReply, Long>{
 		      + "left join fetch pr.parentPartyReply "
 		      + "left join fetch pr.childrenPartyReplies "
 		      + "where pr.id = :id")
-	PartyReply findReplyById(@Param(value = "id") Long id);
+	PartyReply findPartyReplyById(@Param(value = "id") Long id);
 	
 	// 파티 댓글 수정
 	@Modifying

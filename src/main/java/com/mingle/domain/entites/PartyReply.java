@@ -61,13 +61,16 @@ public class PartyReply {
 	
 	@Column(name = "party_reply_adoptive_parent_id", nullable = true)
 	private Long partyReplyAdoptiveParentId;
+	
+	@Column(name = "is_secret")
+	private Boolean isSecret;
 
 
 	
 	
 	@Builder
 	public PartyReply(Long id, String content, Timestamp writeDate, Long partyRegistrationId, Member member,
-			PartyReply parentPartyReply, Set<PartyReply> childrenPartyReplies, Long partyReplyAdoptiveParentId) {
+			PartyReply parentPartyReply, Set<PartyReply> childrenPartyReplies, Long partyReplyAdoptiveParentId, Boolean isSecret) {
 		super();
 		this.id = id;
 		this.content = content;
@@ -77,6 +80,7 @@ public class PartyReply {
 		this.parentPartyReply = parentPartyReply;
 		this.childrenPartyReplies = childrenPartyReplies;
 		this.partyReplyAdoptiveParentId = partyReplyAdoptiveParentId;
+		this.isSecret = isSecret;
 	}
 	
 

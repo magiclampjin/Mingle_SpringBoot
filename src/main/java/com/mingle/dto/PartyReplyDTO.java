@@ -23,11 +23,12 @@ public class PartyReplyDTO {
 	private PartyReplyDTO parentPartyReply;
 	private Set<PartyReply> childrenPartyReplies;
 	private Long partyReplyAdoptiveParentId;
+	private Boolean isSecret;
 
 	
 	@Builder
 	public PartyReplyDTO(Long id, String content, Instant writeDate, Long partyRegistrationId, MemberDTO member,
-			PartyReplyDTO parentPartyReply, Set<PartyReply> childrenPartyReplies, Long partyReplyAdoptiveParentId) {
+			PartyReplyDTO parentPartyReply, Set<PartyReply> childrenPartyReplies, Long partyReplyAdoptiveParentId, Boolean isSecret) {
 		super();
 		this.id = id;
 		this.content = content;
@@ -37,6 +38,7 @@ public class PartyReplyDTO {
 		this.parentPartyReply = parentPartyReply;
 		this.childrenPartyReplies = childrenPartyReplies;
 		this.partyReplyAdoptiveParentId = partyReplyAdoptiveParentId;
+		this.isSecret = isSecret;
 	}
 	
 	

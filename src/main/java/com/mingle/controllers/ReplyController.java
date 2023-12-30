@@ -14,8 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mingle.dto.ReplyDTO;
+import com.mingle.dto.ReportDTO;
+import com.mingle.dto.ReportReplyDTO;
 import com.mingle.dto.UploadReplyDTO;
 import com.mingle.services.ReplyService;
+import com.mingle.services.ReportService;
 
 @RestController
 @RequestMapping("/api/reply")
@@ -25,6 +28,9 @@ public class ReplyController {
 	
 	@Autowired
 	private ReplyService rServ;
+	
+	@Autowired
+	private ReportService reportServ;
 	
 	@PostMapping
 	public ResponseEntity<ReplyDTO> insert(UploadReplyDTO dto) {
@@ -39,6 +45,12 @@ public class ReplyController {
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> delete(@PathVariable Long id) {
 		rServ.deleteById(id);
+		return ResponseEntity.ok().build();
+	}
+	
+	@PostMapping("/report")
+	public ResponseEntity<Void> insertReplyReport(ReportDTO rdto, ReportReplyDTO rrdto){
+		reportServ.insertReplyReport(rdto, rrdto);
 		return ResponseEntity.ok().build();
 	}
 	

@@ -22,10 +22,11 @@ public class UploadPartyReplyDTO {
 	private String memberId;
 	private Long partyReplyParentId;
 	private Long partyReplyAdoptiveParentId;
+	private Boolean isSecret;
 	
 	@Builder
 	public UploadPartyReplyDTO(Long id, String content, Instant writeDate, Long partyRegistrationId, String memberId,
-			Long partyReplyParentId, Long partyReplyAdoptiveParentId) {
+			Long partyReplyParentId, Long partyReplyAdoptiveParentId, Boolean isSecret) {
 		super();
 		this.id = id;
 		this.content = content;
@@ -34,6 +35,7 @@ public class UploadPartyReplyDTO {
 		this.memberId = memberId;
 		this.partyReplyParentId = partyReplyParentId;
 		this.partyReplyAdoptiveParentId = partyReplyAdoptiveParentId;
+		this.isSecret = isSecret;
 	}
 	
 	
