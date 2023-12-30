@@ -89,5 +89,8 @@ public interface MemberRepository extends JpaRepository<Member, String> {
 	// 로그인한 사용자의 밍글머니 불러오기
 	@Query("select m.mingleMoney from Member m where m.id=:id")
 	int selectMingleMoney(String id);
-
+	
+	// 닉네임으로 아이디 가져오기
+	@Query("select m.id from Member m where m.nickname=:nickname")
+	String selectIdByNick(String nickname);
 }

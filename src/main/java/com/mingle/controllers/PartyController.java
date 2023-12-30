@@ -29,6 +29,7 @@ import com.mingle.dto.PaymentDTO;
 import com.mingle.dto.ServiceCategoryDTO;
 import com.mingle.dto.ServiceDTO;
 import com.mingle.services.PartyService;
+import com.mingle.services.ReportService;
 
 @RestController
 @RequestMapping("/api/party")
@@ -38,6 +39,10 @@ public class PartyController {
 	
 	@Autowired
 	private PartyService pServ;
+	
+	//신고
+	@Autowired
+	private ReportService rServ;
 
 	// 제공하는 서비스 카테고리명 불러오기
 	@GetMapping
@@ -162,8 +167,6 @@ public class PartyController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 	}
 	
-	
-
 	// 메인페이지 모집중인 파티 개수
 	@GetMapping("/selectAllPartyCountForMain")
 	public ResponseEntity<Integer> selectAllPartyCountForMain(){
@@ -174,6 +177,17 @@ public class PartyController {
 	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<Integer> deleteById(@PathVariable Long id){
 		return ResponseEntity.ok(pServ.deleteById(id));
+	}
+	
+	// 파티 신고
+	@PostMapping("/insertReport")
+	public ResponseEntity<Void> insertReport(@RequestBody Map<String,Object> param, Authentication authentication){
+		// report 테이블 등록
+		System.out.println(param);
+		rServ.insertReportByParty(param, authentication.getName());
+		// id 이용해 report_party 등록
+		
+		return ResponseEntity.ok().build();
 	}
 
 
