@@ -231,4 +231,15 @@ public class PartyService {
 	public int selectAllPartyCountForMain() {
 		return piRepo.selectAllParty().size();
 	}
+	
+	// 파티 삭제하기
+	public int deleteById(Long id) {
+		int memberCnt = pmRepo.selectCntById(id);
+		if(memberCnt==1){
+			piRepo.delete(piRepo.findById(id).get());
+			return 1;
+		}else {
+			return 0;
+		}
+	}
 }

@@ -53,7 +53,10 @@ public class CurrJoinPartyInfo {
 	private String loginPw;
 	@Column(name="member_cnt")
 	private int memberCnt;
-	
+	@Column(name="member_nicknames")
+	private String memberNicknames;
+	@Column(name="manager_nickname")
+	private String managerNickname;
 	
 	public CurrJoinPartyInfo(Long id, String memberId, boolean isPartyManager, Timestamp startDate, String name, String englishName, String plan) {
 		super();

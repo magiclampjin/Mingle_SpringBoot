@@ -34,6 +34,9 @@ public class CurrJoinPartyInfoDTO {
 	private String loginId;	
 	private String loginPw;
 	private int memberCnt;
+	private String memberNicknames;
+	private String managerNickname;
+	
 	
 	
 	public CurrJoinPartyInfoDTO(Long id, String memberId, boolean isPartyManager, Timestamp startDate, String name, String englishName, String plan) {
