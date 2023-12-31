@@ -12,17 +12,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.FileSystemUtils;
 
 import com.mingle.domain.entites.Member;
 import com.mingle.domain.entites.Payment;
 import com.mingle.domain.repositories.MemberRepository;
 import com.mingle.domain.repositories.PaymentRepository;
 import com.mingle.domain.repositories.TodayCalculationPartyRepository;
+import com.mingle.domain.repositories.TodayEndPartyRepository;
 import com.mingle.dto.PaymentDTO;
 import com.mingle.dto.TodayCalculationPartyDTO;
+import com.mingle.dto.TodayEndPartyDTO;
 import com.mingle.mappers.PaymentMapper;
 import com.mingle.mappers.TodayCalculationPartyMapper;
+import com.mingle.mappers.TodayEndPartyMapper;
 import com.mingle.specification.PaymentSpecification;
 
 @Service
@@ -43,12 +45,10 @@ public class PaymentService {
 	@Autowired
 	private MemberRepository mRepo;
 	
-	// 결제 내역 목록 불러오기
-//	public List<PaymentDTO> selectById(String memberId) {
-//		
-//		return pMapper.toDtoList(pRepo.selectById(memberId));
-//	    
-//	}
+	@Autowired
+	private TodayEndPartyRepository tepRepo;
+	@Autowired
+	private TodayEndPartyMapper tepMap;
 	
 	public List<PaymentDTO> findSearch(String member_id,String service, String type, Timestamp start, Timestamp end){
 	
@@ -70,26 +70,9 @@ public class PaymentService {
 		    
 	}
 	
-	/*
-	 
-	 // 다음 정산일까지 남은 날짜 계산
-	LocalDateTime currentDateTime = LocalDateTime.now();
-	LocalDateTime now = currentDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0);
-	LocalDateTime cal = now.with(ChronoField.DAY_OF_MONTH,dto.getCalculationDate());
-	Instant nowDate =  now.toInstant(ZoneOffset.UTC);
-	Instant calDate =  cal.toInstant(ZoneOffset.UTC);
-	
-	System.out.println("오늘: "+nowDate);
-	System.out.println("이번달 정산일: "+calDate);
-	
-	// 정산일이 오늘보다 이전인 경우 => 다음 달 정산일이 필요함
-	if(calDate.isBefore(nowDate)) {
-		
-	} 
-	 
-	 */
-	
+
 	// 첫달 요금
+	@Transactional
 	public void firstPayment(){
 		// 1. 파티 시작일이 오늘인 파티 정보를 불러온다. -> o
     	// 단, 시작일 = 정산일이 동일하면 제외 -> o
@@ -100,10 +83,11 @@ public class PaymentService {
     	// 4. 파티원의 경우 요금 결제 (밍글머니 우선적용) -> o
     	// 5. 파티장에게 결제된 요금 충전 (밍글머니) -> o
 		
+		// 다음 정산일까지 남은 날자 계산
+		LocalDateTime currentDateTime = LocalDateTime.now(); 
+		LocalDateTime now = currentDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0);
+					
 		for(TodayCalculationPartyDTO dto : list) {
-			// 다음 정산일까지 남은 날자 계산
-			LocalDateTime currentDateTime = LocalDateTime.now(); 
-			LocalDateTime now = currentDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0);
 			LocalDateTime cal = now.with(ChronoField.DAY_OF_MONTH,dto.getCalculationDate());
 			Instant calDate =  cal.toInstant(ZoneOffset.UTC);
 			
@@ -256,5 +240,24 @@ public class PaymentService {
 		pRepo.save(p);
 	}
 	
-	
+	// 파티 종료일에 보증금 반환
+	@Transactional
+	public void returnDeposit() {
+		List<TodayEndPartyDTO> list = tepMap.toDtoList(tepRepo.findAll());
+		for(TodayEndPartyDTO dto : list) {
+			Member m = mRepo.findById(dto.getMemberId()).get();
+			m.setMingleMoney(m.getMingleMoney()+dto.getDeposit());
+			mRepo.save(m);
+			
+			PaymentDTO payment = new PaymentDTO();
+			payment.setPartyRegistrationId(dto.getPartyRegistrationId());
+			payment.setMemberId(dto.getMemberId());
+			payment.setDate(Instant.now());
+			payment.setServiceId(dto.getServiceId());
+			payment.setPaymentTypeId("적립");
+			payment.setPrice(dto.getDeposit());
+			payment.setUsedMingleMoney(0L);
+			pRepo.save(pMapper.toEntity(payment));
+		}
+	}
 }

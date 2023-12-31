@@ -114,9 +114,15 @@ public class AutoScheduler {
 //		pServ.deleteEndDateAfter3Months();
 //	}
     
+    // 파티 종료되면 계정 정보 지우기
+    @Transactional
     @Scheduled(cron = "0 0 0 * * *")
-    // 파티 종료되면 비밀번호 지우기
 	public void updateEndPartyAccountScheduler() {
+    	// 계정 정보 삭제
 		pServ.updateEndPartyAccount();
+		// 보증금 반환
+		payServ.returnDeposit();
 	}
+    
+    
 }

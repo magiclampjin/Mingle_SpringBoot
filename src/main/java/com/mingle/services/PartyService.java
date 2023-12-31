@@ -325,8 +325,10 @@ public class PartyService {
 //		piRepo.deleteEndDateAfter3Months();
 //	}
 	
-	// 파티 종료일에 비밀번호 정보 삭제
+	// 파티 종료일에 계정 정보 삭제
+	@Transactional
 	public void updateEndPartyAccount() {
 		piRepo.updateEndPartyAccount();
 	}
+	
 }
