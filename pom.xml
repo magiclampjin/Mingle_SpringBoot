@@ -99,6 +99,7 @@
 		    <artifactId>google-cloud-bigquery</artifactId>
 		    <version>1.25.0</version>
 		</dependency>
+		<!-- Oauth -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-oauth2-client</artifactId>

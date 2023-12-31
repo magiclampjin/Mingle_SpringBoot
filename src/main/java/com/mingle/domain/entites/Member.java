@@ -77,5 +77,19 @@ public class Member {
         this.socialTypeId=social;
         this.provider = provider;
     }
+	
+	///
+	@Builder
+	public Member(String name, String email, String roleId) {
+		this.name=name;
+		this.email=email;
+		this.roleId=roleId;
+	}
+	
+	public Member update(String name){
+        this.name = name;
+
+        return this;
+    }
 
 }
