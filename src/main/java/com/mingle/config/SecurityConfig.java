@@ -13,8 +13,6 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.mingle.security.CustomAuthenticationFailureHandler;
-import com.mingle.services.CustomOAuth2UserService;
-import com.mingle.services.PrincipalOauth2UserService;
 import com.mingle.services.SecurityService;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,15 +20,9 @@ import jakarta.servlet.http.HttpServletResponse;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
+	
 	@Autowired
 	private SecurityService sServ;
-	
-	@Autowired
-	private PrincipalOauth2UserService principalOauth2UserService;
-	
-	@Autowired
-	private CustomOAuth2UserService customOAuth2UserService;
 	
 	 @Autowired
     private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
@@ -59,11 +51,7 @@ public class SecurityConfig {
 //		.failureHandler((request, response, exception) -> { 
 //			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 //		})
-		.failureHandler(customAuthenticationFailureHandler)
-		.and().oauth2Login()
-		.userInfoEndpoint().userService(customOAuth2UserService);
-
-		
+		.failureHandler(customAuthenticationFailureHandler);
 	
 		// 인증이 되어있지 않을 때 발생하는 예외 처리
 		http.exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
@@ -77,7 +65,7 @@ public class SecurityConfig {
 			response.setStatus(HttpServletResponse.SC_OK);
 		});
 		
-//		http.userDetailsService(sServ);
+		http.userDetailsService(sServ);
 		return http.build();
 	}
 	
@@ -91,15 +79,4 @@ public class SecurityConfig {
 	public LogoutHandler securityContextLogoutHandler() {
 	    return new SecurityContextLogoutHandler();
 	}
-
-	
-//	private CorsConfigurationSource corsConfigurationSource() {
-//        CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.addAllowedOrigin("http://localhost:3000"); // 허용할 출처
-//        configuration.addAllowedMethod("*");
-//        configuration.addAllowedHeader("*");
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", configuration);
-//        return (CorsConfigurationSource) source;
-//    }
 }

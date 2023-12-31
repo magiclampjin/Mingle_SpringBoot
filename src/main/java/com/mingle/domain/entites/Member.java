@@ -59,37 +59,4 @@ public class Member {
 	
 	@Column(name = "provider")
 	private String provider;
-	
-	@Builder(builderClassName = "UserDetailRegister", builderMethodName = "userDetailRegister")
-    public Member(String username, String password, String email, String role) {
-        this.id = username;
-        this.password = password;
-        this.email = email;
-        this.roleId = role;
-    }
-	
-	@Builder(builderClassName = "OAuth2Register", builderMethodName = "oauth2Register")
-    public Member(String username, String password, String email, String role, String social, String provider) {
-        this.id = username;
-        this.password = password;
-        this.email = email;
-        this.roleId = role;
-        this.socialTypeId=social;
-        this.provider = provider;
-    }
-	
-	///
-	@Builder
-	public Member(String name, String email, String roleId) {
-		this.name=name;
-		this.email=email;
-		this.roleId=roleId;
-	}
-	
-	public Member update(String name){
-        this.name = name;
-
-        return this;
-    }
-
 }
