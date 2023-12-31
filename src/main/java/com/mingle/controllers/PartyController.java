@@ -161,6 +161,16 @@ public class PartyController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 	}
 	
+	// 가입한 파티 목록 불러오기 // 나의 파티용 (종료된 파티 포함)
+	@GetMapping("/getMyAllPartyList")
+	public ResponseEntity<List<CurrJoinPartyInfoDTO>> getMyAllPartyList(Authentication authentication){
+		if (authentication != null) {
+			List<CurrJoinPartyInfoDTO> list = pServ.selectMyAllPartyList(authentication.getName());
+			return ResponseEntity.ok(list);
+		}else
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+	}
+	
 	// 특정 파티 정보 불러오기
 	@GetMapping("/getPartyInfo/{id}")
 	public ResponseEntity<CurrJoinPartyInfoDTO> selectMyPartyInfo(@PathVariable Long id, Authentication authentication){

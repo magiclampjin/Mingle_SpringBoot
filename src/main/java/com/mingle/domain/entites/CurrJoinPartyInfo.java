@@ -70,4 +70,16 @@ public class CurrJoinPartyInfo {
 		this.englishName = englishName;
 		this.plan = plan;
 	}
+	
+	public CurrJoinPartyInfo(Long id, String memberId, boolean isPartyManager, Timestamp startDate, String name, String englishName, String plan, Long monthCount) {
+		super();
+		this.id = id;
+		this.memberId = memberId;
+		this.isPartyManager = isPartyManager;
+		this.startDate = startDate;
+		this.name = name;
+		this.englishName = englishName;
+		this.plan = plan;
+		this.monthCount = monthCount;
+	}
 }
