@@ -57,6 +57,8 @@ public class CurrJoinPartyInfo {
 	private String memberNicknames;
 	@Column(name="manager_nickname")
 	private String managerNickname;
+	@Column(name="is_expired")
+	private boolean isExpired;
 	
 	public CurrJoinPartyInfo(Long id, String memberId, boolean isPartyManager, Timestamp startDate, String name, String englishName, String plan) {
 		super();

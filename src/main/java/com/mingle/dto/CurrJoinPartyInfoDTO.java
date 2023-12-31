@@ -36,7 +36,7 @@ public class CurrJoinPartyInfoDTO {
 	private int memberCnt;
 	private String memberNicknames;
 	private String managerNickname;
-	
+	private boolean isExpired;
 	
 	
 	public CurrJoinPartyInfoDTO(Long id, String memberId, boolean isPartyManager, Timestamp startDate, String name, String englishName, String plan) {
