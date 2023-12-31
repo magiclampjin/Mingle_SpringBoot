@@ -37,7 +37,6 @@ public class SecurityConfig {
 		http.csrf().disable().headers().frameOptions().disable();
 		
 		http.authorizeHttpRequests()
-		//.requestMatchers(new AntPathRequestMatcher("/party/PartyCreatePage/**")).authenticated()
 		.requestMatchers(new AntPathRequestMatcher("/uploads/**")).permitAll()
 		.requestMatchers(new AntPathRequestMatcher("/api/admin/**")).hasRole("ADMIN")
 		.requestMatchers(new AntPathRequestMatcher("/api/party/auth/**")).authenticated()
