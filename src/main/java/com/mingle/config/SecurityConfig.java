@@ -12,6 +12,7 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import com.mingle.security.CustomAuthenticationFailureHandler;
 import com.mingle.services.CustomOAuth2UserService;
 import com.mingle.services.PrincipalOauth2UserService;
 import com.mingle.services.SecurityService;
@@ -31,10 +32,12 @@ public class SecurityConfig {
 	@Autowired
 	private CustomOAuth2UserService customOAuth2UserService;
 	
+	 @Autowired
+    private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+	
 	@Bean	
 	protected SecurityFilterChain config(HttpSecurity http) throws Exception{
-		//h2-console화면을 사용하기 위해 해당 옵션을 disable
-		http.csrf().disable().headers().frameOptions().disable();
+		http.csrf().disable();
 		
 		http.authorizeHttpRequests()
 		.requestMatchers(new AntPathRequestMatcher("/uploads/**")).permitAll()
@@ -53,9 +56,10 @@ public class SecurityConfig {
 			response.setStatus(HttpServletResponse.SC_OK);
 		})
 		// 로그인 실패
-		.failureHandler((request, response, exception) -> { 
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-		})
+//		.failureHandler((request, response, exception) -> { 
+//			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//		})
+		.failureHandler(customAuthenticationFailureHandler)
 		.and().oauth2Login()
 		.userInfoEndpoint().userService(customOAuth2UserService);
 

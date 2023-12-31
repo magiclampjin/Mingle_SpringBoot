@@ -34,6 +34,7 @@ public class Report {
 	private String content;
 	
 	@Column(name="report_date")
+
 	@CreationTimestamp
 	private Timestamp reportDate;
 	
@@ -48,7 +49,6 @@ public class Report {
 
 	    LocalDateTime localDateTime = reportDate.toLocalDateTime();
 	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
 	    return localDateTime.format(formatter);
 	}
 }
