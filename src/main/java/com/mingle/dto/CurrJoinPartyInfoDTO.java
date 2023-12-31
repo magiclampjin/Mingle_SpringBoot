@@ -33,6 +33,10 @@ public class CurrJoinPartyInfoDTO {
 	private String plan;
 	private String loginId;	
 	private String loginPw;
+	private int memberCnt;
+	private String memberNicknames;
+	private String managerNickname;
+	private boolean isExpired;
 	
 	
 	public CurrJoinPartyInfoDTO(Long id, String memberId, boolean isPartyManager, Timestamp startDate, String name, String englishName, String plan) {
@@ -44,6 +48,18 @@ public class CurrJoinPartyInfoDTO {
 		this.name = name;
 		this.englishName = englishName;
 		this.plan = plan;
+	}
+	
+	public CurrJoinPartyInfoDTO(Long id, String memberId, boolean isPartyManager, Timestamp startDate, String name, String englishName, String plan, Long monthCount) {
+		super();
+		this.id = id;
+		this.memberId = memberId;
+		this.isPartyManager = isPartyManager;
+		this.startDate = startDate;
+		this.name = name;
+		this.englishName = englishName;
+		this.plan = plan;
+		this.monthCount = monthCount;
 	}
 	
 }

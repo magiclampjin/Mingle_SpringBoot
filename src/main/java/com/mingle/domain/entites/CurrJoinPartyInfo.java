@@ -51,7 +51,14 @@ public class CurrJoinPartyInfo {
 	private String loginId;	
 	@Column(name="login_pw")
 	private String loginPw;
-	
+	@Column(name="member_cnt")
+	private int memberCnt;
+	@Column(name="member_nicknames")
+	private String memberNicknames;
+	@Column(name="manager_nickname")
+	private String managerNickname;
+	@Column(name="is_expired")
+	private boolean isExpired;
 	
 	public CurrJoinPartyInfo(Long id, String memberId, boolean isPartyManager, Timestamp startDate, String name, String englishName, String plan) {
 		super();
@@ -62,5 +69,17 @@ public class CurrJoinPartyInfo {
 		this.name = name;
 		this.englishName = englishName;
 		this.plan = plan;
+	}
+	
+	public CurrJoinPartyInfo(Long id, String memberId, boolean isPartyManager, Timestamp startDate, String name, String englishName, String plan, Long monthCount) {
+		super();
+		this.id = id;
+		this.memberId = memberId;
+		this.isPartyManager = isPartyManager;
+		this.startDate = startDate;
+		this.name = name;
+		this.englishName = englishName;
+		this.plan = plan;
+		this.monthCount = monthCount;
 	}
 }

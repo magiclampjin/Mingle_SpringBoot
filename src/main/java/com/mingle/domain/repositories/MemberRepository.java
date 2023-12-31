@@ -94,4 +94,9 @@ public interface MemberRepository extends JpaRepository<Member, String> {
 
 	// 이메일을 기준으로 사용자 찾아오기
 	Optional<Member> findByEmail(String email);
+
+	// 닉네임으로 아이디 가져오기
+	@Query("select m.id from Member m where m.nickname=:nickname")
+	String selectIdByNick(String nickname);
+
 }

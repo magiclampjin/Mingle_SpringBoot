@@ -1,9 +1,10 @@
 package com.mingle.domain.entites;
 
-import java.time.Instant;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,7 +25,7 @@ public class Report {
 	@Id
 	@Column(name="id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private Long id;
 	
 	@Column(name="member_reporter_id")
 	private String memberReporterId;
@@ -33,20 +34,21 @@ public class Report {
 	private String content;
 	
 	@Column(name="report_date")
-	private Instant reportDate;
+	@CreationTimestamp
+	private Timestamp reportDate;
 	
 	@Column(name="is_process")
-	private boolean isProcess;
+	private Boolean isProcess;
 
 	// reportDate를 yyyy-MM-dd 형식의 문자열로 반환하는 Getter 메서드
-    public String getFormattedReportDate() {
-        if (reportDate == null) {
-            return null;
-        }
+	public String getFormattedReportDate() {
+	    if (reportDate == null) {
+	        return null;
+	    }
 
-        LocalDateTime localDateTime = LocalDateTime.ofInstant(reportDate, ZoneId.systemDefault());
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	    LocalDateTime localDateTime = reportDate.toLocalDateTime();
+	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        return localDateTime.format(formatter);
-    }
+	    return localDateTime.format(formatter);
+	}
 }
