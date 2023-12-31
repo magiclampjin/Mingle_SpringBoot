@@ -65,8 +65,6 @@ public class PartyReply {
 	@Column(name = "is_secret")
 	private Boolean isSecret;
 
-
-	
 	
 	@Builder
 	public PartyReply(Long id, String content, Timestamp writeDate, Long partyRegistrationId, Member member,

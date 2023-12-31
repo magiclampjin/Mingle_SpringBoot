@@ -220,6 +220,12 @@ public class PartyService {
 		return list;
 	}
 	
+	// 가입한 파티 목록 불러오기 (나의 파티용, 종료된 파티 포함)
+	public List<CurrJoinPartyInfoDTO> selectMyAllPartyList(String loginId){
+		List<CurrJoinPartyInfoDTO> list = jpRepo.selectMyAllPartyList(loginId);
+		return list;
+	}
+	
 	// 특정 파티 정보 불러오기
 	public CurrJoinPartyInfoDTO selectMyPartyInfo(Long id, String memberId){
 		CurrJoinPartyInfoDTO info = jpMap.toDto(jpRepo.selectMyPartyInfo(id, memberId));
@@ -268,6 +274,11 @@ public class PartyService {
 		return ptrMapper.toDto(ptrRepo.save(partyReply));
 	}
 	
+	// 파티장 정보 가져오기
+	public String selectPartyManagerId(Long partyRegistrationId) {
+		return pmRepo.selectMemberIdBypartyRegistrationIdAndIsPartyManagerTrue(partyRegistrationId);
+	}
+	
 	// 파티아이디에 따른 파티댓글 출력
 	public Set<PartyReplyDTO> selectPartyReplyById(Long partyRegistrationId){
 		return ptrMapper.toDtoSet(ptrRepo.findFirstPartyReply(partyRegistrationId));
@@ -290,15 +301,22 @@ public class PartyService {
 		ptrRepo.delete(partyReply);
 	}
 	
+	// 파티가 삭제될 경우 그 id에 해당하는 댓글 전부 삭제하는 것을 기조로 만든 함수.
+	public void deletePartyReplyByPartyRegistrationId(Long partyRegistrationId) {
+		ptrRepo.deletePartyReplyByPartyRegistrationId(partyRegistrationId);
+	}
 	
 	// 파티 삭제하기
+	@Transactional
 	public int deleteById(Long id) {
 		int memberCnt = pmRepo.selectCntById(id);
 		if(memberCnt==1){
+			this.deletePartyReplyByPartyRegistrationId(id); //파티댓글에 외래키 지정을 할 경우, 주석을 풀어야함.
 			piRepo.delete(piRepo.findById(id).get());
 			return 1;
 		}else {
 			return 0;
 		}
 	}
+	
 }

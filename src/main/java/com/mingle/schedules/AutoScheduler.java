@@ -91,14 +91,8 @@ public class AutoScheduler {
     
     // 파티 시작일에 첫 정산
     // 매일 오전 12시에 정산 진행
+    @Scheduled(cron = "0 0 0 * * *")
     public void firstPaymentScheduler() {
-    	// 1. 파티 시작일이 오늘인 파티 정보를 불러온다.
-    	// 단, 시작일 = 정산일이 동일하면 
-    	// 2. 해당 파티들의 member 목록 불러오기
-    	// 3. 정산액 계산
-    	// 4. 파티원의 경우 요금 결제 (밍글머니 우선적용)
-    	// 5. 파티장에게 결제된 요금 충전 (밍글머니)
-   
     	payServ.firstPayment();
     }
     
@@ -108,5 +102,9 @@ public class AutoScheduler {
     public void paymentScheduler() {
     	payServ.todayPayment();
     }
-	
+    
+    // 파티 종료일 3개월 경과 후 파티 정보 삭제
+	public void deletePartyScheduler() {
+		
+	}
 }

@@ -161,6 +161,16 @@ public class PartyController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 	}
 	
+	// 가입한 파티 목록 불러오기 // 나의 파티용 (종료된 파티 포함)
+	@GetMapping("/getMyAllPartyList")
+	public ResponseEntity<List<CurrJoinPartyInfoDTO>> getMyAllPartyList(Authentication authentication){
+		if (authentication != null) {
+			List<CurrJoinPartyInfoDTO> list = pServ.selectMyAllPartyList(authentication.getName());
+			return ResponseEntity.ok(list);
+		}else
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+	}
+	
 	// 특정 파티 정보 불러오기
 	@GetMapping("/getPartyInfo/{id}")
 	public ResponseEntity<CurrJoinPartyInfoDTO> selectMyPartyInfo(@PathVariable Long id, Authentication authentication){
@@ -177,9 +187,15 @@ public class PartyController {
 		return ResponseEntity.ok(pServ.selectAllPartyCountForMain());
 	}
 	
+	
+	// 파티 매니저 id 정보 가져오기
+	@GetMapping("/reply/manager/{partyRegistrationId}")
+	public ResponseEntity<String> selectPartyManagerId(@PathVariable Long partyRegistrationId){
+		return ResponseEntity.ok(pServ.selectPartyManagerId(partyRegistrationId));
+	}
 
 	// 파티 댓글 리스트 가져오기
-	@GetMapping("/reply/{id}")
+	@GetMapping("/reply/{partyRegistrationId}")
 	public ResponseEntity<Set<PartyReplyDTO>> selectPartyReplyByPartyRestrationId(@PathVariable Long partyRegistrationId){
 		return ResponseEntity.ok(pServ.selectPartyReplyById(partyRegistrationId));
 	}
@@ -192,8 +208,8 @@ public class PartyController {
 	
 	// 파티 댓글 수정(변경될 사항 : 댓글 내용, 비밀댓글 여부)
 	@PutMapping("/reply/{id}")
-	public ResponseEntity<PartyReplyDTO> updatePartyReplyById(@PathVariable Long id, String Content, Boolean isSecret){
-		return ResponseEntity.ok(pServ.updatePartyReplyById(id, Content, isSecret));
+	public ResponseEntity<PartyReplyDTO> updatePartyReplyById(@PathVariable Long id, String content, Boolean isSecret){
+		return ResponseEntity.ok(pServ.updatePartyReplyById(id, content, isSecret));
 	}
 	
 	// 파티 댓글 삭제

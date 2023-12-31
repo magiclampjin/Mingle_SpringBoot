@@ -137,14 +137,20 @@ public class MemberController {
 
 	// 이메일 인증
 	@GetMapping("/mypageEmailAuth")
-	public ResponseEntity<Boolean> mypageEmailAuth(@RequestParam String email) {
+	public ResponseEntity<Integer> mypageEmailAuth(@RequestParam String email) {
 		logger.debug(email);
-		logger.debug("Cont - 이메일 전송 완료");
-		int number = mServ.sendMail(email);
+		boolean result = mServ.emailDuplicateCheck(email);
+		if(result) {
+			// 중복
+			return ResponseEntity.ok(0);
+		}else {
+			logger.debug("Cont - 이메일 전송 완료");
+			int number = mServ.sendMail(email);
+			num = "" + number;
 
-		num = "" + number;
-
-		return ResponseEntity.ok(true);
+			return ResponseEntity.ok(1);
+		}
+		
 
 	}
 
@@ -217,10 +223,18 @@ public class MemberController {
 
 	// 사용자 휴대폰번호 변경
 	@PutMapping("/mypagePhoneUpdate")
-	public ResponseEntity<Void> updatePhone(Authentication authentication, @RequestBody MemberDTO dto) {
+	public ResponseEntity<Integer> updatePhone(Authentication authentication, @RequestBody MemberDTO dto) {
 		logger.debug(dto.getPhone());
-		mServ.updateUserPhone(authentication.getName(), dto.getPhone());
-		return ResponseEntity.ok().build();
+		// 휴대폰번호 중복 확인
+		boolean result = mServ.phoneDuplicateCheck(dto.getPhone());
+		if(result) {
+			// 중복
+			return ResponseEntity.ok(0);
+		}else {
+			mServ.updateUserPhone(authentication.getName(), dto.getPhone());
+			return ResponseEntity.ok(1);
+		}
+		
 	}
 
 	// 로그인 여부 (파티 생성 시 사용함 - 로그인한 사용자만 생성 가능하도록)
@@ -323,6 +337,14 @@ public class MemberController {
 	public ResponseEntity<Boolean> signupcertification(String code) {
 		boolean result = (code.equals(session.getAttribute("signupVerificationCode").toString()));
 		return ResponseEntity.ok(result);
+	}
+	
+	// 회원가입 본인 인증 코드 제거
+	@GetMapping("/removeVerificationCode")
+	public ResponseEntity<Void> removeSignupVerificationCode(){
+		session.invalidate();
+		System.out.println(session.getAttribute("signupVerificationCode"));
+		return ResponseEntity.ok().build();
 	}
 	
 	@ExceptionHandler(Exception.class)

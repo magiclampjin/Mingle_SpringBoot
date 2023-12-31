@@ -290,7 +290,7 @@ public class MemberService {
 		m.setPassword(pwEncoding);
 		return mRepo.save(m) != null;
 	}
-
+	
 	// 사용자 휴대폰번호 변경
 	public void updateUserPhone(String id, String phone) {
 		Member m = mRepo.findAllById(id);
