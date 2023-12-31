@@ -13,6 +13,7 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import com.mingle.security.CustomAuthenticationFailureHandler;
+import com.mingle.services.CustomOAuth2UserService;
 import com.mingle.services.PrincipalOauth2UserService;
 import com.mingle.services.SecurityService;
 
@@ -27,6 +28,9 @@ public class SecurityConfig {
 	
 	@Autowired
 	private PrincipalOauth2UserService principalOauth2UserService;
+	
+	@Autowired
+	private CustomOAuth2UserService customOAuth2UserService;
 	
 	 @Autowired
     private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
@@ -58,7 +62,7 @@ public class SecurityConfig {
 //		})
 		.failureHandler(customAuthenticationFailureHandler)
 		.and().oauth2Login()
-		.userInfoEndpoint().userService(principalOauth2UserService);
+		.userInfoEndpoint().userService(customOAuth2UserService);
 
 		
 	
