@@ -168,16 +168,8 @@ public class ReportService {
 			ReportDTO report = new ReportDTO(0L, memberId, param.get("content").toString(), Instant.from(formatter.parse(param.get("reportDate").toString())), false);
 			Long id = rRepo.save(rMapper.toEntity(report)).getId();
 			
-			
-			// 댓글 일 때
-			if(param.get("partyReportCategory").toString().equals("댓글")) {
-				
-			}			
-			// 파티 계정 / 미납 신고 신고 일 때
-			else {				
-				ReportPartyDTO reportParty = new ReportPartyDTO(id, Long.parseLong(param.get("partyRegistrationId").toString()),reportMemberId,param.get("partyReportCategory").toString());
-				rptRepo.save(rptMapper.toEntity(reportParty));
-			}
+			ReportPartyDTO reportParty = new ReportPartyDTO(id, Long.parseLong(param.get("partyRegistrationId").toString()),reportMemberId,param.get("partyReportCategory").toString());
+			rptRepo.save(rptMapper.toEntity(reportParty));
 		}
 		
 	}
