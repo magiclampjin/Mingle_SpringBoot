@@ -347,13 +347,6 @@ public class MemberController {
 		return ResponseEntity.ok().build();
 	}
 	
-	// 구글 인증 코드 받기
-	@PostMapping("/OAuth/Google")
-	public ResponseEntity<String> OAuth2Google(String code){
-		System.out.println(code);
-		return ResponseEntity.ok("test");
-	}
-	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
 		logger.error(e.getMessage());
