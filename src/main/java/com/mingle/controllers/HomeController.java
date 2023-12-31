@@ -14,10 +14,5 @@ public class HomeController {
 	public String home() {
 		return "forward:/index.html";
 	}
-	
-//	@ExceptionHandler(Exception.class)
-//	public ResponseEntity<String> exceptionHandler(Exception e) {
-//		logger.error(e.getMessage());
-//		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-//	}
+
 }

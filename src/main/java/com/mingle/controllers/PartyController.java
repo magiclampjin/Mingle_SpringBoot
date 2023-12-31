@@ -229,10 +229,8 @@ public class PartyController {
 	@PostMapping("/insertReport")
 	public ResponseEntity<Void> insertReport(@RequestBody Map<String,Object> param, Authentication authentication){
 		// report 테이블 등록
-		System.out.println(param);
-		rServ.insertReportByParty(param, authentication.getName());
 		// id 이용해 report_party 등록
-		
+		rServ.insertReportByParty(param, authentication.getName());
 		return ResponseEntity.ok().build();
 	}
 

@@ -172,10 +172,7 @@ public class PaymentService {
 		for(TodayCalculationPartyDTO dto : list) {
 			if(dto.isPartyManager() && dto.getCurrPartyMemberCnt()>1) {
 				// 매니저이면서 파티원이 1명이라도 있으면
-				//System.out.println("파티장: "+dto);
 				// ( 파티원이 내는 금액 - 밍글 수수료1000원 - 파티원당 밍글 수수료 ) * 인원수 (이때, 파티장까지 포함된 cnt이므로 -1)
-				//System.out.println("매달 받을 금액: "+((dto.getMonthFee()-1000)-dto.getCommission())*(dto.getCurrPartyMemberCnt()-1));
-				
 				Long saveMoney = ((dto.getMonthFee()-1000)-dto.getCommission())*(dto.getCurrPartyMemberCnt()-1);
 				
 				// 밍글 머니에 저장

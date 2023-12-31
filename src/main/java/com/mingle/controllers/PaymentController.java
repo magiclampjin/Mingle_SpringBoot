@@ -37,20 +37,6 @@ public class PaymentController {
 	@Autowired
 	private MemberService mServ;
 	
-	// 결제 내역 목록 불러오기
-//	@GetMapping
-//	public ResponseEntity<List<PaymentDTO>> selectAll(Authentication authentication) {
-//	    PaymentId pId = new PaymentId();
-//	    pId.setMemberId(authentication.getName());
-//	    
-//	    System.out.println("pid : "+pId.getMemberId());
-//	    
-//	    List<PaymentDTO> list = pServ.selectById(pId.getMemberId());
-//	    
-//	   
-//	    return ResponseEntity.ok(list);
-//	}
-	
 	// 동적 검색
 	@GetMapping("/searchBy")
 	public ResponseEntity<List<PaymentDTO>> selectBySearch(

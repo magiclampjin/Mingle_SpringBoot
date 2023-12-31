@@ -343,7 +343,6 @@ public class MemberController {
 	@GetMapping("/removeVerificationCode")
 	public ResponseEntity<Void> removeSignupVerificationCode(){
 		session.invalidate();
-		System.out.println(session.getAttribute("signupVerificationCode"));
 		return ResponseEntity.ok().build();
 	}
 	
