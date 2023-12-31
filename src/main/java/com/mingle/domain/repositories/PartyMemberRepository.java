@@ -12,7 +12,7 @@ public interface PartyMemberRepository  extends JpaRepository<PartyMember, Long>
 	String selectMemberIdBypartyRegistrationIdAndIsPartyManagerTrue(@Param("partyRegistrationId") Long partyRegistrationId);
 
 	// 가입한 파티 있는 지 확인
-	@Query(value="select count(*) from PartyMember pm where pm.memberId=:userId and DATE_ADD(current_party_info.start_date, INTERVAL current_party_info.month_count MONTH) >= CURRENT_DATE()", nativeQuery = true)
+	@Query(value="select count(*) from party_member pm join party_information pi on pm.party_registration_id = pi.id where member_id=\"test0002\" and DATE_ADD(start_date, INTERVAL month_count MONTH) >= CURRENT_DATE()", nativeQuery = true)
 	Long isMemberParty(@Param("userId") String userId);
 	
 	default boolean isAlreadyMember(String userId) {

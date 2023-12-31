@@ -354,4 +354,11 @@ public class MemberService {
 		m.setMingleMoney(resultMoney);
 		mRepo.save(m);
 	}
+	
+	// 계정 정지
+	public void updateEnabledFalse(String userId) {
+		Member m = mRepo.findById(userId).get();
+		m.setEnabled(false);
+		mRepo.save(m);
+	}
 }

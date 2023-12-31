@@ -2,6 +2,10 @@ package com.mingle.services;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +18,13 @@ import com.mingle.domain.entites.Payment;
 import com.mingle.domain.repositories.MemberRepository;
 import com.mingle.domain.repositories.PaymentRepository;
 import com.mingle.domain.repositories.TodayCalculationPartyRepository;
+import com.mingle.domain.repositories.TodayEndPartyRepository;
 import com.mingle.dto.PaymentDTO;
 import com.mingle.dto.TodayCalculationPartyDTO;
+import com.mingle.dto.TodayEndPartyDTO;
 import com.mingle.mappers.PaymentMapper;
 import com.mingle.mappers.TodayCalculationPartyMapper;
+import com.mingle.mappers.TodayEndPartyMapper;
 import com.mingle.specification.PaymentSpecification;
 
 @Service
@@ -38,12 +45,10 @@ public class PaymentService {
 	@Autowired
 	private MemberRepository mRepo;
 	
-	// 결제 내역 목록 불러오기
-//	public List<PaymentDTO> selectById(String memberId) {
-//		
-//		return pMapper.toDtoList(pRepo.selectById(memberId));
-//	    
-//	}
+	@Autowired
+	private TodayEndPartyRepository tepRepo;
+	@Autowired
+	private TodayEndPartyMapper tepMap;
 	
 	public List<PaymentDTO> findSearch(String member_id,String service, String type, Timestamp start, Timestamp end){
 	
@@ -65,34 +70,92 @@ public class PaymentService {
 		    
 	}
 	
-	/*
-	 
-	 // 다음 정산일까지 남은 날짜 계산
-	LocalDateTime currentDateTime = LocalDateTime.now();
-	LocalDateTime now = currentDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0);
-	LocalDateTime cal = now.with(ChronoField.DAY_OF_MONTH,dto.getCalculationDate());
-	Instant nowDate =  now.toInstant(ZoneOffset.UTC);
-	Instant calDate =  cal.toInstant(ZoneOffset.UTC);
-	
-	System.out.println("오늘: "+nowDate);
-	System.out.println("이번달 정산일: "+calDate);
-	
-	// 정산일이 오늘보다 이전인 경우 => 다음 달 정산일이 필요함
-	if(calDate.isBefore(nowDate)) {
-		
-	} 
-	 
-	 */
-	
+
 	// 첫달 요금
+	@Transactional
 	public void firstPayment(){
-		// 1. 파티 시작일이 오늘인 파티 정보를 불러온다.
-    	// 단, 시작일 = 정산일이 동일하면 제외
-    	// 2. 해당 파티들의 member 목록 불러오기
-    	// 3. 정산액 계산
-    	// 4. 파티원의 경우 요금 결제 (밍글머니 우선적용)
-    	// 5. 파티장에게 결제된 요금 충전 (밍글머니)
+		// 1. 파티 시작일이 오늘인 파티 정보를 불러온다. -> o
+    	// 단, 시작일 = 정산일이 동일하면 제외 -> o
+		List<TodayCalculationPartyDTO> list = tcpMap.toDtoList(tcpRepo.findFirstCalculationParty());
+    	
+		// 2. 해당 파티들의 member 목록 불러오기 -> o
+    	// 3. 정산액 계산 -> o
+    	// 4. 파티원의 경우 요금 결제 (밍글머니 우선적용) -> o
+    	// 5. 파티장에게 결제된 요금 충전 (밍글머니) -> o
 		
+		// 다음 정산일까지 남은 날자 계산
+		LocalDateTime currentDateTime = LocalDateTime.now(); 
+		LocalDateTime now = currentDateTime.withHour(0).withMinute(0).withSecond(0).withNano(0);
+					
+		for(TodayCalculationPartyDTO dto : list) {
+			LocalDateTime cal = now.with(ChronoField.DAY_OF_MONTH,dto.getCalculationDate());
+			Instant calDate =  cal.toInstant(ZoneOffset.UTC);
+			
+			// 정산일이 오늘보다 이전인 경우 => 다음 달 정산일이 필요함
+			if(calDate.isBefore(dto.getStartDate())) {
+				LocalDateTime nextCal = cal.plusMonths(1);
+				calDate = nextCal.toInstant(ZoneOffset.UTC);
+			}
+			
+			// 다음 정산일까지 남은 일자 수
+			long diff = ChronoUnit.DAYS.between(dto.getStartDate(), calDate);
+			
+			if(dto.isPartyManager() && dto.getCurrPartyMemberCnt()>1) {
+				// 매니저이면서 파티원이 1명이라도 있으면
+
+				// 파티장이 받을 금액
+				Long saveMoney = (long) Math.ceil(((double) (dto.getMonthFee() - 1000 - dto.getCommission())) / 31)*diff;
+				
+				// 밍글 머니에 저장
+				Member m = mRepo.findById(dto.getMemberId()).get();
+				m.setMingleMoney(m.getMingleMoney()+saveMoney);
+				mRepo.save(m);
+				
+				// 결제 내역 테이블에 저장
+				PaymentDTO payment = new PaymentDTO();
+				payment.setPartyRegistrationId(dto.getPartyRegistrationId());
+				payment.setMemberId(dto.getMemberId());
+				payment.setDate(Instant.now());
+				payment.setServiceId(dto.getServiceId());
+				payment.setPaymentTypeId("적립");
+				payment.setPrice(saveMoney);
+				payment.setUsedMingleMoney(0L);
+				pRepo.save(pMapper.toEntity(payment));
+			}else {
+				// 매니저가 아니면
+				// 파티원이 첫 달에 낼 금액
+				Long sendMoney = (long) Math.ceil((double)(dto.getMonthFee()/31))*diff;
+				
+				// 밍글머니가 있다면 밍글머니부터 차감
+				// 1. 밍글머니 >= 정산액 
+				Long usedMingleMoney = 0L;
+				
+				if(dto.getMingleMoney() >= sendMoney) {
+					Member m = mRepo.findById(dto.getMemberId()).get();
+					m.setMingleMoney(m.getMingleMoney()-sendMoney);
+					mRepo.save(m);
+					usedMingleMoney = sendMoney;
+				}
+				// 2. 밍글머니 < 정산액
+				else {
+					Member m = mRepo.findById(dto.getMemberId()).get();
+					m.setMingleMoney(0L);
+					mRepo.save(m);
+					usedMingleMoney = dto.getMingleMoney();
+				}
+				
+				// 결제 내역 테이블에 저장
+				PaymentDTO payment = new PaymentDTO();
+				payment.setPartyRegistrationId(dto.getPartyRegistrationId());
+				payment.setMemberId(dto.getMemberId());
+				payment.setDate(Instant.now());
+				payment.setServiceId(dto.getServiceId());
+				payment.setPaymentTypeId("결제");
+				payment.setPrice(sendMoney);
+				payment.setUsedMingleMoney(usedMingleMoney);
+				pRepo.save(pMapper.toEntity(payment));
+			}
+		}
 		
 	}
 	
@@ -133,8 +196,6 @@ public class PaymentService {
 				
 			}else {
 				// 매니저가 아니면
-				// System.out.println("파티원: "+dto);
-				// System.out.println("매달 낼 금액: "+dto.getMonthFee());
 				
 				// 밍글머니가 있다면 밍글머니부터 차감
 				// 1. 밍글머니 >= 정산액 
@@ -179,5 +240,24 @@ public class PaymentService {
 		pRepo.save(p);
 	}
 	
-	
+	// 파티 종료일에 보증금 반환
+	@Transactional
+	public void returnDeposit() {
+		List<TodayEndPartyDTO> list = tepMap.toDtoList(tepRepo.findAll());
+		for(TodayEndPartyDTO dto : list) {
+			Member m = mRepo.findById(dto.getMemberId()).get();
+			m.setMingleMoney(m.getMingleMoney()+dto.getDeposit());
+			mRepo.save(m);
+			
+			PaymentDTO payment = new PaymentDTO();
+			payment.setPartyRegistrationId(dto.getPartyRegistrationId());
+			payment.setMemberId(dto.getMemberId());
+			payment.setDate(Instant.now());
+			payment.setServiceId(dto.getServiceId());
+			payment.setPaymentTypeId("적립");
+			payment.setPrice(dto.getDeposit());
+			payment.setUsedMingleMoney(0L);
+			pRepo.save(pMapper.toEntity(payment));
+		}
+	}
 }

@@ -12,6 +12,7 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import com.mingle.security.CustomAuthenticationFailureHandler;
 import com.mingle.services.SecurityService;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,12 +24,14 @@ public class SecurityConfig {
 	@Autowired
 	private SecurityService sServ;
 	
+	 @Autowired
+    private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+	
 	@Bean	
 	protected SecurityFilterChain config(HttpSecurity http) throws Exception{
 		http.csrf().disable();
 		
 		http.authorizeHttpRequests()
-		//.requestMatchers(new AntPathRequestMatcher("/party/PartyCreatePage/**")).authenticated()
 		.requestMatchers(new AntPathRequestMatcher("/uploads/**")).permitAll()
 		.requestMatchers(new AntPathRequestMatcher("/api/admin/**")).hasRole("ADMIN")
 		.requestMatchers(new AntPathRequestMatcher("/api/party/auth/**")).authenticated()
@@ -45,11 +48,10 @@ public class SecurityConfig {
 			response.setStatus(HttpServletResponse.SC_OK);
 		})
 		// 로그인 실패
-		.failureHandler((request, response, exception) -> { 
-			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-		});
-
-		
+//		.failureHandler((request, response, exception) -> { 
+//			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//		})
+		.failureHandler(customAuthenticationFailureHandler);
 	
 		// 인증이 되어있지 않을 때 발생하는 예외 처리
 		http.exceptionHandling().authenticationEntryPoint((request, response, authException) -> {
