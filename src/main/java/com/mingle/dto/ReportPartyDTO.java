@@ -18,7 +18,7 @@ public class ReportPartyDTO {
 	private Long partyRegistrationId;
 	private String memberId;
 	private String partyReportCategoryId;
-	private ReportDTO report;
+	private Report report;
 	
 	// 파티 신고 insert용 생성자
 	public ReportPartyDTO(Long reportId, Long partyRegistrationId, String memberId, String partyReportCategoryId) {
