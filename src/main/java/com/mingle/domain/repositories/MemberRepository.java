@@ -1,5 +1,7 @@
 package com.mingle.domain.repositories;
 
+import java.util.Optional;
+
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -90,4 +92,6 @@ public interface MemberRepository extends JpaRepository<Member, String> {
 	@Query("select m.mingleMoney from Member m where m.id=:id")
 	int selectMingleMoney(String id);
 
+	// 이메일을 기준으로 사용자 찾아오기
+	Optional<Member> findByEmail(String email);
 }

@@ -12,6 +12,7 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import com.mingle.services.CustomOAuth2UserService;
 import com.mingle.services.PrincipalOauth2UserService;
 import com.mingle.services.SecurityService;
 
@@ -27,9 +28,13 @@ public class SecurityConfig {
 	@Autowired
 	private PrincipalOauth2UserService principalOauth2UserService;
 	
+	@Autowired
+	private CustomOAuth2UserService customOAuth2UserService;
+	
 	@Bean	
 	protected SecurityFilterChain config(HttpSecurity http) throws Exception{
-		http.csrf().disable();
+		//h2-console화면을 사용하기 위해 해당 옵션을 disable
+		http.csrf().disable().headers().frameOptions().disable();
 		
 		http.authorizeHttpRequests()
 		//.requestMatchers(new AntPathRequestMatcher("/party/PartyCreatePage/**")).authenticated()
@@ -53,7 +58,7 @@ public class SecurityConfig {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		})
 		.and().oauth2Login()
-		.userInfoEndpoint().userService(principalOauth2UserService);
+		.userInfoEndpoint().userService(customOAuth2UserService);
 
 		
 	
