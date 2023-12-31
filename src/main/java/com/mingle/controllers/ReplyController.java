@@ -46,7 +46,7 @@ public class ReplyController {
 		rServ.deleteById(id);
 		return ResponseEntity.ok().build();
 	}
-	
+
 	// 댓글 신고로직
 	@PostMapping("/report/{replyId}")
 	public ResponseEntity<Void> insertReplyReport(@PathVariable Long replyId, ReportDTO rdto){
