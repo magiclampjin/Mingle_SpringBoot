@@ -220,6 +220,12 @@ public class PartyService {
 		return list;
 	}
 	
+	// 가입한 파티 목록 불러오기 (나의 파티용, 종료된 파티 포함)
+	public List<CurrJoinPartyInfoDTO> selectMyAllPartyList(String loginId){
+		List<CurrJoinPartyInfoDTO> list = jpRepo.selectMyAllPartyList(loginId);
+		return list;
+	}
+	
 	// 특정 파티 정보 불러오기
 	public CurrJoinPartyInfoDTO selectMyPartyInfo(Long id, String memberId){
 		CurrJoinPartyInfoDTO info = jpMap.toDto(jpRepo.selectMyPartyInfo(id, memberId));

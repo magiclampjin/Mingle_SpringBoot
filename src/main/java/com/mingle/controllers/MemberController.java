@@ -339,6 +339,14 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 	
+	// 회원가입 본인 인증 코드 제거
+	@GetMapping("/removeVerificationCode")
+	public ResponseEntity<Void> removeSignupVerificationCode(){
+		session.invalidate();
+		System.out.println(session.getAttribute("signupVerificationCode"));
+		return ResponseEntity.ok().build();
+	}
+	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
 		logger.error(e.getMessage());
