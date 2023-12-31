@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,10 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,10 +27,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mingle.dto.CurrJoinPartyInfoDTO;
 import com.mingle.dto.PartyInformationDTO;
 import com.mingle.dto.PartyInformationForMainDTO;
+import com.mingle.dto.PartyReplyDTO;
 import com.mingle.dto.PaymentDTO;
 import com.mingle.dto.ServiceCategoryDTO;
 import com.mingle.dto.ServiceDTO;
+import com.mingle.dto.UploadPartyReplyDTO;
 import com.mingle.services.PartyService;
+import com.mingle.services.ReportService;
 
 @RestController
 @RequestMapping("/api/party")
@@ -37,6 +43,10 @@ public class PartyController {
 	
 	@Autowired
 	private PartyService pServ;
+	
+	//신고
+	@Autowired
+	private ReportService rServ;
 
 	// 제공하는 서비스 카테고리명 불러오기
 	@GetMapping
@@ -44,13 +54,6 @@ public class PartyController {
 		List<ServiceCategoryDTO> list = pServ.selectCategoryAll();
 		return ResponseEntity.ok(list);
 	}
-
-//	// 카테고리별 서비스 정보 불러오기
-//	@GetMapping("/getService/{id}")
-//	public ResponseEntity<List<ServiceDTO>> selectServiceByCategoryId(@PathVariable String id) {
-//		List<ServiceDTO> list = pServ.selectServiceByCategoryId(id);
-//		return ResponseEntity.ok(list);
-//	}
 
 	// 카테고리별 서비스 정보 & 가입한 서비스 정보 불러오기
 	@GetMapping("/getService/{id}")
@@ -168,12 +171,53 @@ public class PartyController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 	}
 	
-	
-
 	// 메인페이지 모집중인 파티 개수
 	@GetMapping("/selectAllPartyCountForMain")
 	public ResponseEntity<Integer> selectAllPartyCountForMain(){
 		return ResponseEntity.ok(pServ.selectAllPartyCountForMain());
+	}
+	
+
+	// 파티 댓글 리스트 가져오기
+	@GetMapping("/reply/{id}")
+	public ResponseEntity<Set<PartyReplyDTO>> selectPartyReplyByPartyRestrationId(@PathVariable Long partyRegistrationId){
+		return ResponseEntity.ok(pServ.selectPartyReplyById(partyRegistrationId));
+	}
+	
+	// 파티 댓글 작성
+	@PostMapping("/reply")
+	public ResponseEntity<PartyReplyDTO> insertPartyReply(UploadPartyReplyDTO dto){
+		return ResponseEntity.ok(pServ.insertPartyReply(dto));
+	}
+	
+	// 파티 댓글 수정(변경될 사항 : 댓글 내용, 비밀댓글 여부)
+	@PutMapping("/reply/{id}")
+	public ResponseEntity<PartyReplyDTO> updatePartyReplyById(@PathVariable Long id, String Content, Boolean isSecret){
+		return ResponseEntity.ok(pServ.updatePartyReplyById(id, Content, isSecret));
+	}
+	
+	// 파티 댓글 삭제
+	@DeleteMapping("/reply/{id}")
+	public ResponseEntity<Void> deletePartyReplyById(@PathVariable Long id){
+		pServ.deletePartyReplyById(id);
+		return ResponseEntity.ok().build();
+	}
+
+	// 파티 삭제
+	@DeleteMapping("/delete/{id}")
+	public ResponseEntity<Integer> deleteById(@PathVariable Long id){
+		return ResponseEntity.ok(pServ.deleteById(id));
+	}
+	
+	// 파티 신고
+	@PostMapping("/insertReport")
+	public ResponseEntity<Void> insertReport(@RequestBody Map<String,Object> param, Authentication authentication){
+		// report 테이블 등록
+		System.out.println(param);
+		rServ.insertReportByParty(param, authentication.getName());
+		// id 이용해 report_party 등록
+		
+		return ResponseEntity.ok().build();
 	}
 
 

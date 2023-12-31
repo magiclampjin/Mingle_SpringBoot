@@ -388,9 +388,5 @@ public class PostService {
 	public String getRealPath() {
 		return "C:/Mingle/uploads/";
 	}
-	
-	
-
-	
 
 }
