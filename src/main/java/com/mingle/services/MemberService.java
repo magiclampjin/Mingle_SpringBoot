@@ -153,6 +153,10 @@ public class MemberService {
 		// 조정된 birth를 Timestamp로 변환
 	    Timestamp timestampBirth = Timestamp.from(adjustedBirth);
 	    user.setBirth(timestampBirth);
+	    
+	    if(user.getMemberRecommenderId().equals("")) {
+	    	user.setMemberRecommenderId(null);
+	    }
 		return mRepo.save(user);
 	}
 
@@ -286,7 +290,7 @@ public class MemberService {
 		m.setPassword(pwEncoding);
 		return mRepo.save(m) != null;
 	}
-
+	
 	// 사용자 휴대폰번호 변경
 	public void updateUserPhone(String id, String phone) {
 		Member m = mRepo.findAllById(id);

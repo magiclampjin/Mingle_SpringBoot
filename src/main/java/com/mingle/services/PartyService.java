@@ -1,10 +1,12 @@
 package com.mingle.services;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,27 +16,34 @@ import com.mingle.dao.PartyDAO;
 import com.mingle.domain.entites.Member;
 import com.mingle.domain.entites.PartyMember;
 import com.mingle.domain.entites.PartyRegistration;
+import com.mingle.domain.entites.PartyReply;
 import com.mingle.domain.repositories.CurrJoinPartyInfoRepository;
 import com.mingle.domain.repositories.MemberRepository;
 import com.mingle.domain.repositories.PartyInformationForMainRepository;
 import com.mingle.domain.repositories.PartyInformationRepository;
 import com.mingle.domain.repositories.PartyMemberRepository;
 import com.mingle.domain.repositories.PartyRegistrationRepository;
+import com.mingle.domain.repositories.PartyReplyRepository;
 import com.mingle.domain.repositories.PaymentRepository;
 import com.mingle.domain.repositories.ServiceCategoryRepository;
 import com.mingle.domain.repositories.ServiceRepository;
 import com.mingle.dto.CurrJoinPartyInfoDTO;
 import com.mingle.dto.PartyInformationDTO;
 import com.mingle.dto.PartyInformationForMainDTO;
+import com.mingle.dto.PartyReplyDTO;
 import com.mingle.dto.PaymentDTO;
 import com.mingle.dto.ServiceCategoryDTO;
 import com.mingle.dto.ServiceDTO;
+import com.mingle.dto.UploadPartyReplyDTO;
 import com.mingle.mappers.CurrJoinPartyInfoMapper;
 import com.mingle.mappers.PartyInformationForMainMapper;
 import com.mingle.mappers.PartyInformationMapper;
+import com.mingle.mappers.PartyReplyMapper;
 import com.mingle.mappers.PaymentMapper;
 import com.mingle.mappers.ServiceCategoryMapper;
 import com.mingle.mappers.ServiceMapper;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class PartyService {
@@ -88,6 +97,11 @@ public class PartyService {
 	private CurrJoinPartyInfoRepository jpRepo;
 	@Autowired
 	private CurrJoinPartyInfoMapper jpMap;
+	
+	@Autowired
+	private PartyReplyRepository ptrRepo;
+	@Autowired
+	private PartyReplyMapper ptrMapper;
 	
 	// 제공하는 서비스 카테고리명 불러오기
 	public List<ServiceCategoryDTO> selectCategoryAll() {
@@ -206,12 +220,17 @@ public class PartyService {
 		return list;
 	}
 	
+	// 가입한 파티 목록 불러오기 (나의 파티용, 종료된 파티 포함)
+	public List<CurrJoinPartyInfoDTO> selectMyAllPartyList(String loginId){
+		List<CurrJoinPartyInfoDTO> list = jpRepo.selectMyAllPartyList(loginId);
+		return list;
+	}
+	
 	// 특정 파티 정보 불러오기
 	public CurrJoinPartyInfoDTO selectMyPartyInfo(Long id, String memberId){
 		CurrJoinPartyInfoDTO info = jpMap.toDto(jpRepo.selectMyPartyInfo(id, memberId));
 		
 		// 아직 파티 시작 전이면 아이디, 비밀번호 정보 비활성화
-
 		// 현재 날짜와 시간을 얻기
         LocalDateTime midnight = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         Instant instant = midnight.toInstant(ZoneOffset.UTC);
@@ -231,5 +250,61 @@ public class PartyService {
 	// 메인페이지 모집중인 파티 개수
 	public int selectAllPartyCountForMain() {
 		return piRepo.selectAllParty().size();
+	}
+	
+	
+	// 파티 댓글 작성
+	@Transactional
+	public PartyReplyDTO insertPartyReply(UploadPartyReplyDTO dto) {
+		
+		PartyReply partyReply = new PartyReply();
+		partyReply.setContent(dto.getContent());
+		partyReply.setPartyRegistrationId(dto.getPartyRegistrationId());
+		partyReply.setMember(mRepo.selectMypageInfo(dto.getMemberId()));
+		if(dto.getPartyReplyParentId()>0) {
+			partyReply.setParentPartyReply(ptrRepo.findPartyReplyById(dto.getPartyReplyParentId()));
+		}
+		if(dto.getPartyReplyAdoptiveParentId()>0) {
+			partyReply.setPartyReplyAdoptiveParentId(dto.getPartyReplyAdoptiveParentId());
+		}
+		partyReply.setWriteDate(Timestamp.from(dto.getWriteDate()));
+		
+		partyReply.setIsSecret(dto.getIsSecret());
+		
+		return ptrMapper.toDto(ptrRepo.save(partyReply));
+	}
+	
+	// 파티아이디에 따른 파티댓글 출력
+	public Set<PartyReplyDTO> selectPartyReplyById(Long partyRegistrationId){
+		return ptrMapper.toDtoSet(ptrRepo.findFirstPartyReply(partyRegistrationId));
+	}
+	
+	// 파티 댓글 수정
+	@Transactional
+	public PartyReplyDTO updatePartyReplyById(Long id, String content, Boolean isSecret) {
+		PartyReply partyReply = ptrRepo.findById(id).orElseThrow(() -> new EntityNotFoundException());
+		
+		partyReply.setContent(content);
+		partyReply.setIsSecret(isSecret);
+		return ptrMapper.toDto(ptrRepo.save(partyReply));
+	}
+	
+	
+	// 파티 댓글 삭제
+	public void deletePartyReplyById(Long id) {
+		PartyReply partyReply = ptrRepo.findById(id).get();
+		ptrRepo.delete(partyReply);
+	}
+	
+	
+	// 파티 삭제하기
+	public int deleteById(Long id) {
+		int memberCnt = pmRepo.selectCntById(id);
+		if(memberCnt==1){
+			piRepo.delete(piRepo.findById(id).get());
+			return 1;
+		}else {
+			return 0;
+		}
 	}
 }

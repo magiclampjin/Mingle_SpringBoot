@@ -23,6 +23,8 @@ import com.mingle.dto.PaymentDTO;
 import com.mingle.services.MemberService;
 import com.mingle.services.PaymentService;
 
+import jakarta.transaction.Transactional;
+
 @RestController
 @RequestMapping("/api/payment")
 public class PaymentController {
@@ -97,6 +99,7 @@ public class PaymentController {
 	
 	// 인출하기
 	@GetMapping("/withdrawMingleMoney")
+	@Transactional
 	public ResponseEntity<Integer> withdrawMingleMoney(Authentication authentication, String money){
 
 		// 멤버의 밍글머니에서 빼기
