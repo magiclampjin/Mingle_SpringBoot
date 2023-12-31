@@ -65,7 +65,7 @@ public class SecurityConfig {
 			response.setStatus(HttpServletResponse.SC_OK);
 		});
 		
-		http.userDetailsService(sServ);
+		//http.userDetailsService(sServ); 주석해도 시큐리티 잘 동작하는 것 같음. 이걸 넣으면 enable 예외처리가 안됨.
 		return http.build();
 	}
 	
