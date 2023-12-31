@@ -7,12 +7,10 @@ import org.springframework.stereotype.Service;
 
 import com.mingle.domain.entites.Reply;
 import com.mingle.domain.repositories.MemberRepository;
-import com.mingle.domain.repositories.ReplyReactionsRepository;
 import com.mingle.domain.repositories.ReplyRepository;
 import com.mingle.dto.ReplyDTO;
 import com.mingle.dto.UploadReplyDTO;
 import com.mingle.mappers.ReplyMapper;
-import com.mingle.mappers.ReplyReactionsMapper;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -25,12 +23,6 @@ public class ReplyService {
 	
 	@Autowired
 	private ReplyMapper rMapper;
-	
-	@Autowired
-	private ReplyReactionsRepository rrRepo;
-	
-	@Autowired
-	private ReplyReactionsMapper rrMapper;
 	
 	@Autowired
 	private MemberRepository mRepo;
@@ -51,7 +43,6 @@ public class ReplyService {
 //		else {
 //			reply.setChildrenReplies(rRepo.findChildRepliesById(dto.getReplyParentId()));
 //		}
-		dto.getReplyParentId();
 		if(dto.getReplyAdoptiveParentId()>0) {
 			reply.setReplyAdoptiveParentId(dto.getReplyAdoptiveParentId());
 		}
@@ -67,7 +58,7 @@ public class ReplyService {
 	    Reply reply = rRepo.findById(id)
 	                      .orElseThrow(() -> new EntityNotFoundException("Reply not found with id: " + id));
 	    reply.setContent(content);
-	    return rMapper.toDto(reply);
+	    return rMapper.toDto(rRepo.save(reply));
 	}
 	
 	// 댓글 삭제
@@ -77,11 +68,7 @@ public class ReplyService {
 	}
 	
 	
-	// 댓글 좋아요
-	
-	
-	
-	// 댓글 싫어요
+
 	
 	
 	

@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mingle.domain.entites.Report;
+import com.mingle.domain.entites.ReportPost;
+import com.mingle.domain.entites.ReportReply;
 import com.mingle.domain.entites.Warning;
 import com.mingle.domain.repositories.MemberRepository;
 import com.mingle.domain.repositories.PartyMemberRepository;
@@ -43,6 +45,7 @@ public class ReportService {
 	@Autowired
 	private ReportPostMapper rpMapper;
 	
+	
 	// 댓글 신고
 	@Autowired
 	private ReportReplyRepository rrRepo;
@@ -64,6 +67,7 @@ public class ReportService {
 	// 경고
 	@Autowired
 	private WarningRepository wRepo;
+	
 	
 	// 미처리 신고 리스트
 	public List<ReportDTO> findTop10ByIsProcessFalseOrderByReportDateDesc() {
@@ -118,10 +122,36 @@ public class ReportService {
 	// 신고 처리
 	public void updateReportProcess(Long id) {
 		Report report = rRepo.findAllById(id); // 해당하는 report 가져옴
-		report.setProcess(true);
+		report.setIsProcess(true);
 		rRepo.save(report); 
 	}
 	
+	// 게시글 신고 처리
+	@Transactional
+	public void insertPostReport(Long postId, ReportDTO rdto) {
+	    // Report 엔티티 저장
+	    Report report = rRepo.save(rMapper.toEntity(rdto));
+
+	    // ReportPost 엔티티 생성 및 초기화
+	    ReportPost reportPost = new ReportPost();
+	    reportPost.setReportId(report.getId()); // Report 엔티티의 ID 할당
+	    reportPost.setPostId(postId);
+
+
+	    // ReportPost 엔티티 저장
+	    rpRepo.save(reportPost);
+	}
+	// 댓글 신고 처리
+	@Transactional
+	public void insertReplyReport(Long replyId, ReportDTO rdto) {
+		Report report = rRepo.save(rMapper.toEntity(rdto));
+		
+		ReportReply reportReply = new ReportReply();
+		reportReply.setReportId(report.getId());
+		reportReply.setReplyId(replyId);
+
+		rrRepo.save(reportReply);
+	}
 	
 	
 	// 파티 신고

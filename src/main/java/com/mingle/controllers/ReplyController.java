@@ -10,13 +10,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mingle.dto.ReplyDTO;
+import com.mingle.dto.ReportDTO;
 import com.mingle.dto.UploadReplyDTO;
 import com.mingle.services.ReplyService;
+import com.mingle.services.ReportService;
 
 @RestController
 @RequestMapping("/api/reply")
@@ -26,6 +27,9 @@ public class ReplyController {
 	
 	@Autowired
 	private ReplyService rServ;
+	
+	@Autowired
+	private ReportService reportServ;
 	
 	@PostMapping
 	public ResponseEntity<ReplyDTO> insert(UploadReplyDTO dto) {
@@ -40,6 +44,13 @@ public class ReplyController {
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> delete(@PathVariable Long id) {
 		rServ.deleteById(id);
+		return ResponseEntity.ok().build();
+	}
+
+	// 댓글 신고로직
+	@PostMapping("/report/{replyId}")
+	public ResponseEntity<Void> insertReplyReport(@PathVariable Long replyId, ReportDTO rdto){
+		reportServ.insertReplyReport(replyId, rdto);
 		return ResponseEntity.ok().build();
 	}
 	
