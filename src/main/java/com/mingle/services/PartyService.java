@@ -311,7 +311,7 @@ public class PartyService {
 	public int deleteById(Long id) {
 		int memberCnt = pmRepo.selectCntById(id);
 		if(memberCnt==1){
-//			this.deletePartyReplyByPartyRegistrationId(id); //파티댓글에 외래키 지정을 할 경우, 주석을 풀어야함.
+			this.deletePartyReplyByPartyRegistrationId(id); //파티댓글에 외래키 지정을 할 경우, 주석을 풀어야함.
 			piRepo.delete(piRepo.findById(id).get());
 			return 1;
 		}else {
