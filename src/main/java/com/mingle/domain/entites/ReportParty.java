@@ -21,7 +21,7 @@ public class ReportParty {
 	Long reportId;
 	
 	@Column(name="party_registration_id")
-	Long partyRegistratinoId;
+	Long partyRegistrationId;
 	
 	@Column(name="member_id")
 	String memberId;

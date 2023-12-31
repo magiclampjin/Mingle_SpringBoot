@@ -2,6 +2,8 @@ package com.mingle.services;
 
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,11 +17,15 @@ import com.mingle.auth.GoogleUserInfo;
 import com.mingle.auth.KakaoUserInfo;
 import com.mingle.auth.OAuth2UserInfo;
 import com.mingle.auth.PrincipalDetails;
+import com.mingle.controllers.AdminController;
 import com.mingle.domain.entites.Member;
 import com.mingle.domain.repositories.MemberRepository;
 
 @Service
 public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
+	
+	private static final Logger logger = LoggerFactory.getLogger(PrincipalOauth2UserService.class);
+	
 	@Autowired
 	private MemberRepository mRepo;
 
@@ -30,7 +36,6 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
 	
 	@Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-		System.out.println("제발..");
 		OAuth2User oAuth2User = super.loadUser(userRequest);
         
         OAuth2UserInfo oAuth2UserInfo = null;
@@ -45,11 +50,11 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
 //            oAuth2UserInfo = new NaverUserInfo(oAuth2User.getAttributes());
 //        }
         else if(provider.equals("kakao")){	//추가
-        	System.out.println("zkzkdh");
+     
             oAuth2UserInfo = new KakaoUserInfo(oAuth2User.getAttributes());
         }
         
-        System.out.println(oAuth2UserInfo+"syo");
+        logger.debug(oAuth2UserInfo+"syo");
         String providerId = oAuth2UserInfo.getProviderId();	
         String username = provider+"_"+providerId;  			
 

@@ -1,20 +1,23 @@
 package com.mingle.controllers;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-
-@RestController
+@Controller
 public class HomeController {
-	@GetMapping("/**")
+	
+	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
+	
+	@RequestMapping("/")
 	public String home() {
 		return "forward:/index.html";
 	}
 	
-//	@ResponseBody
-//	@GetMapping("/member")
-//	public String test() {
-//		System.out.println("밍글");
-//		return "ok";
+//	@ExceptionHandler(Exception.class)
+//	public ResponseEntity<String> exceptionHandler(Exception e) {
+//		logger.error(e.getMessage());
+//		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 //	}
 }

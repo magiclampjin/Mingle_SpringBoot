@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mingle.controllers.AdminController;
 import com.mingle.domain.entites.Member;
 import com.mingle.domain.repositories.AdjectiveRepository;
 import com.mingle.domain.repositories.AdjectiveViewRepository;
@@ -38,6 +41,9 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class MemberService {
+	
+	private static final Logger logger = LoggerFactory.getLogger(MemberService.class);
+	
 	@Autowired
 	private MemberMapper mMapper;
 
@@ -135,11 +141,9 @@ public class MemberService {
 		String pwEncoding = passwordEncoder.encode(dto.getPassword());
 		// 현재 시각을 얻어옴 -> 가입 일자 저장
 		LocalDateTime now = LocalDateTime.now();
-		System.out.println(dto.getBirth());
-		
+
 		// birth를 -9시간으로 조정
 	    Instant adjustedBirth = dto.getBirth().minusSeconds(9 * 60 * 60);	
-	    System.out.println(adjustedBirth);
 		Member user = mMapper.toEntity(dto);
 		user.setPassword(pwEncoding);
 		user.setRoleId("ROLE_MEMBER");
@@ -149,6 +153,10 @@ public class MemberService {
 		// 조정된 birth를 Timestamp로 변환
 	    Timestamp timestampBirth = Timestamp.from(adjustedBirth);
 	    user.setBirth(timestampBirth);
+	    
+	    if(user.getMemberRecommenderId().equals("")) {
+	    	user.setMemberRecommenderId(null);
+	    }
 		return mRepo.save(user);
 	}
 
@@ -384,7 +392,7 @@ public class MemberService {
 
 		// 결과 코드가 200(성공) 일때
 		int responseCode = conn.getResponseCode();
-		System.out.println("responseCode : " + responseCode);
+		logger.debug("responseCode : " + responseCode);
 
 		Member savedUser = new Member();
 		if (responseCode == 200) {
@@ -397,7 +405,7 @@ public class MemberService {
 				result += line;
 			}
 
-			System.out.println("response body : " + result);
+			logger.debug("response body : " + result);
 
 			// JSON 파싱
 			// ObjectMapper를 사용하여 JSON 문자열을 JsonNode로 파싱
@@ -407,13 +415,11 @@ public class MemberService {
 			String id = jsonNode.get("id").toString();
 			// 카카오에 사용자가 등록한 이름
 			String nickname = jsonNode.get("properties").get("nickname").toString();
-			System.out.println("id" + id);
 
-			System.out.println("nickname" + nickname);
 			// DB에 카카오 로그인한 기록이 없다면 카카오톡에서 전달한 유저 정보를 바탕으로
 			// 객체 생성 후 DB에 저장후 DTO로 반환
 			if (!mRepo.existsById(id)) {
-				System.out.println("사용자가 db에 존재하지 않음");
+				logger.debug("사용자가 db에 존재하지 않음.");
 				Member user = new Member();
 				user.setId(id);
 				user.setPassword("");
@@ -435,7 +441,7 @@ public class MemberService {
 				savedUser = mRepo.save(user);
 			} else {
 				// DB에 카카오로 로그인된 정보가 있다면 token 생성해서 리턴
-				System.out.println("사용자가 db에 존재");
+				logger.debug("사용자가 DB에 존재");
 				savedUser = mRepo.findAllById(id);
 			}
 
@@ -470,11 +476,11 @@ public class MemberService {
 //					System.out.println("Custom: " + authenticatedUser);
 				return mMapper.toDto(savedUser);
 			} else {
-				System.out.println("Principal is not an instance of SecurityUser");
+				logger.debug("Principal is not an instance of SecurityUser");
 			}
 //			}
 		} else {
-			System.out.println("error");
+			logger.debug("error");
 		}
 		return new MemberDTO();
 	}

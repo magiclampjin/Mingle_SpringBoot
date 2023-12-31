@@ -309,7 +309,6 @@ public class PostService {
 	// 게시글 삭제
 	@Transactional
 	public void deleteById(Long id) throws IOException {
-		System.out.println(id);
 		List<String> fileList = pfRepo.selectSysNameListByPostId(id);
 		this.deleteServerFileList(fileList);
 		pfRepo.deleteByPostId(id); // 게시글 삭제 시 관련 파일정보를 DB에서 삭제.
@@ -389,9 +388,5 @@ public class PostService {
 	public String getRealPath() {
 		return "C:/Mingle/uploads/";
 	}
-	
-	
-
-	
 
 }

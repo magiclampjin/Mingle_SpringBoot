@@ -2,6 +2,8 @@ package com.mingle.controllers;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mingle.dto.BankDTO;
 import com.mingle.dto.PaymentAccountDTO;
+import com.mingle.exceptions.AxiosPageAsyncException;
 import com.mingle.services.MemberService;
 import com.mingle.services.PartyService;
 import com.mingle.services.PaymentAccountService;
@@ -24,6 +27,8 @@ import com.mingle.services.PaymentAccountService;
 @RestController
 @RequestMapping("/api/paymentAccount")
 public class PaymentAccountController {
+	
+	private static final Logger logger = LoggerFactory.getLogger(PaymentAccountController.class);
 	
 	@Autowired
 	private PaymentAccountService paServ;
@@ -37,9 +42,7 @@ public class PaymentAccountController {
 	// 계좌 등록
 	@PostMapping("/accountInsert")
 	public ResponseEntity<Void> insertAccountInfo(Authentication authentication, @RequestBody PaymentAccountDTO dto){
-		System.out.println(dto.getBankId());
-		System.out.println(dto.getAccountNumber());
-		
+
 		// 사용자 아이디 가져오기
 		if (authentication != null) {
 			// 로그인한 사용자의 아이디
@@ -57,11 +60,14 @@ public class PaymentAccountController {
 	
 	// 등록된 계좌 불러오기
 	@GetMapping("/accountSelect")
-	public ResponseEntity<PaymentAccountDTO> selectById(Authentication authentication){
-		// 로그인한 사용자의 아이디로 계좌 목록 불러오기
-		PaymentAccountDTO dto = paServ.selectById(authentication.getName());
+	public ResponseEntity<PaymentAccountDTO> selectById(Authentication authentication) throws AxiosPageAsyncException{
 		
-		return ResponseEntity.ok(dto);
+		// 로그인한 사용자의 아이디로 계좌 목록 불러오기]
+		if(authentication != null) {
+			PaymentAccountDTO dto = paServ.selectById(authentication.getName());
+			return ResponseEntity.ok(dto);
+		}
+		throw new AxiosPageAsyncException();
 	}
 	
 	// 등록된 계좌 삭제하기
@@ -98,9 +104,15 @@ public class PaymentAccountController {
 
 	}
 	
+	@ExceptionHandler(AxiosPageAsyncException.class)
+	public ResponseEntity<Void> AxiosAsyncHandler(Exception e){
+		logger.error(e.getMessage());
+		return ResponseEntity.ok().build();
+	}
+	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
-		e.printStackTrace();
+		logger.error(e.getMessage());
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 	}
 }

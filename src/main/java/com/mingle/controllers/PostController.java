@@ -9,6 +9,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -33,24 +35,22 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.mingle.dto.PostDTO;
 import com.mingle.dto.PostViewDTO;
+import com.mingle.dto.ReportDTO;
 import com.mingle.dto.UploadPostDTO;
 import com.mingle.services.PostService;
+import com.mingle.services.ReportService;
 
 @RestController
 @RequestMapping("/api/post")
 public class PostController {
 
+	private static final Logger logger = LoggerFactory.getLogger(PostController.class);
+	
 	@Autowired
 	private PostService pServ;
-
-//	@GetMapping("/freeTop10")
-//	public ResponseEntity<List<Map<String,Object>>> getLastestFreePosts(){
-//		return ResponseEntity.ok(pServ.selectByNoticeFalseTop10());
-//	}
-//	@GetMapping("/noticeTop10")
-//	public ResponseEntity<List<Map<String,Object>>> getLastestNoticePosts(){
-//		return ResponseEntity.ok(pServ.selectByNoticeTrueTop10());
-//	}
+	
+	@Autowired
+	private ReportService reportServ;
 
 	// 최신 자유게시판 글 목록 출력(10개)
 	@GetMapping("/freeTop10")
@@ -186,13 +186,24 @@ public class PostController {
 	    }
 	    return ResponseEntity.ok().build();
 	}
+	
+	// 게시글 신고
+	@PostMapping("/report/{postId}")
+	public ResponseEntity<Void> reportPost(@PathVariable Long postId, ReportDTO rdto){
+		reportServ.insertPostReport(postId,rdto);
+		return ResponseEntity.ok().build();
+	}
 
 
 	// 에러 핸들러
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> handleException(Exception e, WebRequest request) {
-		e.printStackTrace();
+		logger.error(e.getMessage());
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("에러 발생: " + e.getMessage());
 	}
+	
+	// 게시글 신고
+	
+	
 
 }

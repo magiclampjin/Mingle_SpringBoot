@@ -3,6 +3,8 @@ package com.mingle.controllers;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -38,6 +41,9 @@ import jakarta.servlet.http.HttpSession;
 @RestController
 @RequestMapping("/api/member")
 public class MemberController {
+	
+	private static final Logger logger = LoggerFactory.getLogger(MemberController.class);
+	
 	@Autowired
 	private MemberService mServ;
 
@@ -67,9 +73,9 @@ public class MemberController {
 			userInfo.put("loginNick", dto.getNickname());
 			userInfo.put("loginRole", dto.getRoleId());
 
-			System.out.println("userInfo : " + userInfo);
+			logger.debug("userInfo : " + userInfo);
 		} else {
-			System.out.println("authentication 비어있음");
+			logger.debug("authentication 비어있음");
 		}
 
 		return ResponseEntity.ok(userInfo);
@@ -92,9 +98,9 @@ public class MemberController {
 	// 전화번호 중복검사
 	@PostMapping("/phoneDuplicateCheck")
 	public ResponseEntity<Boolean> phoneDuplicateCheck(String phone) {
-		System.out.println(phone);
+		logger.debug(phone);
 		boolean result = mServ.phoneDuplicateCheck(phone);
-		System.out.println(result);
+		logger.debug("result"+result);
 		return ResponseEntity.ok(result);
 	}
 
@@ -108,7 +114,6 @@ public class MemberController {
 	// 회원가입
 	@PostMapping("/insertMember")
 	public ResponseEntity<Integer> insertMember(@RequestBody MemberDTO dto) {
-		System.out.println(dto.getBirth());
 		Member insertResult = mServ.insertMember(dto);
 		int result = insertResult != null ? 1 : 0;
 		return ResponseEntity.ok(result);
@@ -133,10 +138,8 @@ public class MemberController {
 	// 이메일 인증
 	@GetMapping("/mypageEmailAuth")
 	public ResponseEntity<Boolean> mypageEmailAuth(@RequestParam String email) {
-		System.out.println(email);
-
-		System.out.println("Cont- 이메일 전송 완료");
-
+		logger.debug(email);
+		logger.debug("Cont - 이메일 전송 완료");
 		int number = mServ.sendMail(email);
 
 		num = "" + number;
@@ -215,7 +218,7 @@ public class MemberController {
 	// 사용자 휴대폰번호 변경
 	@PutMapping("/mypagePhoneUpdate")
 	public ResponseEntity<Void> updatePhone(Authentication authentication, @RequestBody MemberDTO dto) {
-		System.out.println(dto.getPhone());
+		logger.debug(dto.getPhone());
 		mServ.updateUserPhone(authentication.getName(), dto.getPhone());
 		return ResponseEntity.ok().build();
 	}
@@ -233,7 +236,7 @@ public class MemberController {
 	@GetMapping("/isAdmin")
 	public ResponseEntity<Boolean> isAdmin(Authentication authentication) {
 		boolean isAdmin = mServ.isAdmin(authentication.getName());
-		System.out.println("isAdmin? :" + isAdmin);
+		logger.debug("isAdmin: "+isAdmin);
 		if(isAdmin) {
 			return ResponseEntity.ok(true);
 		} else {
@@ -248,7 +251,7 @@ public class MemberController {
 		if (authentication != null) {
 			OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 			Map<String, Object> attributes = oAuth2User.getAttributes();
-			System.out.println(attributes);
+			logger.debug(attributes.toString());
 			// PrincipalOauth2UserService의 getAttributes내용과 같음
 
 			Map<String, Object> attributes1 = oAuth2UserPrincipal.getAttributes();
@@ -320,5 +323,11 @@ public class MemberController {
 	public ResponseEntity<Boolean> signupcertification(String code) {
 		boolean result = (code.equals(session.getAttribute("signupVerificationCode").toString()));
 		return ResponseEntity.ok(result);
+	}
+	
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<String> exceptionHandler(Exception e) {
+		logger.error(e.getMessage());
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 	}
 }
