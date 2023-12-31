@@ -11,6 +11,7 @@ import com.mingle.domain.repositories.NewVideoRepository;
 import com.mingle.dto.NewVideoDTO;
 import com.mingle.mappers.NewVideoMapper;
 import com.mingle.services.NewVideoAPIService;
+import com.mingle.services.PartyService;
 import com.mingle.services.PaymentService;
 
 import jakarta.transaction.Transactional;
@@ -38,6 +39,10 @@ public class AutoScheduler {
 	// 정산일마다 요금 정산
 	@Autowired
 	private PaymentService payServ;
+	
+	// 파티 정보 삭제 (종료일 후 3개월 경과)
+	@Autowired
+	private PartyService pServ;
 	
 
     @Scheduled(cron = "0 0 12 * * ?")
@@ -104,7 +109,14 @@ public class AutoScheduler {
     }
     
     // 파티 종료일 3개월 경과 후 파티 정보 삭제
-	public void deletePartyScheduler() {
-		
+//    @Scheduled(cron = "0/10 * * * * *")
+//	public void deletePartyScheduler() {
+//		pServ.deleteEndDateAfter3Months();
+//	}
+    
+    @Scheduled(cron = "0 0 0 * * *")
+    // 파티 종료되면 비밀번호 지우기
+	public void updateEndPartyAccountScheduler() {
+		pServ.updateEndPartyAccount();
 	}
 }

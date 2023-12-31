@@ -1,6 +1,8 @@
 package com.mingle.domain.entites;
 
-import java.time.Instant;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.Period;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,7 +31,7 @@ public class PartyInformation {
 	@Column(name="people_count")
 	private long peopleCount;
 	@Column(name="start_date")
-	private Instant startDate;
+	private Timestamp startDate;
 	@Column(name="month_count")
 	private long monthCount;
 	@Column(name="calculation_date")

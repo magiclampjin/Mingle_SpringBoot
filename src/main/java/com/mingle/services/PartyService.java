@@ -307,4 +307,14 @@ public class PartyService {
 			return 0;
 		}
 	}
+	
+//	// 파티 종료일 이후 3개월 경과 시 파티 삭제
+//	public void deleteEndDateAfter3Months() {
+//		piRepo.deleteEndDateAfter3Months();
+//	}
+	
+	// 파티 종료일에 비밀번호 정보 삭제
+	public void updateEndPartyAccount() {
+		piRepo.updateEndPartyAccount();
+	}
 }
