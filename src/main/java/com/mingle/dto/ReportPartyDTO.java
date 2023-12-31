@@ -18,5 +18,5 @@ public class ReportPartyDTO {
 	private Long partyRegistrationId;
 	private String memberId;
 	private String partyReportCategoryId;
-	private Report report;
+	private ReportDTO report;
 }

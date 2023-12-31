@@ -17,6 +17,6 @@ import lombok.ToString;
 public class ReportReplyDTO {
 	private Long reportId;
 	private Long replyId;
-	private Report report;
-	private Reply reply;
+	private ReportDTO report;
+	private ReplyDTO reply;
 }
