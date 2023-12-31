@@ -23,9 +23,12 @@ import com.mingle.dto.ReportDTO;
 import com.mingle.dto.ReportPartyDTO;
 import com.mingle.dto.ReportPostDTO;
 import com.mingle.dto.ReportReplyDTO;
+import com.mingle.services.MemberService;
 import com.mingle.services.PartyService;
 import com.mingle.services.PostService;
 import com.mingle.services.ReportService;
+
+import jakarta.transaction.Transactional;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -41,6 +44,9 @@ public class AdminController {
 	
 	@Autowired
 	private PartyService ptServ;
+	
+	@Autowired
+	private MemberService mServ;
 	
 	// 미처리 신고 리스트 (전체)
 	@GetMapping("/reportList")
@@ -70,7 +76,7 @@ public class AdminController {
 		return ResponseEntity.ok(list);
 	}
 	
-	// 미처리 파티 카테고리 리스트 (계정/댓글/미납/채팅)
+	// 미처리 파티 카테고리 리스트 (계정/댓글/미납)
 	@GetMapping("/reportPartyCategoryList/{category}")
 	public ResponseEntity<List<ReportDTO>> selectAllByReportPartyCategoryList(@PathVariable String category) {
 		List<ReportDTO> list = rServ.selectAllByReportPartyCategoryList(category);
@@ -99,9 +105,15 @@ public class AdminController {
 	}
 	
 	// 회원 경고
+	@Transactional
 	@PostMapping("/giveWarning")
 	public ResponseEntity<Void> insertWarningByMemberId(@RequestBody Warning warning) {
-		rServ.insertWarningByMemberId(warning);
+		rServ.insertWarningByMemberId(warning); // 신고 테이블에 신고대상자 기록
+		
+		Long warningCount = rServ.selectWarningCountByMemberId(warning.getMemberId());
+		if(warningCount >= 3) {
+			mServ.updateEnabledFalse(warning.getMemberId());
+		}
 		return ResponseEntity.ok().build();
 	}
 	
@@ -165,6 +177,8 @@ public class AdminController {
 		List<Map<String,Object>> list = ptServ.selectCountUserByService();
 		return ResponseEntity.ok(list);
 	}
+	
+// ----------------------------------------------------------------
 	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
