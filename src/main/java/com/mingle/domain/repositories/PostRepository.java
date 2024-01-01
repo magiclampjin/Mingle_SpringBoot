@@ -2,6 +2,7 @@ package com.mingle.domain.repositories;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -21,9 +22,9 @@ public interface PostRepository extends JpaRepository<Post, Long>{
             "where r.parentReply is null and p.id = :id")
     Post findPostById(@Param("id") Long id);
 	
-
-	@Query("select p from Post p left join fetch p.member left join fetch p.replies left join fetch p.files where p.isNotice = true")
-	List<Post> findAllByNoticePosts();
+    // 공지글 최신 10개 출력
+    @Query("select p from Post p left join fetch p.member left join fetch p.replies left join fetch p.files where p.isNotice = true order by p.writeDate desc")
+    List<Post> findTop10ByNoticePosts(Pageable pageable);
 	
 	// 게시글 조회 수 증가
 	@Transactional

@@ -326,7 +326,7 @@ public class PostService {
 	// 모든 공지 게시글 가져오기
 	// 공지 게시글 불러오기 ( 관리자 대시보드 )
 	public List<PostDTO> selectNoticePosts() {
-		List<Post> plist = pRepo.findAllByNoticePosts();
+		List<Post> plist = pRepo.findTop10ByNoticePosts(PageRequest.of(0, 10));
 		return pMapper.toDtoList(plist);
 	}
 	
