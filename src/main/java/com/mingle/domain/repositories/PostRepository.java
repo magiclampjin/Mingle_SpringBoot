@@ -23,7 +23,7 @@ public interface PostRepository extends JpaRepository<Post, Long>{
     Post findPostById(@Param("id") Long id);
 	
     // 공지글 최신 10개 출력
-    @Query("select p from Post p left join fetch p.member left join fetch p.replies left join fetch p.files where p.isNotice = true order by p.writeDate desc")
+    @Query("select p from Post p left join fetch p.member left join fetch p.replies left join fetch p.files where p.isNotice = true order by p.id desc")
     List<Post> findTop10ByNoticePosts(Pageable pageable);
 	
 	// 게시글 조회 수 증가
@@ -37,11 +37,11 @@ public interface PostRepository extends JpaRepository<Post, Long>{
 	public Long selectViewcountByPostId(@Param("postId") Long postId);
 	
 	// 고정 중인 공지글 오름차순으로 출력
-	@Query("select p from Post p where isNotice = true and isFix = true order by writeDate desc")
+	@Query("select p from Post p where isNotice = true and isFix = true order by p.id desc")
 	List<Post> selectByFixedNotice();
 	
 	// 고정 중이 아닌 공지글 오름차순으로 출력
-	@Query("select p from Post p where isNotice = true and isFix = false order by writeDate desc")
+	@Query("select p from Post p where isNotice = true and isFix = false order by p.id desc")
 	List<Post> selectByUnFixedNotice();
 	
 	// 아이디에 해당하는 Post
